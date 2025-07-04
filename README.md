@@ -1,6 +1,6 @@
 # 🛍️ **Ứng Dụng Quản Lý Cửa Hàng** 🏪
 
-![Store Management](https://img.freepik.com/free-vector/retail-store-interior-with-shelves-products_107791-1814.jpg?w=1380&t=st=1698765432~exp=1698766032~hmac=abcdef123456)
+![Store Management](https://i.pinimg.com/736x/74/2e/51/742e51f96e8f930a8e8330fb58acd768.jpg)
 
 ## 🌟 **Tính Năng Nổi Bật**
 
@@ -12,7 +12,6 @@
 | **👥 Khách Hàng** | Quản lý thông tin, lịch sử mua hàng | 👤 |
 
 ## 🎨 **Giao Diện Trực Quan**
-```diff
 + Màu sắc tươi sáng, dễ sử dụng
 + Hiển thị hình ảnh sản phẩm rõ ràng
 + Dark/Light mode tùy chọn
