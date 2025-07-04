@@ -7,18 +7,14 @@
 | Feature | Mô Tả | Icon |
 |---------|-------|------|
 | **📦 Quản Lý Sản Phẩm** | Thêm/Xóa/Sửa sản phẩm, quản lý kho | 🧺 |
-| **💵 Bán Hàng** | Thanh toán nhanh, in hóa đơn | 🧾 |
+| **💵 Bán Hàng** | Thanh toán, in hóa đơn | 🧾 |
 | **📊 Báo Cáo** | Thống kê doanh thu theo ngày/tuần/tháng | 📈 |
 | **👥 Khách Hàng** | Quản lý thông tin, lịch sử mua hàng | 👤 |
 
 ## 🎨 **Giao Diện Trực Quan**
-+ Màu sắc tươi sáng, dễ sử dụng
-+ Hiển thị hình ảnh sản phẩm rõ ràng
-+ Dark/Light mode tùy chọn
-
-Frontend:
-Backend:
-Database:
++ Màu sắc tươi sáng
++ Hiển thị sản phẩm
++ Dễ sử dụng
 
 1. ⏱️ **Tiết kiệm thời gian** quản lý
 2. 💰 **Tăng doanh thu** với báo cáo thông minh
