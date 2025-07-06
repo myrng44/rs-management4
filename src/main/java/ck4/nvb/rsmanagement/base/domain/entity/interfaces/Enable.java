@@ -3,12 +3,12 @@ package ck4.nvb.rsmanagement.base.domain.entity.interfaces;
 public interface Enable {
 
     /**
-     * @return Boolean - Whether or not this object is active
+     * @return Boolean - Whether this object is active
      */
-    public Boolean getActive();
+    public boolean getEnable();
 
     /**
-     * @param active - whether or not this object is active
+     * @param active - whether this object is active
      */
-    public void setActive(Boolean active);
+    public void setEnable(Boolean active);
 }

@@ -35,7 +35,29 @@ public class QueryWhereBuilder {
                     where.append(" AND ").append(c.getKey()).append(" > :").append(param);
                     params.put(param, c.getValue());
                     break;
-                // ... others cases
+                case CONTAINS:
+                    where.append(" AND ").append(c.getKey()).append(" LIKE :").append(param);
+                    params.put(param, "%" + c.getValue() + "%");
+                    break;
+                case GREATER_THAN_OR_EQUAL:
+                    where.append(" AND ").append(c.getKey()).append(" >= :").append(param);
+                    params.put(param, c.getValue());
+                    break;
+                case LESS_THAN:
+                    where.append(" AND ").append(c.getKey()).append(" < :").append(param);
+                    params.put(param, c.getValue());
+                    break;
+                case LESS_THAN_OR_EQUAL:
+                    where.append(" AND ").append(c.getKey()).append(" <= :").append(param);
+                    params.put(param, c.getValue());
+                    break;
+                case NEGATION:
+                    where.append(" AND ").append(c.getKey()).append(" != :").append(param);
+                    params.put(param, c.getValue());
+                    break;
+                default:
+                    // Skip unsupported operators
+                    break;
             }
         }
         return new SqlAndParams(where.toString(), params);

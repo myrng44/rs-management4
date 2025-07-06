@@ -1,6 +1,7 @@
 package ck4.nvb.rsmanagement.base.domain.entity;
 
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.FullAudited;
+import ck4.nvb.rsmanagement.base.domain.entity.interfaces.SoftDeletable;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Generated;
@@ -8,7 +9,7 @@ import lombok.Generated;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
-public abstract class FullAuditedSerialIdEntity extends AuditedSerialIdEntity implements FullAudited<Long> {
+public abstract class FullAuditedSerialIdEntity extends AuditedSerialIdEntity implements FullAudited<Long>, SoftDeletable {
     // Fields
     @Column(name = "deleted_time")
     private LocalDateTime deletedTime;
