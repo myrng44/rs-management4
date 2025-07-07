@@ -1,6 +1,6 @@
 package ck4.nvb.rsmanagement.core.web.refreshtoken.domain;
 
-import ck4.nvb.rsmanagement.base.domain.entity.CreationAuditedEntity;
+import ck4.nvb.rsmanagement.base.domain.entity.CreationAuditedGeneratedIdEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "refresh_token")
 @Getter @Setter
-public class RefreshToken extends CreationAuditedEntity<String, Long> {
+public class RefreshToken extends CreationAuditedGeneratedIdEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;

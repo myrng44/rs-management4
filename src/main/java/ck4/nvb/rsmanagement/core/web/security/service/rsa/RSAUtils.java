@@ -12,7 +12,7 @@ import java.util.Base64;
 public class RSAUtils {
     public static final String KEY_ALGORITHM = "RSA";
 
-    public static final int DEFAULT_KEY_SIZE = 1024;
+    public static final int DEFAULT_KEY_SIZE = 2048;
 
     public static PublicKey getPublicKey(String publicKeyFileName) throws Exception {
         byte[] bytes = readFile(publicKeyFileName);

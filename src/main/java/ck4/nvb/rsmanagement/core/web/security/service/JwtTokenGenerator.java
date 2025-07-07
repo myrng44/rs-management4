@@ -5,6 +5,7 @@ import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import ck4.nvb.rsmanagement.core.web.security.service.dto.TokenResponseDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +43,7 @@ public class JwtTokenGenerator {
                 .subject(userRoleDto.getUserId().toString())
                 .issuedAt(new Date(response.getIssuedAt()))
                 .expiration(new Date(response.getExpiresAt()))
-                .signWith(privateKey)
+                .signWith(privateKey, SignatureAlgorithm.RS256)
                 .compact();
         response.setAccessToken(accessToken);
 
