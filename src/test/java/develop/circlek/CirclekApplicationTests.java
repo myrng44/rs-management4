@@ -1,13 +1,13 @@
-package ck4.nvb.rsmanagement;
+package develop.circlek;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RsManagementApplicationTests {
+class CirclekApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
+	@Test
+	void contextLoads() {
+	}
 
 }
