@@ -1,4 +1,4 @@
-package develop.circlek.dto;
+package develop.circlek.dto.user;
 
 
 import jakarta.validation.constraints.Size;

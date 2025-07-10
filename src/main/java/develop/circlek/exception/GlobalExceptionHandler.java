@@ -1,7 +1,7 @@
 package develop.circlek.exception;
 
-import develop.circlek.dto.ApiResponse;
-import develop.circlek.entity.User;
+import develop.circlek.dto.user.ApiResponse;
+import develop.circlek.entity.user.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;

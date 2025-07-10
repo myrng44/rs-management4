@@ -1,4 +1,4 @@
-package develop.circlek.dto;
+package develop.circlek.dto.user;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

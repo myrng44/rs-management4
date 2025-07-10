@@ -1,4 +1,4 @@
-package develop.circlek.dto;
+package develop.circlek.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.swing.text.AbstractDocument;
 
 @Data
 @NoArgsConstructor

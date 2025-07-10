@@ -1,16 +1,16 @@
-package develop.circlek.entity;
+package develop.circlek.entity.user;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "permission")
+@Table(name = "role_permission")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Permission {
+public class Role_permission {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String code;
-    String permissionDesc;
+    String role_id;
+    String permission_id;
 }

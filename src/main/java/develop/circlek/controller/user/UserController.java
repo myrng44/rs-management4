@@ -1,10 +1,11 @@
-package develop.circlek.controller;
+package develop.circlek.controller.user;
 
-import develop.circlek.dto.ApiResponse;
-import develop.circlek.dto.UserCreationRequest;
-import develop.circlek.dto.UserUpdateRequest;
-import develop.circlek.entity.User;
-import develop.circlek.service.UserService;
+import develop.circlek.dto.user.ApiResponse;
+import develop.circlek.dto.user.UserCreationRequest;
+import develop.circlek.dto.user.UserUpdateRequest;
+import develop.circlek.entity.user.User;
+import develop.circlek.service.implement.user.UserServiceImpl;
+import develop.circlek.service.interfacee.user.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -42,9 +43,9 @@ public class UserController {
         return userService.updateUser(userId, request);
     }
 
-    @DeleteMapping
-    String deleteUser() {
-        userService.deleteUser();
+    @DeleteMapping("/{userId}")
+    String deleteUser(@PathVariable("userId") String userId) {
+        userService.deleteUser(userId);
         return "User has been deleted";
     }
 }
