@@ -1,31 +1,29 @@
 package ck4.nvb.rsmanagement.core.module.users.userrole.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
-@Getter @Setter
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor
 public class UserRoleDto extends EntityDto<Long> {
-    // Core relationships
+    //main relationships
     private Long userId;
     private Long roleId;
     private Long storeId;
     
-    // User information
-    private String username;
+    //user information (optional)
+    private String userName;
     private String fullName;
     private String email;
     private String phone;
     
-    // Role information
+    //role information
     private String roleName;
-    private String roleDescription;
     
-    // Permissions for this specific role
+    //permissions for role
     private List<String> permissions;
-    
-    // Store information (optional)
-    private String storeName;
 }

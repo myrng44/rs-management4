@@ -4,21 +4,29 @@ import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.base.application.dto.PagedAndSortedResultRequestDto;
 import ck4.nvb.rsmanagement.base.application.dto.PagedResultDto;
 import ck4.nvb.rsmanagement.base.application.exception.AppException;
+import ck4.nvb.rsmanagement.base.application.exception.IllegalPropertyException;
+import ck4.nvb.rsmanagement.base.application.utils.PredicateBuilder;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
 import ck4.nvb.rsmanagement.base.domain.repository.BaseRepository;
+import ck4.nvb.rsmanagement.base.domain.repository.OffsetBasedPageable;
+import ck4.nvb.rsmanagement.base.web.error.FieldError;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
 import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
+import com.querydsl.core.types.Predicate;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Getter
 @Transactional(readOnly = true)
@@ -89,48 +97,99 @@ public abstract class GetServiceImpl<D extends EntityDto<ID>, T extends IEntity<
 
     @Override
     public long count(List<SearchCriteria> filter) throws AppException {
-        return repository.countByDynamicFilter(filter);
+        return repository.count(mapToPredicate(filter));
     }
 
     @Override
     public List<D> getAll(List<SearchCriteria> filter) throws AppException {
-        List<T> result = getRepository().findByDynamicFilter(filter, 0, Integer.MAX_VALUE, Sort.unsorted());
-        return mapToGetListOutputDto(result);
+        return mapToGetListOutputDto(StreamSupport.stream(getRepository().findAll(mapToPredicate(filter)).spliterator(), false).collect(Collectors.toList()));
+
     }
 
     @Override
     @Transactional(readOnly = true)
     public PagedResultDto<D> getPage(PagedAndSortedResultRequestDto paging) throws AppException {
-        Sort sort = buildSort(paging);
-        int offset = paging.getOffset();
-        int limit = paging.getLimit();
-        List<T> result = repository.findByDynamicFilter(null, offset, limit, sort);
-        long total = repository.count();
-        return new PagedResultDto<>(total, mapToGetListOutputDto(result));
+        Page<T> result = getRepository().findAll(mapToPageable(paging));
+        return new PagedResultDto<>(result.getTotalElements(), mapToGetListOutputDto(result.getContent()));
     }
 
     @Override
     public PagedResultDto<D> getPage(List<SearchCriteria> filter, PagedAndSortedResultRequestDto paging) throws AppException {
-        Sort sort = buildSort(paging);
-        int offset = paging.getOffset();
-        int limit = paging.getLimit();
-        List<T> result = repository.findByDynamicFilter(filter, offset, limit, sort);
-        long total = repository.countByDynamicFilter(filter);
-        return new PagedResultDto<>(total, mapToGetListOutputDto(result));
+        Page<T> result = getRepository().findAll(mapToPredicate(filter), mapToPageable(paging));
+        return new PagedResultDto<>(result.getTotalElements(), mapToGetListOutputDto(result.getContent()));
     }
 
-    protected Sort buildSort(PagedAndSortedResultRequestDto paging) {
-        if (paging == null || paging.getSort() == null || paging.getSort().isEmpty()) return Sort.unsorted();
-        String[] sorts = paging.getSort().split(",");
-        List<Sort.Order> orders = new ArrayList<>();
-        Set<String> allowed = getSortableKeys();
-        for (String sort : sorts) {
-            String[] parts = sort.trim().split("\\s+");
-            String key = parts[0];
-            if (!allowed.contains(key)) continue;
-            String direction = (parts.length > 1 && "desc".equalsIgnoreCase(parts[1])) ? "DESC" : "ASC";
-            orders.add(new Sort.Order(Sort.Direction.fromString(direction), key));
+
+
+//    protected Sort buildSort(PagedAndSortedResultRequestDto paging) {
+//        if (paging == null || paging.getSort() == null || paging.getSort().isEmpty()) return Sort.unsorted();
+//        String[] sorts = paging.getSort().split(",");
+//        List<Sort.Order> orders = new ArrayList<>();
+//        Set<String> allowed = getSortableKeys();
+//        for (String sort : sorts) {
+//            String[] parts = sort.trim().split("\\s+");
+//            String key = parts[0];
+//            if (!allowed.contains(key)) continue;
+//            String direction = (parts.length > 1 && "desc".equalsIgnoreCase(parts[1])) ? "DESC" : "ASC";
+//            orders.add(new Sort.Order(Sort.Direction.fromString(direction), key));
+//        }
+//        return orders.isEmpty() ? Sort.unsorted() : Sort.by(orders);
+//    }
+
+    private OffsetBasedPageable mapToPageable(PagedAndSortedResultRequestDto paging) {
+        if (getSortableKeys() == null || getSortableKeys().isEmpty()
+                || paging.getSort() == null || paging.getSort().isEmpty()) {
+            return new OffsetBasedPageable(Math.max(0, paging.getOffset()), Math.max(1, paging.getLimit()));
         }
-        return orders.isEmpty() ? Sort.unsorted() : Sort.by(orders);
+
+        // process sorting string
+        String[] requestSorts = StringUtils.split(paging.getSort(), ",");
+        if (requestSorts == null || requestSorts.length == 0) {
+            return new OffsetBasedPageable(Math.max(0, paging.getOffset()), Math.max(1, paging.getLimit()));
+        }
+
+        List<Sort.Order> sorts = new ArrayList<>();
+        for (String requestSort : requestSorts) {
+            String[] parts = StringUtils.split(requestSort.replaceAll("\\s+", " ").trim(), " ");
+
+            // Only add allowed sortable columns
+            if (parts == null || parts.length == 0) continue;
+
+            String key = getReplaceKeyMap().getOrDefault(parts[0], parts[0]);
+            if (!getSortableKeys().contains(key)) continue;
+
+            // Get ASC or DESC direction
+            if (parts.length > 1 && parts[1] != null && parts[1].equalsIgnoreCase("desc")) {
+                sorts.add(new Sort.Order(Sort.Direction.DESC, key));
+            } else sorts.add(new Sort.Order(Sort.Direction.ASC, key));
+        }
+
+        if (sorts.isEmpty()) {
+            return new OffsetBasedPageable(Math.max(0, paging.getOffset()), Math.max(1, paging.getLimit()));
+        }
+        return new OffsetBasedPageable(Math.max(0, paging.getOffset()), Math.max(1, paging.getLimit()), Sort.by(sorts));
+    }
+
+    public Predicate mapToPredicate(List<SearchCriteria> filter) {
+        if (filter == null || filter.isEmpty()) throw new AppException("Null search criteria");
+
+        List<SearchCriteria> criteria = new ArrayList<>();
+        List<FieldError> fieldErrors = new ArrayList<>();
+        for (SearchCriteria c : filter) {
+            if (!getSearchableKeys().containsKey(c.getKey())) {
+                fieldErrors.add(new FieldError(c.getKey(), "Non searchable key"));
+                continue;
+            }
+            if (!getSearchableKeys().get(c.getKey()).contains(c.getOperator())) {
+                fieldErrors.add(new FieldError(c.getKey(), "Not supported operator " + c.getOperator().name()));
+                continue;
+            }
+
+            criteria.add(c);
+        }
+
+        if (!fieldErrors.isEmpty()) throw new IllegalPropertyException(fieldErrors);
+
+        return new PredicateBuilder<>(type).and(criteria).replaceKeyMap(getReplaceKeyMap()).build();
     }
 }

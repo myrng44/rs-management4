@@ -5,7 +5,7 @@ import lombok.*;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class TokenRequestDto extends CredentialInput {
 
-    // Optional: specify store to log in to
+    //pptional: specify store to log in to
     private Long storeId;
 
     private String ipAddress;

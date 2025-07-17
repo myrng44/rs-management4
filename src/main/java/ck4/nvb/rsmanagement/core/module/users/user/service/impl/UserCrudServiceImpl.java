@@ -1,8 +1,8 @@
 package ck4.nvb.rsmanagement.core.module.users.user.service.impl;
 
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
-import ck4.nvb.rsmanagement.core.module.users.user.domain.entity.User;
-import ck4.nvb.rsmanagement.core.module.users.user.domain.repository.UserRepository;
+import ck4.nvb.rsmanagement.core.module.users.user.domain.User;
+import ck4.nvb.rsmanagement.core.module.users.user.domain.UserRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.UserCrudService;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.BaseUserDto;
 import org.modelmapper.ModelMapper;

@@ -17,7 +17,7 @@ import java.util.Map;
 public class TestController {
 
     /**
-     * Public endpoint - no authentication required
+     * public endpoint - no authentication required
      */
     @GetMapping("/public")
     public ResponseEntity<Map<String, Object>> publicEndpoint() {
@@ -28,7 +28,7 @@ public class TestController {
     }
 
     /**
-     * Protected endpoint - requires authentication
+     * protected endpoint - requires authentication
      */
     @GetMapping("/protected")
     public ResponseEntity<Map<String, Object>> protectedEndpoint() {
@@ -37,42 +37,42 @@ public class TestController {
         
         Map<String, Object> response = new HashMap<>();
         response.put("message", "This is a protected endpoint");
-        response.put("user", userRole.getUsername());
+        response.put("user", userRole.getUserName());
         response.put("userId", userRole.getUserId());
         response.put("storeId", userRole.getStoreId());
         response.put("roleId", userRole.getRoleId());
         response.put("permissions", userRole.getPermissions());
         response.put("timestamp", System.currentTimeMillis());
         
-        log.info("User {} accessed protected endpoint", userRole.getUsername());
+        log.info("User {} accessed protected endpoint", userRole.getUserName());
         
         return ResponseEntity.ok(response);
     }
 
     /**
-     * Admin only endpoint - requires USER_WRITE permission
+     * admin only endpoint - requires USER_WRITE permission
      */
     @GetMapping("/admin")
-    @PreAuthorize("hasAuthority('USER_WRITE')")
+    @PreAuthorize("hasAuthority('SYSTEM_CONFIG')")
     public ResponseEntity<Map<String, Object>> adminEndpoint() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserRoleDto userRole = (UserRoleDto) authentication.getPrincipal();
         
         Map<String, Object> response = new HashMap<>();
         response.put("message", "This is an admin-only endpoint");
-        response.put("user", userRole.getUsername());
+        response.put("user", userRole.getUserName());
         response.put("permissions", userRole.getPermissions());
         response.put("timestamp", System.currentTimeMillis());
         
-        log.info("Admin user {} accessed admin endpoint", userRole.getUsername());
+        log.info("Admin user {} accessed admin endpoint", userRole.getUserName());
         
         return ResponseEntity.ok(response);
     }
 
     /**
-     * Store-specific endpoint - requires STORE_ACCESS permission
+     * store-specific endpoint - requires STORE_ACCESS permission
      */
-    @GetMapping("/store/{storeId}")
+/*    @GetMapping("/store/{storeId}")
     @PreAuthorize("hasAuthority('STORE_ACCESS') and #storeId == authentication.principal.storeId")
     public ResponseEntity<Map<String, Object>> storeEndpoint(@PathVariable Long storeId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -80,36 +80,15 @@ public class TestController {
         
         Map<String, Object> response = new HashMap<>();
         response.put("message", "This is a store-specific endpoint");
-        response.put("user", userRole.getUsername());
+        response.put("user", userRole.getUserName());
         response.put("requestedStoreId", storeId);
         response.put("userStoreId", userRole.getStoreId());
         response.put("timestamp", System.currentTimeMillis());
         
-        log.info("User {} accessed store {} endpoint", userRole.getUsername(), storeId);
+        log.info("User {} accessed store {} endpoint", userRole.getUserName(), storeId);
         
         return ResponseEntity.ok(response);
-    }
+    }*/
 
-    /**
-     * Get current user info
-     */
-    @GetMapping("/me")
-    public ResponseEntity<Map<String, Object>> getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserRoleDto userRole = (UserRoleDto) authentication.getPrincipal();
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("userId", userRole.getUserId());
-        response.put("username", userRole.getUsername());
-        response.put("fullName", userRole.getFullName());
-        response.put("email", userRole.getEmail());
-        response.put("phone", userRole.getPhone());
-        response.put("storeId", userRole.getStoreId());
-        response.put("roleId", userRole.getRoleId());
-        response.put("roleName", userRole.getRoleName());
-        response.put("permissions", userRole.getPermissions());
-        response.put("timestamp", System.currentTimeMillis());
-        
-        return ResponseEntity.ok(response);
-    }
+
 } 

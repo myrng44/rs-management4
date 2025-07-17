@@ -37,20 +37,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = extractTokenFromRequest(request);
             
             if (StringUtils.hasText(token)) {
-                // Validate token and extract user details
+                //validate token and extract user details
                 UserRoleDto userRole = jwtTokenGenerator.getUserDetailsFromToken(token, rsaKeyProperties.getPublicKey());
                 
-                if (userRole != null && userRole.getUsername() != null) {
-                    // Validate token against user details
+                if (userRole != null && userRole.getUserName() != null) {
+                    //validate token against user details
                     Boolean isValid = jwtTokenGenerator.validateToken(token, userRole, rsaKeyProperties.getPublicKey());
                     
                     if (Boolean.TRUE.equals(isValid)) {
-                        // Create authentication with authorities
+                        //create authentication with authorities
                         List<SimpleGrantedAuthority> authorities = userRole.getPermissions() != null ?
                             userRole.getPermissions().stream()
                                 .map(SimpleGrantedAuthority::new)
                                 .collect(Collectors.toList()) :
-                            List.of(new SimpleGrantedAuthority("USER"));
+                            List.of(new SimpleGrantedAuthority("ORDER_VIEW"));
                         
                         UsernamePasswordAuthenticationToken authentication = 
                             new UsernamePasswordAuthenticationToken(userRole, null, authorities);
@@ -58,9 +58,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                         
                         log.debug("Authenticated user: {} with authorities: {}", 
-                            userRole.getUsername(), authorities);
+                            userRole.getUserName(), authorities);
                     } else {
-                        log.warn("Invalid token for user: {}", userRole.getUsername());
+                        log.warn("Invalid token for user: {}", userRole.getUserName());
                     }
                 }
             }

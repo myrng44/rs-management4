@@ -7,9 +7,9 @@ import ck4.nvb.rsmanagement.base.application.exception.ObjectNotFoundException;
 import ck4.nvb.rsmanagement.base.application.service.CreationAuditedCrudService;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.CreationAudited;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;

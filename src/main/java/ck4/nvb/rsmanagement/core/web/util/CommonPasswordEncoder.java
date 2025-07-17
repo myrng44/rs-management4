@@ -7,15 +7,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommonPasswordEncoder {
-    // Get the only object available
-    // Create an object
+    //singleton
     @Getter
     private static final CommonPasswordEncoder instance = new CommonPasswordEncoder();
 
     @Getter
     private final PasswordEncoder encoder = new BCryptPasswordEncoder(8);
 
-    // Make the constructor private so that this class cannot be instantiated
+    //make the constructor private so that this class cannot be instantiated
     private CommonPasswordEncoder() {
     }
 

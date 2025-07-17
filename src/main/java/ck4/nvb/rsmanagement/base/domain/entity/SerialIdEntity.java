@@ -2,6 +2,7 @@ package ck4.nvb.rsmanagement.base.domain.entity;
 
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
 import ck4.nvb.rsmanagement.base.util.JacksonParser;
+import ck4.nvb.rsmanagement.base.util.SnowflakeIdGeneratorHolder;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,13 +10,20 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor
 @MappedSuperclass
+@Access(AccessType.FIELD)
 public abstract class SerialIdEntity implements IEntity<Long> {
 
     //Fields
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @PrePersist
+    public void ensureId() {
+        if (id == null) {
+            id = SnowflakeIdGeneratorHolder.getInstance().nextId();
+        }
+    }
 
     public SerialIdEntity(Long serialId) {
         setId(serialId);

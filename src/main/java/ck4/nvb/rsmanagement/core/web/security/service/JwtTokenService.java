@@ -9,22 +9,22 @@ import ck4.nvb.rsmanagement.core.web.security.service.dto.TokenResponseDto;
 public interface JwtTokenService {
     
     /**
-     * Authenticate user and generate access token with refresh token
+     * authenticate user and generate access token with refresh token
      */
     TokenResponseDto getToken(TokenRequestDto request) throws AppException;
 
     /**
-     * Refresh access token using refresh token
+     * refresh access token using refresh token
      */
     TokenResponseDto refreshToken(TokenRefreshRequestDto request) throws AppException;
 
     /**
-     * Remove refresh token (logout)
+     * remove refresh token (logout)
      */
     void removeToken(TokenRefreshRequestDto request) throws AppException;
 
     /**
-     * Verify and extract user information from JWT token
+     * verify and extract user information from JWT token
      */
     UserRoleDto verifyToken(String token) throws AppException;
 }

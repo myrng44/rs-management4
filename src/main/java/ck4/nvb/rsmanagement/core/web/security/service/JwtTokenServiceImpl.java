@@ -40,17 +40,17 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     public TokenResponseDto getToken(TokenRequestDto request) throws AppException {
-        // 1. Authenticate user
+        //authenticate user
         UserRoleDto userRole;
         if (request.getStoreId() != null) {
-            // Login to specific store
+            //login to a store
             userRole = userService.getByUsernameAndPasswordAndStore(
                 request.getUsername(), 
                 request.getPassword(),
                 request.getStoreId()
             );
         } else {
-            // Login with primary role
+            //login with primary role
             userRole = userService.getByUsernameAndPassword(
                 request.getUsername(), 
                 request.getPassword()
@@ -58,31 +58,31 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         }
 
         logger.info("[traceId-{}] User {}|{} - Get Access Token from IP: {} for Store: {}", 
-            request.getTraceId(), userRole.getUserId(), userRole.getUsername(), 
+            request.getTraceId(), userRole.getUserId(), userRole.getUserName(),
             request.getIpAddress(), userRole.getStoreId());
 
-        // 2. Generate access token
+        //generate access token
         TokenResponseDto response = tokenGenerator.generateToken(userRole, rsaKeys.getPrivateKey());
 
-        // 3. Generate refresh token
+        //generate refresh token
         String deviceSession = request.getDeviceSession();
         if (deviceSession == null) {
             deviceSession = request.getIpAddress() + "-" + userRole.getUserId();
         }
 
-        // Delete previous refresh tokens for this device session
+        //delete previous refresh tokens for this device session
         if (deviceSession != null) {
             refreshTokenService.deleteAll(deviceSession, userRole.getUserId());
         }
 
-        // Create new refresh token
+        //create new refresh token
         RefreshTokenDto refreshToken = new RefreshTokenDto();
         refreshToken.setId(UUID.randomUUID().toString());
         refreshToken.setDeviceSession(deviceSession);
         refreshToken.setIpAddress(request.getIpAddress());
         refreshToken.setExpiredTime(LocalDateTime.now().plusSeconds(refreshExpiration / 1000));
 
-        // Save refresh token
+        //save refresh token
         refreshTokenService.create(refreshToken, createUserGetDto(userRole));
         response.setRefreshToken(refreshToken.getId());
 
@@ -91,14 +91,14 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     public TokenResponseDto refreshToken(TokenRefreshRequestDto request) throws AppException {
-        // 1. Get and validate refresh token
+        //get and validate refresh token
         RefreshTokenGetDto refreshToken = refreshTokenGetService.get(request.getRefreshToken());
         if (refreshToken == null) {
             logger.error("Refresh Token not found");
             throw new AppException("Refresh Token not found");
         }
 
-        // 2. Check device session
+        //check device session
         String deviceSession = request.getDeviceSession();
         if (deviceSession == null) {
             deviceSession = request.getIpAddress() + "-" + refreshToken.getCreatorId();
@@ -110,14 +110,14 @@ public class JwtTokenServiceImpl implements JwtTokenService {
             throw new AppException("Invalid refresh token");
         }
 
-        // 3. Check if refresh token is expired
+        //check if refresh token is expired
         if (refreshToken.getExpiredTime().isBefore(LocalDateTime.now())) {
             refreshTokenService.delete(refreshToken.getId(), createUserGetDto(refreshToken.getCreatorId()));
             logger.error("Refresh Token expired");
             throw new AppException("Expired refresh token");
         }
 
-        // 4. Get user role and generate new access token
+        //get user role and generate new access token
         UserRoleDto userRole = userService.get(refreshToken.getCreatorId());
         TokenResponseDto response = tokenGenerator.generateToken(userRole, rsaKeys.getPrivateKey());
         response.setRefreshToken(refreshToken.getId());

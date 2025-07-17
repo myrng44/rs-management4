@@ -22,10 +22,11 @@ public class JwtTokenGenerator {
     public TokenResponseDto generateToken(UserRoleDto userRoleDto, PrivateKey privateKey) {
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userRoleDto.getUserId());
-        claims.put("roleId", userRoleDto.getRoleId());
-        claims.put("storeId", userRoleDto.getStoreId());
-        claims.put("username", userRoleDto.getUsername()); // Add username for validation
+        claims.put("userId", String.valueOf(userRoleDto.getUserId()));
+        claims.put("roleId", String.valueOf(userRoleDto.getRoleId()));
+        claims.put("storeId", String.valueOf(userRoleDto.getStoreId()));
+        claims.put("username", userRoleDto.getUserName()); // Add username for validation
+        claims.put("permissions", userRoleDto.getPermissions());
         if (userRoleDto.getFullName() != null) {
             claims.put("fullName", userRoleDto.getFullName());
         }
@@ -62,7 +63,10 @@ public class JwtTokenGenerator {
             userRoleDto.setUserId(Long.valueOf(claims.get("userId", String.class)));
             userRoleDto.setRoleId(Long.valueOf(claims.get("roleId", String.class)));
             userRoleDto.setStoreId(Long.valueOf(claims.get("storeId", String.class)));
-            userRoleDto.setUsername(claims.get("username", String.class)); // Add username
+            userRoleDto.setUserName(claims.get("username", String.class)); // Add username
+
+            List<String> permissions = claims.get("permissions", List.class);
+            userRoleDto.setPermissions(permissions);
 
             return userRoleDto;
         } catch (Exception e) {
@@ -81,7 +85,7 @@ public class JwtTokenGenerator {
     public Boolean validateToken(String token, UserRoleDto userDetails, PublicKey publicKey) {
         try {
             String username = getUsernameFromToken(token, publicKey);
-            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token, publicKey));
+            return (username.equals(userDetails.getUserName()) && !isTokenExpired(token, publicKey));
         } catch (Exception e) {
             return false;
         }

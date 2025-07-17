@@ -1,7 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.users.user.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
-import ck4.nvb.rsmanagement.core.module.users.user.domain.entity.User;
+import ck4.nvb.rsmanagement.core.module.users.user.domain.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

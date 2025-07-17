@@ -7,8 +7,8 @@ import ck4.nvb.rsmanagement.core.module.users.role.domain.entity.Role;
 import ck4.nvb.rsmanagement.core.module.users.role.domain.repository.RoleRepository;
 import ck4.nvb.rsmanagement.core.module.users.rolepermission.domain.entity.RolePermission;
 import ck4.nvb.rsmanagement.core.module.users.rolepermission.domain.repository.RolePermissionRepository;
-import ck4.nvb.rsmanagement.core.module.users.user.domain.entity.User;
-import ck4.nvb.rsmanagement.core.module.users.user.domain.repository.UserRepository;
+import ck4.nvb.rsmanagement.core.module.users.user.domain.User;
+import ck4.nvb.rsmanagement.core.module.users.user.domain.UserRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.UserGetServiceWithRole;
 import ck4.nvb.rsmanagement.core.module.users.userrole.domain.entity.UserRole;
 import ck4.nvb.rsmanagement.core.module.users.userrole.domain.repository.UserRoleRepository;
@@ -106,7 +106,7 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
             throw new AppException("User has no roles assigned");
         }
         
-        // Get the first role (primary role)
+        //get first role (primary role)
         UserRole userRole = userRoles.get(0);
         return buildUserRoleDto(userRole, user);
     }
@@ -122,11 +122,11 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
     }
 
     private UserRoleDto buildUserRoleDto(UserRole userRole, User user) throws AppException {
-        // Get role information
+        //get role information
         Role role = roleRepository.findById(userRole.getRoleId())
                 .orElseThrow(() -> new AppException("Role not found"));
 
-        // Get permissions for the role
+        //get permissions for role
         List<RolePermission> rolePermissions = rolePermissionRepository.findByRoleId(role.getId());
         List<String> permissions = rolePermissions.stream()
                 .map(rp -> {
@@ -136,24 +136,22 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
                 .filter(code -> code != null)
                 .collect(Collectors.toList());
 
-        // Build UserRoleDto
         UserRoleDto userRoleDto = new UserRoleDto();
         userRoleDto.setId(userRole.getId());
         userRoleDto.setUserId(user.getId());
         userRoleDto.setRoleId(role.getId());
         userRoleDto.setStoreId(userRole.getStoreId());
         
-        // User information
-        userRoleDto.setUsername(user.getUsername());
+        //user information
+        userRoleDto.setUserName(user.getUsername());
         userRoleDto.setFullName(user.getName());
         userRoleDto.setEmail(user.getEmail());
         userRoleDto.setPhone(user.getPhone());
         
-        // Role information
+        //role information
         userRoleDto.setRoleName(role.getName());
-        userRoleDto.setRoleDescription(role.getDescription());
-        
-        // Permissions
+
+        //permissions
         userRoleDto.setPermissions(permissions);
 
         return userRoleDto;

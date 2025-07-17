@@ -1,6 +1,8 @@
 package ck4.nvb.rsmanagement.base.domain.entity;
 
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.Audited;
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Generated;

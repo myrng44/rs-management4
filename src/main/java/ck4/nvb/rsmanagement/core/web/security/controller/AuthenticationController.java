@@ -1,6 +1,11 @@
 package ck4.nvb.rsmanagement.core.web.security.controller;
 
 import ck4.nvb.rsmanagement.base.application.exception.AppException;
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.BaseUserDto;
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserCreateDto;
+import ck4.nvb.rsmanagement.core.module.users.user.service.impl.UserCrudServiceImpl;
+import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+import ck4.nvb.rsmanagement.core.module.users.userrole.service.impl.UserRoleServiceImpl;
 import ck4.nvb.rsmanagement.core.web.security.service.JwtTokenService;
 import ck4.nvb.rsmanagement.core.web.security.service.dto.TokenRefreshRequestDto;
 import ck4.nvb.rsmanagement.core.web.security.service.dto.TokenRequestDto;
@@ -9,6 +14,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,9 +26,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
 
     private final JwtTokenService jwtTokenService;
+    private final UserCrudServiceImpl userCrudService;
+    private final UserRoleServiceImpl userRoleService;
 
     /**
-     * Login endpoint
+     * login endpoint
      */
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> login(@Valid @RequestBody TokenRequestDto request) {
@@ -38,8 +48,40 @@ public class AuthenticationController {
         }
     }
 
+    @PostMapping("/register")
+    @PreAuthorize("hasAuthority('USER_MANAGEMENT')")
+    public ResponseEntity<BaseUserDto> register(@Valid @RequestBody UserCreateDto request) {
+        try {
+            BaseUserDto user = getBaseUserDto();
+
+            log.info("Register attempt for user: {}", request.getUserName());
+            BaseUserDto response = userCrudService.create(request, user);
+            log.info("Register successful for user: {}", request.getUserName());
+            return ResponseEntity.ok(response);
+        } catch (AppException e) {
+            log.warn("Register failed for user: {} - {}", request.getUserName(), e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            log.error("Register error for user: {}", request.getUserName(), e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    private static BaseUserDto getBaseUserDto() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserRoleDto userRole = (UserRoleDto) authentication.getPrincipal();
+        BaseUserDto user = new BaseUserDto();
+        user.setId(userRole.getUserId());
+        user.setUserName(userRole.getUserName());
+        user.setFullName(userRole.getFullName());
+        user.setEmail(userRole.getEmail());
+        user.setPhone(userRole.getPhone());
+        user.setStoreId(userRole.getStoreId());
+        return user;
+    }
+
     /**
-     * Refresh token endpoint
+     * refresh token endpoint
      */
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponseDto> refreshToken(@Valid @RequestBody TokenRefreshRequestDto request) {
@@ -58,7 +100,7 @@ public class AuthenticationController {
     }
 
     /**
-     * Logout endpoint
+     * logout endpoint
      */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@Valid @RequestBody TokenRefreshRequestDto request) {
@@ -77,7 +119,7 @@ public class AuthenticationController {
     }
 
     /**
-     * Validate token endpoint (for testing)
+     * validate token endpoint (test)
      */
     @GetMapping("/validate")
     public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String authHeader) {
@@ -92,5 +134,19 @@ public class AuthenticationController {
             log.error("Token validation error", e);
             return ResponseEntity.badRequest().body("Token validation failed");
         }
+    }
+
+    /**
+     * get current user info
+     */
+    @GetMapping("/me")
+    public ResponseEntity<UserRoleDto> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Principal class: {}", authentication.getPrincipal().getClass().getName());
+        UserRoleDto userRole = (UserRoleDto) authentication.getPrincipal();
+
+        UserRoleDto response = userRoleService.getFullInfoByUserIdAndRoleId(userRole.getUserId(), userRole.getRoleId());
+
+        return ResponseEntity.ok(response);
     }
 } 
