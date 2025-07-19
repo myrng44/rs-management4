@@ -7,7 +7,9 @@ import lombok.experimental.FieldDefaults;
 public enum ErrorCode {
     USERNAME(1000, "UserName must be at leat 3 characters"),
     PASSWORD(1001, "PassWord must be at leat 5 characters"),
-    INVALID_KEY(1000, "Invalid message key"),
+    INVALID_KEY(1002, "Invalid message key"),
+    ROLENAME(1003, "Role has valid"),
+    USER_NOT_EXISTED(1004, "User not existed")
     ;
     ErrorCode(int code, String message) {
         this.code = code;
