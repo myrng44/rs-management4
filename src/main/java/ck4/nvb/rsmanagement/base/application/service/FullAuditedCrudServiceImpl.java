@@ -67,11 +67,13 @@ public abstract class FullAuditedCrudServiceImpl<D extends EntityDto<ID>, T exte
         return keys;
     }
 
-    private List<SearchCriteria> addDeletedFalse(List<SearchCriteria> filter) {
-        if (filter == null) {
-            filter = new ArrayList<>();
+    public List<SearchCriteria> addDeletedFalse(List<SearchCriteria> filter) {
+        if (filter == null) filter = new ArrayList<>();
+        boolean hasDeleted = filter.stream()
+                .anyMatch(c -> "deleted".equals(c.getKey()) && SearchOperator.EQUALS.equals(c.getOperator()));
+        if (!hasDeleted) {
+            filter.add(new SearchCriteria("deleted", SearchOperator.EQUALS, Boolean.FALSE.toString()));
         }
-        filter.add(new SearchCriteria("deleted", SearchOperator.EQUALS, Boolean.FALSE.toString()));
         return filter;
     }
 

@@ -88,13 +88,15 @@ public class PredicateBase<T> {
                     return getNumberPredicate(path, operator, Double.parseDouble(value));
                 }
             }
-            case "Boolean": {
-                if (operator == SearchOperator.EQUALS) {
-                    return entityPath.getBoolean(key).eq(Boolean.parseBoolean(value));
-                } else {
-                    throw new InvalidFormatException("Unsupported boolean operation in filter query.");
+            case "Boolean":
+                case "boolean": {
+                    if (operator == SearchOperator.EQUALS) {
+                        return entityPath.getBoolean(key).eq(Boolean.parseBoolean(value));
+                    } else {
+                        throw new InvalidFormatException("Unsupported boolean operation in filter query.");
+                    }
                 }
-            }
+
             case "String": {
                 return getStringPredicate(key, operator, value, entityPath);
             }

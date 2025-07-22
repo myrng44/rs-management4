@@ -21,16 +21,16 @@ public class ProductUpdateDto extends BaseProductDto implements UpdateInput<Prod
     public boolean mapToEntity(Product entity) {
         boolean isModified = false;
 
-        if (!sku.equals(entity.getSku())) {
+        if (sku == null || !sku.equals(entity.getSku())) {
             entity.setSku(sku);
             isModified = true;
         }
 
-        if (!name.equals(entity.getName())) {
+        if (name == null || !name.equals(entity.getName())) {
             entity.setName(name);
             isModified = true;
         }
-        if (!description.equals(entity.getDescription())) {
+        if ( description == null || !description.equals(entity.getDescription())) {
             entity.setDescription(description);
             isModified = true;
         }

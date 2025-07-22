@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service("productService")
 public class ProductServiceImpl extends FullAuditedCrudServiceImpl<ProductGetDto, Product, Long, UserGetDto, Long> {
@@ -21,7 +22,17 @@ public class ProductServiceImpl extends FullAuditedCrudServiceImpl<ProductGetDto
 
     @Override
     public ProductGetDto mapToEntityDto(Product entity) {
-        return new ModelMapper().map(entity, ProductGetDto.class);
+        ProductGetDto dto = new ProductGetDto();
+        dto.setId(entity.getId());
+        dto.setName(entity.getName());
+        dto.setDescription(entity.getDescription());
+        dto.setSku(entity.getSku());
+        dto.setCategoryId(entity.getCategoryId());
+        dto.setUnitPrice(entity.getUnitPrice());
+        dto.setSupplierId(entity.getSupplierId());
+
+//        return new ModelMapper().map(entity, ProductGetDto.class);
+        return dto;
     }
 
     @Override
@@ -30,4 +41,16 @@ public class ProductServiceImpl extends FullAuditedCrudServiceImpl<ProductGetDto
         keys.put("sku", List.of(SearchOperator.CONTAINS, SearchOperator.EQUALS));
         return keys;
     }
+
+    @Override
+    public Set<String> getSortableKeys() {
+        Set<String> keys = super.getSortableKeys();
+        keys.add("sku");
+        keys.add("name");
+        keys.add("price");
+
+        return keys;
+    }
+
+
 }
