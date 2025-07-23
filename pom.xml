@@ -10,7 +10,7 @@
     </parent>
     <groupId>ck4.nvb</groupId>
     <artifactId>rs-management</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>68.86</version>
     <name>rs-management</name>
     <description>rs-management</description>
     <url/>
@@ -98,6 +98,13 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.snowflake/snowflake-jdbc -->
+        <!-- https://mvnrepository.com/artifact/xyz.downgoon/snowflake -->
+        <dependency>
+            <groupId>xyz.downgoon</groupId>
+            <artifactId>snowflake</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 
