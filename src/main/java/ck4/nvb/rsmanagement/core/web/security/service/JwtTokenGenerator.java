@@ -25,11 +25,7 @@ public class JwtTokenGenerator {
         claims.put("userId", String.valueOf(userRoleDto.getUserId()));
         claims.put("roleId", String.valueOf(userRoleDto.getRoleId()));
         claims.put("storeId", String.valueOf(userRoleDto.getStoreId()));
-        claims.put("username", userRoleDto.getUserName()); // Add username for validation
-        claims.put("permissions", userRoleDto.getPermissions());
-        if (userRoleDto.getFullName() != null) {
-            claims.put("fullName", userRoleDto.getFullName());
-        }
+        claims.put("username", userRoleDto.getUserName()); //add username for validation
 
         TokenResponseDto response = new TokenResponseDto();
         response.setIssuedAt(System.currentTimeMillis());
@@ -64,9 +60,6 @@ public class JwtTokenGenerator {
             userRoleDto.setRoleId(Long.valueOf(claims.get("roleId", String.class)));
             userRoleDto.setStoreId(Long.valueOf(claims.get("storeId", String.class)));
             userRoleDto.setUserName(claims.get("username", String.class)); // Add username
-
-            List<String> permissions = claims.get("permissions", List.class);
-            userRoleDto.setPermissions(permissions);
 
             return userRoleDto;
         } catch (Exception e) {

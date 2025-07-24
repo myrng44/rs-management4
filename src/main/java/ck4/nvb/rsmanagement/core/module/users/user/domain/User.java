@@ -1,7 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.users.user.domain;
 
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
-import ck4.nvb.rsmanagement.base.domain.entity.interfaces.Enable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +18,7 @@ import java.util.List;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends FullAuditedSerialIdEntity implements Enable, UserDetails {
+public class User extends FullAuditedSerialIdEntity implements UserDetails {
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
@@ -39,21 +38,8 @@ public class User extends FullAuditedSerialIdEntity implements Enable, UserDetai
     @Column(name = "store_id")
     private Long storeId;
 
-    @Column(name = "enabled")
-    private boolean enable = true;
-
     public User(Long id) {
         setId(id);
-    }
-
-    @Override
-    public boolean getEnable() {
-        return enable;
-    }
-
-    @Override
-    public void setEnable(Boolean active) {
-        this.enable = active;
     }
 
     // UserDetails implementation
@@ -76,10 +62,5 @@ public class User extends FullAuditedSerialIdEntity implements Enable, UserDetai
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enable;
     }
 }

@@ -29,7 +29,7 @@ public class TokenResponseDto extends Dto {
         return "TokenResponseDto{" +
                 "accessToken='" + accessToken + '\'' +
                 ", type='" + tokenType + '\'' +
-                ", refreshToken='" + refreshToken + '\'' +
+                ", refreshTokenID='" + refreshToken + '\'' +
                 ", issuedAt=" + issuedAt +
                 ", expiresIn=" + expiresIn +
                 ", expiresAt=" + expiresAt +

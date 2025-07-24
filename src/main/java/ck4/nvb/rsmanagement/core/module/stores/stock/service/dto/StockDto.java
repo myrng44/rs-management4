@@ -36,8 +36,8 @@ public class StockDto extends EntityDto<Long> implements CreateInput<Stock>, Upd
             isModified = true;
         }
 
-        if(enabled != entity.getEnable()) {
-            entity.setEnable(enabled);
+        if(enabled != entity.isDeleted()) {
+            entity.setDeleted(enabled);
             isModified = true;
         }
 

@@ -1,4 +1,4 @@
-package ck4.nvb.rsmanagement.core.module.stores.stock.domain;
+package ck4.nvb.rsmanagement.core.module.order.orderdetail.domain;
 
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
 import jakarta.persistence.Column;
@@ -11,12 +11,15 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Entity
-@Table(name = "stock")
-public class Stock extends FullAuditedSerialIdEntity {
+@Table(name = "order_detail")
+public class OrderDetail extends FullAuditedSerialIdEntity {
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "order_id")
+    private String orderId;
 
-    @Column(name = "location")
-    private String location;
+    @Column(name = "product_id")
+    private Long productId;
+
+    @Column(name = "quantity")
+    private int quantity;
 }

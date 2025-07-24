@@ -29,7 +29,6 @@ public class UserCreateDto extends BaseUserDto implements CreateInput<User> {
         user.setStoreId(storeId);
 
         //auto set fields
-        user.setEnable(true);
         user.setDeleted(false);
 
         return user;
