@@ -1,9 +1,9 @@
-package ck4.nvb.rsmanagement.core.module.order.order.controller;
+package ck4.nvb.rsmanagement.core.module.order.paymentmethod.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
-import ck4.nvb.rsmanagement.core.module.order.order.domain.Order;
-import ck4.nvb.rsmanagement.core.module.order.order.service.OrderCrudServiceImpl;
-import ck4.nvb.rsmanagement.core.module.order.order.service.dto.OrderDto;
+import ck4.nvb.rsmanagement.core.module.order.paymentmethod.domain.PaymentMethod;
+import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.PaymentMethodCrudServiceImpl;
+import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.dto.PaymentMethodDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import org.modelmapper.ModelMapper;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/orders")
-public class OrderController extends AuditedCrudController<OrderDto, Order, String, UserGetDto, Long, OrderDto, OrderDto> {
+@RequestMapping("/api/v1/payment-method")
+public class PaymentMethodController extends AuditedCrudController<PaymentMethodDto, PaymentMethod, Long, UserGetDto, Long, PaymentMethodDto, PaymentMethodDto> {
 
     @Autowired
-    public OrderController(OrderCrudServiceImpl service) {
+    public PaymentMethodController(PaymentMethodCrudServiceImpl service) {
         super(service);
     }
 

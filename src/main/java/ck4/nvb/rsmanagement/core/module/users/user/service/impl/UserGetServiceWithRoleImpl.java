@@ -93,7 +93,7 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
             throw new AppException("Invalid password");
         }
 
-        if (!user.isDeleted()) {
+        if (user.isDeleted()) {
             throw new AppException("User is disabled");
         }
 

@@ -46,17 +46,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -69,13 +62,27 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- ===============================UTILS (mapper, language, ...)====================================== -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <optional>true</optional>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
             <version>3.2.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.17.0</version>
+        </dependency>
 
+        <!-- ===============================JWT (authentication using jwt token)======================================= -->
         <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -97,22 +104,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.17.0</version>
-        </dependency>
-
-<!--        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-processor</artifactId>
-            <version>7.0.6.Final</version>
-        </dependency>-->
-<!--        <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-        </dependency>-->
+        <!-- ==============================SWAGGER (document api)================================== -->
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -120,6 +112,7 @@
             <version>2.8.3</version>
         </dependency>
 
+        <!-- ==============================QUERYDSL (dynamic query execute)================================= -->
         <!-- https://mvnrepository.com/artifact/com.querydsl/querydsl-jpa -->
         <dependency>
             <groupId>com.querydsl</groupId>
@@ -132,6 +125,21 @@
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-apt</artifactId>
             <version>5.1.0</version>
+        </dependency>
+
+        <!-- ===============================FLYWAY (database's version control)================================= -->
+        <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>11.10.4</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-database-postgresql -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>11.10.4</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 

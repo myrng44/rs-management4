@@ -1,7 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.order.voucher.service;
 
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
-import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.Voucher;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.VoucherRepository;
 import ck4.nvb.rsmanagement.core.module.order.voucher.service.dto.VoucherDto;

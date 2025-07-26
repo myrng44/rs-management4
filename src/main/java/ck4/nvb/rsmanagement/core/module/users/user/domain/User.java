@@ -45,7 +45,6 @@ public class User extends FullAuditedSerialIdEntity implements UserDetails {
     // UserDetails implementation
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // TODO: Implement role-based authorities
         return List.of(new SimpleGrantedAuthority("USER"));
     }
 

@@ -1,12 +1,17 @@
 package ck4.nvb.rsmanagement.core.module.order.order.service;
 
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
-import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
+import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.order.order.domain.Order;
 import ck4.nvb.rsmanagement.core.module.order.order.domain.OrderRepository;
 import ck4.nvb.rsmanagement.core.module.order.order.service.dto.OrderDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service("orderService")
 public class OrderCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDto, Order, String, UserGetDto, Long> {
@@ -22,6 +27,25 @@ public class OrderCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDto, O
 
     @Override
     public OrderDto mapToEntityDto(Order entity) {
-        return null;
+        return new ModelMapper().map(entity, OrderDto.class);
+    }
+
+    @Override
+    public Map<String, List<SearchOperator>> getSearchableKeys() {
+        Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
+        keys.put("customerId", List.of(SearchOperator.EQUALS));
+        keys.put("storeId", List.of(SearchOperator.EQUALS));
+        keys.put("voucherId", List.of(SearchOperator.EQUALS));
+        keys.put("finalPrice", List.of(SearchOperator.EQUALS,
+                SearchOperator.LESS_THAN,
+                SearchOperator.GREATER_THAN,
+                SearchOperator.GREATER_THAN_OR_EQUAL,
+                SearchOperator.LESS_THAN_OR_EQUAL));
+        return keys;
+    }
+
+    @Override
+    public Set<String> getSortableKeys() {
+        return super.getSortableKeys();
     }
 }

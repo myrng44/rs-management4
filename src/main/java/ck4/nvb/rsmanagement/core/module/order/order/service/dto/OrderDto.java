@@ -11,7 +11,6 @@ import org.modelmapper.ModelMapper;
 
 @Getter @Setter @NoArgsConstructor
 public class OrderDto extends EntityDto<String> implements CreateInput<Order>, UpdateInput<Order> {
-    private String orderId;
     private Long customerId;
     private Long storeId;
     private Long voucherId;

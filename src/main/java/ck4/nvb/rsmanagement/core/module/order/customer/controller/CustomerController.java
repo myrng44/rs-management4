@@ -1,9 +1,9 @@
-package ck4.nvb.rsmanagement.core.module.order.order.controller;
+package ck4.nvb.rsmanagement.core.module.order.customer.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
-import ck4.nvb.rsmanagement.core.module.order.order.domain.Order;
-import ck4.nvb.rsmanagement.core.module.order.order.service.OrderCrudServiceImpl;
-import ck4.nvb.rsmanagement.core.module.order.order.service.dto.OrderDto;
+import ck4.nvb.rsmanagement.core.module.order.customer.domain.Customer;
+import ck4.nvb.rsmanagement.core.module.order.customer.service.CustomerCrudServiceImpl;
+import ck4.nvb.rsmanagement.core.module.order.customer.service.dto.CustomerDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import org.modelmapper.ModelMapper;
@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/orders")
-public class OrderController extends AuditedCrudController<OrderDto, Order, String, UserGetDto, Long, OrderDto, OrderDto> {
+@RequestMapping("/api/v1/customer")
+public class CustomerController extends AuditedCrudController<CustomerDto, Customer, Long, UserGetDto, Long, CustomerDto, CustomerDto> {
 
     @Autowired
-    public OrderController(OrderCrudServiceImpl service) {
-        super(service);
+    public CustomerController(CustomerCrudServiceImpl customerCrudService) {
+        super(customerCrudService);
     }
 
     @Override
