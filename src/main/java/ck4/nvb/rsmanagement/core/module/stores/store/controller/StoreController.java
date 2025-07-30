@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/store")
+@RequestMapping("${rs.api.main.baseUrl}/store")
 public class StoreController extends AuditedCrudController<StoreDto, Store, Long, UserGetDto, Long, StoreDto, StoreDto> {
 
     public StoreController(StoreCrudServiceImpl storeCrudService) {

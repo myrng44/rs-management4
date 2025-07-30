@@ -6,18 +6,24 @@ import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.domain.OrderDetail;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.domain.OrderDetailRepository;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.dto.OrderDetailDto;
-import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
+import ck4.nvb.rsmanagement.core.module.stores.product.service.ProductServiceImpl;
+import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 @Service("orderDetailService")
 public class OrderDetailCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDetailDto, OrderDetail, Long, UserGetDto, Long> implements OrderDetailService {
-    protected OrderDetailCrudServiceImpl(OrderDetailRepository repository) {
+
+    private final ProductServiceImpl productService;
+
+    protected OrderDetailCrudServiceImpl(OrderDetailRepository repository, ProductServiceImpl productService) {
         super(repository, OrderDetail.class);
+        this.productService = productService;
     }
 
     @Override
@@ -39,7 +45,10 @@ public class OrderDetailCrudServiceImpl extends FullAuditedCrudServiceImpl<Order
     }
 
     @Override
-    public List<Product> getMostSoldProductsPerWeek(int noProducts) throws AppException {
-        return List.of();
+    public List<ProductGetDto> getMostSoldProductsLastDay(int days, int noProducts) throws AppException {
+        LocalDateTime end = LocalDateTime.now();
+        LocalDateTime start = end.minusDays(days);
+
+        return productService.mapToGetListOutputDto(getRepository().findMostSoldProductsOfInterval(start, end, noProducts));
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/import-log")
+@RequestMapping("/${rs.api.main.baseUrl}/import-log")
 public class ImportLogController extends AuditedCrudController<ImportLogDto, ImportLog, String, UserGetDto, Long, ImportLogDto, ImportLogDto> {
 
     public ImportLogController(ImportLogServiceImpl importLogService) {

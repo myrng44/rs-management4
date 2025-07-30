@@ -20,7 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/${rs.api.main.publicUrl}/auth")
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationController {

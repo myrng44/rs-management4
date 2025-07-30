@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/supplier")
+@RequestMapping("/${rs.api.main.baseUrl}/supplier")
 public class SupplierController extends AuditedCrudController<SupplierDto, Supplier, Long, UserGetDto, Long, SupplierDto, SupplierDto> {
 
     public SupplierController(SupplierServiceImpl supplierService) {

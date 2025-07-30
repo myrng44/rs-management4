@@ -22,7 +22,4 @@ public class StoreStock extends FullAuditedSerialIdEntity {
 
     @Column(name = "quantity")
     private Integer quantity;
-
-    @Column(name = "import_log_id")
-    private String importLogId;
 }

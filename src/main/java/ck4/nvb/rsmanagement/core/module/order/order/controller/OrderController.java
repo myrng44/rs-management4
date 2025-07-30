@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/orders")
+@RequestMapping("/${rs.api.main.baseUrl}/orders")
 public class OrderController extends AuditedCrudController<OrderDto, Order, String, UserGetDto, Long, OrderDto, OrderDto> {
 
     @Autowired

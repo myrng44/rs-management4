@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/stock")
+@RequestMapping("/${rs.api.main.baseUrl}/stock")
 public class StockController extends AuditedCrudController<StockDto, Stock, Long, UserGetDto, Long, StockDto, StockDto> {
 
     public StockController(StockServiceImpl stockService) {

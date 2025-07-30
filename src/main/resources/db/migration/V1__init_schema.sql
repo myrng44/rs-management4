@@ -242,7 +242,6 @@
         last_updater bigint,
         product_id bigint,
         store_id bigint,
-        import_log_id varchar(255),
         primary key (id)
     );
     create index idx_storestock_store_product on store_stock(store_id, product_id);

@@ -17,8 +17,6 @@ public class StoreStockDto extends EntityDto<Long> implements CreateInput<StoreS
 
     private Integer quantity;
 
-    private String importLogId;
-
     @Override
     public StoreStock mapToEntity() {
         return new ModelMapper().map(this, StoreStock.class);
@@ -40,11 +38,6 @@ public class StoreStockDto extends EntityDto<Long> implements CreateInput<StoreS
 
         if (quantity != entity.getQuantity()) {
             entity.setQuantity(quantity);
-            isModified = true;
-        }
-
-        if (!importLogId.equals(entity.getImportLogId())) {
-            entity.setImportLogId(importLogId);
             isModified = true;
         }
 

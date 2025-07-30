@@ -16,7 +16,7 @@ import java.util.*;
 @Component
 public class JwtTokenGenerator {
 
-    @Value("${application.security.jwt.expiration}")
+    @Value("${rs.security.jwt.expiration}")
     private long jwtExpiration;
 
     public TokenResponseDto generateToken(UserRoleDto userRoleDto, PrivateKey privateKey) {

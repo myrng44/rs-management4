@@ -10,6 +10,7 @@ import ck4.nvb.rsmanagement.base.domain.entity.interfaces.CreationAudited;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteriaParser;
+import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,5 +72,14 @@ public abstract class AuditedGetController<D extends EntityDto<ID>, T extends IE
         User user = extractUser(auth);
         if (request.getPaging() == null) request.setPaging(new PagedAndSortedResultRequestDto());
         return getService().getPage(request.mapToSearchCriteria(), request.getPaging(), user);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> count(@RequestParam(required = false, name = "query") List<String> query) {
+        if (query != null) {
+            List<SearchCriteria> params = SearchCriteriaParser.parse(query);
+            return ResponseEntity.ok(getService().count(params));
+        }
+        return ResponseEntity.ok(getService().count(List.of(new SearchCriteria("deleted", SearchOperator.EQUALS, "false"))));
     }
 }

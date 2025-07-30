@@ -29,7 +29,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value("${application.security.jwt.refresh-token.expiration}")
+    @Value("${rs.security.jwt.refresh-token.expiration}")
     private long refreshExpiration;
 
     private final UserGetServiceWithRole userService;

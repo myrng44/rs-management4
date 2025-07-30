@@ -8,13 +8,18 @@ import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductUpdate
 import ck4.nvb.rsmanagement.core.module.stores.product.service.ProductServiceImpl;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+import lombok.Getter;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping("/${rs.api.main.baseUrl}/products")
+@Getter
 public class ProductController extends AuditedCrudController<ProductGetDto, Product, Long, UserGetDto, Long, ProductCreateDto, ProductUpdateDto> {
 
     private final ProductServiceImpl productService;
@@ -38,5 +43,12 @@ public class ProductController extends AuditedCrudController<ProductGetDto, Prod
             return new ModelMapper().map(principal, UserGetDto.class);
         }
         return null;
+    }
+
+
+    @GetMapping("/qty")
+    public ResponseEntity<Integer> remainQuantity(Authentication auth, @RequestParam long productId) {
+        UserGetDto user = extractUser(auth);
+        return ResponseEntity.ok(getProductService().getRemainQuantity(productId, user.getStoreId()));
     }
 }

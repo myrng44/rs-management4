@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/payment-method")
+@RequestMapping("/${rs.api.main.baseUrl}/payment-method")
 public class PaymentMethodController extends AuditedCrudController<PaymentMethodDto, PaymentMethod, Long, UserGetDto, Long, PaymentMethodDto, PaymentMethodDto> {
 
     @Autowired

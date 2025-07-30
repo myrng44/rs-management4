@@ -1,6 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.stores.product.service;
 
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
+import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
 import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
@@ -14,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service("productService")
-public class ProductServiceImpl extends FullAuditedCrudServiceImpl<ProductGetDto, Product, Long, UserGetDto, Long> {
+public class ProductServiceImpl extends FullAuditedCrudServiceImpl<ProductGetDto, Product, Long, UserGetDto, Long> implements ProductService {
 
     protected ProductServiceImpl(ProductRepository repository) {
         super(repository, Product.class);
@@ -36,6 +37,11 @@ public class ProductServiceImpl extends FullAuditedCrudServiceImpl<ProductGetDto
     }
 
     @Override
+    public ProductRepository getRepository() {
+        return (ProductRepository) super.getRepository();
+    }
+
+    @Override
     public Map<String, List<SearchOperator>> getSearchableKeys() {
         Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
         keys.put("sku", List.of(SearchOperator.CONTAINS, SearchOperator.EQUALS));
@@ -52,5 +58,14 @@ public class ProductServiceImpl extends FullAuditedCrudServiceImpl<ProductGetDto
         return keys;
     }
 
-
+    /**
+     *
+     * @param productId productId of a product
+     * @param storeId   storeId of a store
+     * @return          qty of a product of a store
+     */
+    @Override
+    public int getRemainQuantity(long productId, long storeId) {
+        return getRepository().remainQuantity(productId, storeId);
+    }
 }

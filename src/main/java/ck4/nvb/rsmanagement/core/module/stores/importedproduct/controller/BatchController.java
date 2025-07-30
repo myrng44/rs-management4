@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/batch")
+@RequestMapping("/${rs.api.main.baseUrl}/batch")
 public class BatchController extends AuditedCrudController<BatchDto, Batch, Long, UserGetDto, Long, BatchDto, BatchDto> {
 
     protected BatchController(BatchCrudServiceImpl batchCrudService) {

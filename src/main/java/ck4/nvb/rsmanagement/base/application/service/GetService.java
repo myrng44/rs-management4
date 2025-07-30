@@ -36,7 +36,7 @@ public interface GetService<D extends EntityDto<ID>, T extends IEntity<ID>, ID e
     List<D> getAll() throws AppException;
 
     long count(List<SearchCriteria> filter) throws AppException;
-
+    
     /**
      * Return a list of objects
      *

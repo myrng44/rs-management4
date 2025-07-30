@@ -1,24 +1,29 @@
 package ck4.nvb.rsmanagement.core.module.order.orderdetail.controller;
 
+import ck4.nvb.rsmanagement.base.application.dto.PagedResultDto;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.domain.OrderDetail;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.OrderDetailCrudServiceImpl;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.dto.OrderDetailDto;
+import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/order-detail")
+@RequestMapping("/${rs.api.main.baseUrl}/order-detail")
 public class OrderDetailController extends AuditedCrudController<OrderDetailDto, OrderDetail, Long, UserGetDto, Long, OrderDetailDto, OrderDetailDto> {
 
-    @Autowired
+    private final OrderDetailCrudServiceImpl orderDetailCrudService;
+
     public OrderDetailController(OrderDetailCrudServiceImpl service) {
         super(service);
+        this.orderDetailCrudService = service;
     }
 
     @Override
@@ -35,5 +40,12 @@ public class OrderDetailController extends AuditedCrudController<OrderDetailDto,
             return new ModelMapper().map(principal, UserGetDto.class);
         }
         return null;
+    }
+
+    @GetMapping("/most")
+    public List<ProductGetDto> getMostSoldProductsLastDay(Authentication auth, @RequestParam int days, @RequestParam int noProducts) {
+        UserGetDto user = extractUser(auth);
+
+        return orderDetailCrudService.getMostSoldProductsLastDay(days, noProducts);
     }
 }
