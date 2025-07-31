@@ -1,13 +1,12 @@
 package develop.circlek.config;
 
-import develop.circlek.entity.user.*;
-import develop.circlek.repository.*;
+import develop.circlek.core.user.domain.entity.*;
+import develop.circlek.core.user.domain.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -26,8 +25,7 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (userRepository.count() == 0) {
-            log.info("Initializing sample data...");
-
+            // Create permissions
             PermissionEntity userRead = createPermission("USER_READ", "Read user information");
             PermissionEntity userWrite = createPermission("USER_WRITE", "Create and update users");
             PermissionEntity userDelete = createPermission("USER_DELETE", "Delete users");
@@ -35,22 +33,22 @@ public class DataInitializer implements CommandLineRunner {
             PermissionEntity roleWrite = createPermission("ROLE_WRITE", "Create and update roles");
             PermissionEntity adminAccess = createPermission("ADMIN_ACCESS", "Full admin access");
 
+            // Create roles
             RoleEntity adminRole = createRole("ADMIN", "System Administrator");
             RoleEntity managerRole = createRole("MANAGER", "Store Manager");
             RoleEntity employeeRole = createRole("EMPLOYEE", "Store Employee");
 
+            // Assign permissions to roles
             assignPermissionsToRole(adminRole, Arrays.asList(userRead, userWrite, userDelete, roleRead, roleWrite, adminAccess));
             assignPermissionsToRole(managerRole, Arrays.asList(userRead, userWrite, roleRead, roleWrite));
             assignPermissionsToRole(employeeRole, Arrays.asList(userRead, roleRead));
 
+            // Create users
             UserEntity admin = createUser("admin", "password123", "System Admin", "admin@circlek.com", "0123456789", 1L);
             UserEntity manager = createUser("manager1", "password123", "Store Manager", "manager1@circlek.com", "0123456788", 1L);
             UserEntity employee = createUser("employee1", "password123", "Store Employee", "employee1@circlek.com", "0123456787", 1L);
 
-            userRepository.save(admin);
-            userRepository.save(manager);
-            userRepository.save(employee);
-
+            // Assign roles to users
             assignRoleToUser(admin, adminRole);
             assignRoleToUser(manager, managerRole);
             assignRoleToUser(employee, employeeRole);
@@ -88,7 +86,6 @@ public class DataInitializer implements CommandLineRunner {
                 .storeId(storeId)
                 .createAt(LocalDateTime.now())
                 .createBy(1L)
-                .updateBy(null)
                 .build();
         return userRepository.save(user);
     }
@@ -111,7 +108,5 @@ public class DataInitializer implements CommandLineRunner {
                 .role(role)
                 .build();
         userRoleRepository.save(userRole);
-        log.info("Assigned role {} to user {} with userId: {}, roleId: {}",
-                role.getName(), user.getUserName(), user.getId(), role.getId());
     }
 }

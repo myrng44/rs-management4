@@ -1,6 +1,6 @@
 package develop.circlek.config;
 
-import develop.circlek.util.JwtAuthenticationFilter;
+import develop.circlek.config.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
