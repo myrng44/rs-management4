@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository("customerRepository")
 public interface CustomerRepository extends BaseFullAuditedRepository<Customer, Long, Long> {
+    int countCustomerByDeletedIsFalse();
 }

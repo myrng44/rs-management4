@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service("paymentMethodService")
 public class PaymentMethodCrudServiceImpl extends FullAuditedCrudServiceImpl<PaymentMethodDto, PaymentMethod, Long, UserGetDto, Long> {
@@ -35,6 +36,14 @@ public class PaymentMethodCrudServiceImpl extends FullAuditedCrudServiceImpl<Pay
         Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
         keys.put("code", List.of(SearchOperator.EQUALS, SearchOperator.CONTAINS));
         keys.put("name", List.of(SearchOperator.EQUALS, SearchOperator.CONTAINS));
+        return keys;
+    }
+
+    @Override
+    public Set<String> getSortableKeys() {
+        Set<String> keys = super.getSortableKeys();
+        keys.add("name");
+        keys.add("code");
         return keys;
     }
 }

@@ -2,7 +2,7 @@ package ck4.nvb.rsmanagement.core.module.order.order.service;
 
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
 import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
-import ck4.nvb.rsmanagement.core.module.order.order.domain.Order;
+import ck4.nvb.rsmanagement.core.module.order.order.domain.Orders;
 import ck4.nvb.rsmanagement.core.module.order.order.domain.OrderRepository;
 import ck4.nvb.rsmanagement.core.module.order.order.service.dto.OrderDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
@@ -14,10 +14,10 @@ import java.util.Map;
 import java.util.Set;
 
 @Service("orderService")
-public class OrderCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDto, Order, String, UserGetDto, Long> {
+public class OrderCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDto, Orders, String, UserGetDto, Long> {
 
     protected OrderCrudServiceImpl(OrderRepository repository) {
-        super(repository, Order.class);
+        super(repository, Orders.class);
     }
 
     @Override
@@ -26,7 +26,7 @@ public class OrderCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDto, O
     }
 
     @Override
-    public OrderDto mapToEntityDto(Order entity) {
+    public OrderDto mapToEntityDto(Orders entity) {
         return new ModelMapper().map(entity, OrderDto.class);
     }
 
@@ -46,6 +46,8 @@ public class OrderCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDto, O
 
     @Override
     public Set<String> getSortableKeys() {
-        return super.getSortableKeys();
+        Set<String> keys = super.getSortableKeys();
+        keys.add("finalPrice");
+        return keys;
     }
 }

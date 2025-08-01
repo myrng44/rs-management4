@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/${rs.api.main.baseUrl}/order-detail")
+@RequestMapping("/${rs.api.main.baseUrl}/order-details")
 public class OrderDetailController extends AuditedCrudController<OrderDetailDto, OrderDetail, Long, UserGetDto, Long, OrderDetailDto, OrderDetailDto> {
 
     private final OrderDetailCrudServiceImpl orderDetailCrudService;

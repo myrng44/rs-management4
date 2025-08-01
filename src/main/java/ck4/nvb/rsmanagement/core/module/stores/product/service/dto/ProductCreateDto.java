@@ -12,7 +12,7 @@ public class ProductCreateDto extends BaseProductDto implements CreateInput<Prod
     private String sku;
     private String name;
     private String description;
-    private double unitPrice;
+    private Integer unitPrice;
     private Long categoryId;
     private Long supplierId;
 

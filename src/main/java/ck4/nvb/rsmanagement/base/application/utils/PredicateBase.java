@@ -58,8 +58,7 @@ public class PredicateBase<T> {
      * @param classType     the class type
      * @return  Predicate
      */
-    private BooleanExpression getPredicate(String key, SearchOperator operator, String value, PathBuilder<?> entityPath,
-                                           Class<?> classType) throws Exception {
+    private BooleanExpression getPredicate(String key, SearchOperator operator, String value, PathBuilder<?> entityPath, Class<?> classType) throws Exception {
         final String multivalueSeperator = "_";
         boolean isMultiValue = value.contains(multivalueSeperator);
         Class<?> propertyType = getPropertyType(classType, key);

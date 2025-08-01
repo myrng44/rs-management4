@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -119,49 +117,38 @@ public abstract class GetServiceImpl<D extends EntityDto<ID>, T extends IEntity<
         return new PagedResultDto<>(result.getTotalElements(), mapToGetListOutputDto(result.getContent()));
     }
 
-
-
-//    protected Sort buildSort(PagedAndSortedResultRequestDto paging) {
-//        if (paging == null || paging.getSort() == null || paging.getSort().isEmpty()) return Sort.unsorted();
-//        String[] sorts = paging.getSort().split(",");
-//        List<Sort.Order> orders = new ArrayList<>();
-//        Set<String> allowed = getSortableKeys();
-//        for (String sort : sorts) {
-//            String[] parts = sort.trim().split("\\s+");
-//            String key = parts[0];
-//            if (!allowed.contains(key)) continue;
-//            String direction = (parts.length > 1 && "desc".equalsIgnoreCase(parts[1])) ? "DESC" : "ASC";
-//            orders.add(new Sort.Order(Sort.Direction.fromString(direction), key));
-//        }
-//        return orders.isEmpty() ? Sort.unsorted() : Sort.by(orders);
-//    }
-
     private OffsetBasedPageable mapToPageable(PagedAndSortedResultRequestDto paging) {
         if (getSortableKeys() == null || getSortableKeys().isEmpty()
                 || paging.getSort() == null || paging.getSort().isEmpty()) {
             return new OffsetBasedPageable(Math.max(0, paging.getOffset()), Math.max(1, paging.getLimit()));
         }
 
-        // process sorting string
-        String[] requestSorts = StringUtils.split(paging.getSort(), ",");
-        if (requestSorts == null || requestSorts.length == 0) {
+        // Split and trim sort params ("+name,-createdTime" -> ["+name", "-createdTime"])
+        String[] requestSorts = Arrays.stream(paging.getSort().split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toArray(String[]::new);
+        if (requestSorts.length == 0) {
             return new OffsetBasedPageable(Math.max(0, paging.getOffset()), Math.max(1, paging.getLimit()));
         }
 
         List<Sort.Order> sorts = new ArrayList<>();
         for (String requestSort : requestSorts) {
-            String[] parts = StringUtils.split(requestSort.replaceAll("\\s+", " ").trim(), " ");
+            String column = requestSort.trim();
+            Sort.Direction direction = Sort.Direction.ASC;
 
-            // Only add allowed sortable columns
-            if (parts == null || parts.length == 0) continue;
+            if (column.startsWith("-")) {
+                direction = Sort.Direction.DESC;
+                column = column.substring(1);
+            } else if (column.startsWith("+")) {
+                column = column.substring(1);
+            }
 
-            String key = getReplaceKeyMap().getOrDefault(parts[0], parts[0]);
+            // Áp dụng replaceKeyMap nếu có
+            String key = getReplaceKeyMap().getOrDefault(column, column);
             if (!getSortableKeys().contains(key)) continue;
 
-            // Get ASC or DESC direction
-            if (parts.length > 1 && parts[1] != null && parts[1].equalsIgnoreCase("desc")) {
-                sorts.add(new Sort.Order(Sort.Direction.DESC, key));
-            } else sorts.add(new Sort.Order(Sort.Direction.ASC, key));
+            sorts.add(new Sort.Order(direction, key));
         }
 
         if (sorts.isEmpty()) {
@@ -189,6 +176,7 @@ public abstract class GetServiceImpl<D extends EntityDto<ID>, T extends IEntity<
         }
 
         if (!fieldErrors.isEmpty()) throw new IllegalPropertyException(fieldErrors);
+        logger.debug("Mapping to predicate with field: {}", filter);
 
         return new PredicateBuilder<>(type).and(criteria).replaceKeyMap(getReplaceKeyMap()).build();
     }

@@ -14,7 +14,7 @@ public class CustomerDto extends EntityDto<Long> implements CreateInput<Customer
     private String name;
     private String phone;
     private String gender;
-    private int point;
+    private Integer point;
 
     @Override
     public Customer mapToEntity() {

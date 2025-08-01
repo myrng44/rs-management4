@@ -15,8 +15,6 @@ public class StockDto extends EntityDto<Long> implements CreateInput<Stock>, Upd
 
     private String location;
 
-    private boolean enabled;
-
     @Override
     public Stock mapToEntity() {
         return new ModelMapper().map(this, Stock.class);
@@ -33,11 +31,6 @@ public class StockDto extends EntityDto<Long> implements CreateInput<Stock>, Upd
 
         if (!location.equals(entity.getLocation())) {
             entity.setLocation(location);
-            isModified = true;
-        }
-
-        if(enabled != entity.isDeleted()) {
-            entity.setDeleted(enabled);
             isModified = true;
         }
 

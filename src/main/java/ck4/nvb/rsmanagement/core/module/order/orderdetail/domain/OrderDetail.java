@@ -21,5 +21,5 @@ public class OrderDetail extends FullAuditedSerialIdEntity {
     private Long productId;
 
     @Column(name = "quantity")
-    private int quantity;
+    private Integer quantity;
 }

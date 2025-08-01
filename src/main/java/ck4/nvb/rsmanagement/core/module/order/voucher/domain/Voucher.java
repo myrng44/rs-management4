@@ -23,10 +23,10 @@ public class Voucher extends FullAuditedSerialIdEntity {
     private String description;
 
     @Column(name = "discount_percent")
-    private int discountPercent;
+    private Integer discountPercent;
 
     @Column(name = "discount_value")
-    private int discountValue;
+    private Integer discountValue;
 
     @Column(name = "start_time")
     private LocalDateTime startTime;

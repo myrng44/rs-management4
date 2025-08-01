@@ -17,8 +17,8 @@ public class ProductFilterInputDto implements FilterInput {
     //fillable fields for products
     private String name;
     private String description;
-    private Double minPrice;
-    private Double maxPrice;
+    private Integer minPrice;
+    private Integer maxPrice;
     private Long categoryId;
     private Long supplierId;
 

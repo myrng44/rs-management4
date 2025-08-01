@@ -1,7 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.order.order.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
-import ck4.nvb.rsmanagement.core.module.order.order.domain.Order;
+import ck4.nvb.rsmanagement.core.module.order.order.domain.Orders;
 import ck4.nvb.rsmanagement.core.module.order.order.service.OrderCrudServiceImpl;
 import ck4.nvb.rsmanagement.core.module.order.order.service.dto.OrderDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/orders")
-public class OrderController extends AuditedCrudController<OrderDto, Order, String, UserGetDto, Long, OrderDto, OrderDto> {
+public class OrderController extends AuditedCrudController<OrderDto, Orders, String, UserGetDto, Long, OrderDto, OrderDto> {
 
     @Autowired
     public OrderController(OrderCrudServiceImpl service) {

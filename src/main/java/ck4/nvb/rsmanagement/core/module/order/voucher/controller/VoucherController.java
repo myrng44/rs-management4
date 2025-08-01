@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/${rs.api.main.baseUrl}/voucher")
+@RequestMapping("/${rs.api.main.baseUrl}/vouchers")
 public class VoucherController extends AuditedCrudController<VoucherDto, Voucher, Long, UserGetDto, Long, VoucherDto, VoucherDto> {
 
     @Autowired

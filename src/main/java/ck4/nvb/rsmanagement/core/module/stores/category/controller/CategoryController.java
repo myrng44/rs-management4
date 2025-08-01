@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/${rs.api.main.baseUrl}/category")
+@RequestMapping("/${rs.api.main.baseUrl}/categories")
 public class CategoryController extends AuditedCrudController<CategoryDto, Category, Long, UserGetDto, Long, CategoryDto, CategoryDto> {
 
     protected CategoryController(CategoryServiceImpl categoryService) {

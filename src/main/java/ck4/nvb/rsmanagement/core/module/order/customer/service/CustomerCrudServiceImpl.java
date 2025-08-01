@@ -46,6 +46,11 @@ public class CustomerCrudServiceImpl extends FullAuditedCrudServiceImpl<Customer
 
     @Override
     public Set<String> getSortableKeys() {
-        return super.getSortableKeys();
+        Set<String> keys = super.getSortableKeys();
+        keys.add("name");
+        keys.add("phone");
+        keys.add("gender");
+        keys.add("point");
+        return keys;
     }
 }

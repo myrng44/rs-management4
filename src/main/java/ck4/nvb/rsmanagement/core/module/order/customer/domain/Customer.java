@@ -23,5 +23,5 @@ public class Customer extends FullAuditedSerialIdEntity {
     private String gender;
 
     @Column(name = "point")
-    private int point;
+    private Integer point;
 }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service("orderDetailService")
 public class OrderDetailCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDetailDto, OrderDetail, Long, UserGetDto, Long> implements OrderDetailService {
@@ -45,10 +46,22 @@ public class OrderDetailCrudServiceImpl extends FullAuditedCrudServiceImpl<Order
     }
 
     @Override
+    public Set<String> getSortableKeys() {
+        Set<String> keys = super.getSortableKeys();
+        keys.add("quantity");
+        return keys;
+    }
+
+    @Override
     public List<ProductGetDto> getMostSoldProductsLastDay(int days, int noProducts) throws AppException {
         LocalDateTime end = LocalDateTime.now();
         LocalDateTime start = end.minusDays(days);
 
         return productService.mapToGetListOutputDto(getRepository().findMostSoldProductsOfInterval(start, end, noProducts));
+    }
+
+    @Override
+    public List<OrderDetailDto> getDetailByOrderId(long orderId) throws AppException {
+        return List.of();
     }
 }

@@ -1,6 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.order.orderdetail.service;
 
 import ck4.nvb.rsmanagement.base.application.exception.AppException;
+import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.dto.OrderDetailDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 
@@ -14,4 +15,11 @@ public interface OrderDetailService {
      * @return a list of products
      */
     List<ProductGetDto> getMostSoldProductsLastDay(int days, int noProducts) throws AppException;
+
+    /**
+     * Get all order detail by orderId
+     * @param orderId       identifier of an order
+     * @return              list of orderDetailDto
+     */
+    List<OrderDetailDto> getDetailByOrderId(long orderId) throws AppException;
 }

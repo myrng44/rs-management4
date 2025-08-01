@@ -1,7 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.order.order.domain;
 
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedGeneratedIdEntity;
-import ck4.nvb.rsmanagement.base.domain.entity.GeneratedIdEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -13,7 +12,7 @@ import lombok.Setter;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Entity
 @Table(name = "orders")
-public class Order extends FullAuditedGeneratedIdEntity {
+public class Orders extends FullAuditedGeneratedIdEntity {
 
     @Column(name = "customer_id")
     private Long customerId;
@@ -25,7 +24,7 @@ public class Order extends FullAuditedGeneratedIdEntity {
     private Long voucherId;
 
     @Column(name = "final_price")
-    private int finalPrice;
+    private Integer finalPrice;
 
     @Column(name = "note")
     private String note;

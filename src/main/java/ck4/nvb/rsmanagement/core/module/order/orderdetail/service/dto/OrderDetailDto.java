@@ -14,7 +14,7 @@ public class OrderDetailDto extends EntityDto<Long> implements CreateInput<Order
 
     private String orderId;
     private Long productId;
-    private int quantity;
+    private Integer quantity;
 
     @Override
     public OrderDetail mapToEntity() {
@@ -36,7 +36,7 @@ public class OrderDetailDto extends EntityDto<Long> implements CreateInput<Order
             entity.setProductId(productId);
             isModified = true;
         }
-        if (quantity != entity.getQuantity()) {
+        if (!quantity.equals(entity.getQuantity())) {
             entity.setQuantity(quantity);
             isModified = true;
         }

@@ -21,7 +21,7 @@ public class Product extends FullAuditedSerialIdEntity {
     private String description;
 
     @Column(name = "unit_price", nullable = false)
-    private double unitPrice;
+    private Integer unitPrice;
 
     @Column(name = "category_id")
     private Long categoryId;

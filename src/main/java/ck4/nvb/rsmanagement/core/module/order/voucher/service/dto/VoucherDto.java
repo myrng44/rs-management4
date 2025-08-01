@@ -15,8 +15,8 @@ import java.time.LocalDate;
 public class VoucherDto extends EntityDto<Long> implements CreateInput<Voucher>, UpdateInput<Voucher> {
     private String code;
     private String description;
-    private int discountPercent;
-    private int discountValue;
+    private Integer discountPercent;
+    private Integer discountValue;
     private LocalDate startTime;
     private LocalDate expirationTime;
 
@@ -39,11 +39,11 @@ public class VoucherDto extends EntityDto<Long> implements CreateInput<Voucher>,
             entity.setDescription(description);
             isModified = true;
         }
-        if (discountPercent != entity.getDiscountPercent()) {
+        if (!discountPercent.equals(entity.getDiscountPercent())) {
             entity.setDiscountPercent(discountPercent);
             isModified = true;
         }
-        if (discountValue != entity.getDiscountValue()) {
+        if (!discountValue.equals(entity.getDiscountValue())) {
             entity.setDiscountValue(discountValue);
             isModified = true;
         }

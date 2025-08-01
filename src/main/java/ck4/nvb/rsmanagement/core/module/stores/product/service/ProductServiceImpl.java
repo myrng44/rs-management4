@@ -53,7 +53,8 @@ public class ProductServiceImpl extends FullAuditedCrudServiceImpl<ProductGetDto
         Set<String> keys = super.getSortableKeys();
         keys.add("sku");
         keys.add("name");
-        keys.add("price");
+        keys.add("categoryId");
+        keys.add("unitPrice");
 
         return keys;
     }

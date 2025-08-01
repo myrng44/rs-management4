@@ -17,8 +17,6 @@ public class StoreDto extends EntityDto<Long> implements CreateInput<Store>, Upd
 
     private String phone;
 
-    private boolean enabled;
-
     @Override
     public Store mapToEntity() {
         return new ModelMapper().map(this, Store.class);
