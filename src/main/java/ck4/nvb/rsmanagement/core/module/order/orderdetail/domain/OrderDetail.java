@@ -22,4 +22,7 @@ public class OrderDetail extends FullAuditedSerialIdEntity {
 
     @Column(name = "quantity")
     private Integer quantity;
+
+    @Column(name = "unit_price")
+    private Integer unitPrice;
 }

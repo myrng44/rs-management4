@@ -5,6 +5,7 @@ import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.domain.OrderDetail;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.OrderDetailCrudServiceImpl;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.dto.OrderDetailDto;
+import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.dto.OrderDetailGetDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
@@ -16,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/${rs.api.main.baseUrl}/order-details")
-public class OrderDetailController extends AuditedCrudController<OrderDetailDto, OrderDetail, Long, UserGetDto, Long, OrderDetailDto, OrderDetailDto> {
+@RequestMapping("/${rs.api.main.baseUrl}/orders/details")
+public class OrderDetailController extends AuditedCrudController<OrderDetailGetDto, OrderDetail, Long, UserGetDto, Long, OrderDetailDto, OrderDetailDto> {
 
     private final OrderDetailCrudServiceImpl orderDetailCrudService;
 
@@ -42,10 +43,9 @@ public class OrderDetailController extends AuditedCrudController<OrderDetailDto,
         return null;
     }
 
-    @GetMapping("/most")
-    public List<ProductGetDto> getMostSoldProductsLastDay(Authentication auth, @RequestParam int days, @RequestParam int noProducts) {
+    @GetMapping("/summary/{orderId}")
+    public List<OrderDetailGetDto> getOrderDetails(@PathVariable String orderId, Authentication auth) {
         UserGetDto user = extractUser(auth);
-
-        return orderDetailCrudService.getMostSoldProductsLastDay(days, noProducts);
+        return orderDetailCrudService.getDetailByOrderId(orderId);
     }
 }

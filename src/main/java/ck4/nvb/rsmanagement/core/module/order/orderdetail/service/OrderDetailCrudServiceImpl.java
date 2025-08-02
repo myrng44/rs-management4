@@ -5,11 +5,11 @@ import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
 import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.domain.OrderDetail;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.domain.OrderDetailRepository;
-import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.dto.OrderDetailDto;
+import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.dto.OrderDetailGetDto;
+import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.ProductServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service("orderDetailService")
-public class OrderDetailCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDetailDto, OrderDetail, Long, UserGetDto, Long> implements OrderDetailService {
+public class OrderDetailCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDetailGetDto, OrderDetail, Long, UserGetDto, Long> implements OrderDetailService {
 
     private final ProductServiceImpl productService;
 
@@ -33,8 +33,18 @@ public class OrderDetailCrudServiceImpl extends FullAuditedCrudServiceImpl<Order
     }
 
     @Override
-    public OrderDetailDto mapToEntityDto(OrderDetail entity) {
-        return new ModelMapper().map(entity, OrderDetailDto.class);
+    public OrderDetailGetDto mapToEntityDto(OrderDetail entity) {
+        Product product = productService.getEntity(entity.getProductId());
+        //snapshot
+        entity.setUnitPrice(product.getUnitPrice()); //auto get product's unitPrice at the time of transaction
+        OrderDetailGetDto dto = new OrderDetailGetDto();
+        dto.setId(entity.getId());
+        dto.setOrderId(entity.getOrderId());
+        dto.setProductId(product.getId());
+        dto.setProductName(product.getName());
+        dto.setQuantity(entity.getQuantity());
+        dto.setUnitPrice(entity.getUnitPrice());
+        return dto;
     }
 
     @Override
@@ -61,7 +71,7 @@ public class OrderDetailCrudServiceImpl extends FullAuditedCrudServiceImpl<Order
     }
 
     @Override
-    public List<OrderDetailDto> getDetailByOrderId(long orderId) throws AppException {
-        return List.of();
+    public List<OrderDetailGetDto> getDetailByOrderId(String orderId) throws AppException {
+        return mapToGetListOutputDto(getRepository().findAllByOrderId(orderId));
     }
 }

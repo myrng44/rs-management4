@@ -86,6 +86,7 @@
         last_updater bigint,
         product_id bigint,
         order_id varchar(255),
+        unit_price integer,
         primary key (id)
     );
     create index idx_orderdetail_order on order_detail(order_id);
