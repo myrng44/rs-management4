@@ -8,14 +8,14 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Table(name = "order")
+@Table(name = "`order`")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class OrderEntity extends BaseEntity<Long> {
+public class OrderEntity extends BaseEntity<String> {
 
     @Column(name = "customerId")
     Long customerId;
@@ -27,7 +27,7 @@ public class OrderEntity extends BaseEntity<Long> {
     Long voucherId;
 
     @Column(name = "finalPrice", nullable = false)
-    BigDecimal finalPrice;
+    Integer finalPrice;
 
     @Column(name = "note")
     String note;
@@ -35,10 +35,13 @@ public class OrderEntity extends BaseEntity<Long> {
     @Column(name = "paymentId", nullable = false)
     Long paymentId;
 
-    @Builder.Default
     @Column(name = "isDeleted", nullable = false)
     Boolean isDeleted = false;
 
     @OneToMany(mappedBy = "orderId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<OrderDetailEntity> orderDetails;
+
+    @Column(name = "status", nullable = false)
+    @Builder.Default
+    String status = "Đang xử lý";
 }

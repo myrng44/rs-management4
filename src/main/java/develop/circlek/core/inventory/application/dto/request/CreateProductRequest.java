@@ -23,8 +23,7 @@ public class CreateProductRequest extends BaseRequest {
     private String description;
     
     @NotNull(message = "Unit price is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Unit price must be greater than 0")
-    private BigDecimal unitPrice;
+    private Integer unitPrice;
     
     @NotNull(message = "Category ID is required")
     private Long categoryId;

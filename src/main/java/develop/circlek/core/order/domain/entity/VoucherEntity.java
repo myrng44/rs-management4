@@ -20,16 +20,14 @@ public class VoucherEntity extends BaseEntity<Long> {
     @Column(name = "code", nullable = false)
     String code;
 
-    @Column(name = "desc")
+    @Column(name = "description")
     String description;
 
     @Column(name = "discountPer")
-    @Builder.Default
-    Short discountPercent = 0;
+    Integer discountPercent = 0;
 
     @Column(name = "discountVal")
-    @Builder.Default
-    BigDecimal discountValue = BigDecimal.ZERO;
+    Integer discountValue;
 
     @Column(name = "validFrom", nullable = false)
     LocalDate startTime;

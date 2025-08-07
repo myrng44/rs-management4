@@ -43,4 +43,17 @@ public class OrderController extends BaseController<OrderEntity, OrderDTO, Strin
         List<Object[]> products = orderService.getTopProducts(days, noProducts);
         return ResponseEntity.ok(ApiResponse.success(products));
     }
+
+    @GetMapping("/recent")
+    public ResponseEntity<ApiResponse<List<OrderDTO>>> getRecentOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size) {
+        try {
+            List<OrderDTO> orders = orderService.getRecentOrders(page, size);
+            return ResponseEntity.ok(ApiResponse.success(orders));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(400, e.getMessage()));
+        }
+    }
 }

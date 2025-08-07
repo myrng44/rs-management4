@@ -15,8 +15,8 @@ import java.time.LocalDate;
 public class VoucherDTO extends BaseDTO {
     private String code;
     private String description;
-    private Short discountPercent;
-    private BigDecimal discountValue;
+    private Integer discountPercent;
+    private Integer discountValue;
     private LocalDate startTime;
     private LocalDate expirationTime;
 }

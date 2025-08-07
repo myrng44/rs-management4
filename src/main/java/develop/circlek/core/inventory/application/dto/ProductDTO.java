@@ -15,7 +15,7 @@ public class ProductDTO extends BaseDTO {
     private String name;
     private String sku;
     private String description;
-    private BigDecimal unitPrice;
+    private Integer unitPrice;
     private Long categoryId;
     private String categoryName;
     private Long supplierId;

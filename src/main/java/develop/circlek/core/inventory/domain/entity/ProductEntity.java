@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -29,8 +30,8 @@ public class ProductEntity extends BaseEntity<Long> {
     @Column(name = "description")
     String description;
 
-    @Column(name = "unitPrice", nullable = false, precision = 10, scale = 2)
-    BigDecimal unitPrice = BigDecimal.ZERO;
+    @Column(name = "unitPrice", nullable = false)
+    Integer unitPrice ;
 
     @Column(name = "categoryId", nullable = false)
     Long categoryId;
@@ -40,6 +41,9 @@ public class ProductEntity extends BaseEntity<Long> {
 
     @Column(name = "deleted", nullable = false)
     Boolean deleted = false;
+
+    @Column(name = "lastUpdate")
+    LocalDateTime lastUpdate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoryId", insertable = false, updatable = false)

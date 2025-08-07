@@ -36,6 +36,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/**").hasAnyAuthority("USER_READ", "USER_WRITE", "USER_DELETE")
                         .requestMatchers("/api/roles/**").hasAnyAuthority("ROLE_READ", "ROLE_WRITE")
+                        .requestMatchers("/api/products/**").permitAll()
+                        .requestMatchers("/api/categories/**").permitAll()
+                        .requestMatchers("/api/suppliers/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -22,6 +22,5 @@ public class OrderDetailEntity extends BaseEntity<Long> {
     Long productId;
 
     @Column(name = "quantity", nullable = false)
-    @Builder.Default
     Integer quantity = 0;
 }

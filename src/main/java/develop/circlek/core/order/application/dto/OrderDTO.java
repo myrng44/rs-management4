@@ -13,9 +13,11 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 public class OrderDTO extends BaseDTO {
     private Long customerId;
+    private String customerName;
     private Long storeId;
     private Long voucherId;
-    private BigDecimal finalPrice;
+    private Integer finalPrice;
     private String note;
     private Long paymentId;
+    private String status;
 }

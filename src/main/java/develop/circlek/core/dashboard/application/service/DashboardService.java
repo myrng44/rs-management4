@@ -6,17 +6,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import org.springframework.cache.annotation.Cacheable;
+
 @Service
 @RequiredArgsConstructor
 public class DashboardService {
-
     private final OrderService orderService;
     private final JdbcTemplate jdbcTemplate;
 
+    @Cacheable("dashboardSummary")
     public DashboardSummaryDTO getSummary() {
         Long totalProducts = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM product", Long.class);
         Long totalCustomers = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM customer WHERE is_deleted = false", Long.class);
-        
+
         return DashboardSummaryDTO.builder()
                 .totalProducts(totalProducts != null ? totalProducts : 0L)
                 .todayOrders(orderService.getTodayOrdersCount())
