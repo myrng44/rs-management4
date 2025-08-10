@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Entity
-@Table(name = "orders")
+@Table(name = "order")
 public class Orders extends FullAuditedGeneratedIdEntity {
 
     @Column(name = "customer_id")

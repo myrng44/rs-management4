@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Entity
-@Table(name = "store_stock")
+@Table(name = "store_stocks")
 public class StoreStock extends FullAuditedSerialIdEntity {
 
     @Column(name = "product_id")
