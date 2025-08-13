@@ -13,7 +13,7 @@ public class SupplierDto extends EntityDto<Long> implements CreateInput<Supplier
 
     private String name;
 
-    private String address;
+    private Long locationId;
 
     private String contact;
 
@@ -21,7 +21,7 @@ public class SupplierDto extends EntityDto<Long> implements CreateInput<Supplier
     public Supplier mapToEntity() {
         Supplier supplier = new Supplier();
         supplier.setName(name);
-        supplier.setAddress(address);
+        supplier.setLocationId(locationId);
         supplier.setContact(contact);
         return supplier;
     }
@@ -39,8 +39,8 @@ public class SupplierDto extends EntityDto<Long> implements CreateInput<Supplier
             isModified = true;
         }
 
-        if (!address.equals(entity.getAddress())) {
-            entity.setAddress(address);
+        if (!locationId.equals(entity.getLocationId())) {
+            entity.setLocationId(locationId);
             isModified = true;
         }
 

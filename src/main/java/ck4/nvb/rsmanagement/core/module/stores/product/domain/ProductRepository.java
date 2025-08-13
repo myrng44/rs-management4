@@ -6,14 +6,14 @@ import org.springframework.stereotype.Repository;
 
 @Repository("productRepository")
 public interface ProductRepository extends BaseFullAuditedRepository<Product, Long, Long> {
+
     @Query(value = """
-    SELECT quantity
-    FROM store_stock
-    WHERE product_id = :productId
-      AND store_id = :storeId
-      AND deleted = false;
-""",
-    nativeQuery = true)
+        SELECT COALESCE(SUM(qty_available), 0)
+        FROM batch_stock
+        WHERE product_id = :productId
+          AND store_id = :storeId
+          AND deleted = false
+    """, nativeQuery = true)
     int remainQuantity(Long productId, Long storeId);
 
     int countProductsByDeletedIsFalse();

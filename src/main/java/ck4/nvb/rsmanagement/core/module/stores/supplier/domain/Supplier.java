@@ -15,8 +15,8 @@ public class Supplier extends FullAuditedSerialIdEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "address")
-    private String address;
+    @Column(name = "location_id")
+    private Long locationId;
 
     @Column(name = "contact")
     private String contact;

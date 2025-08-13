@@ -2,7 +2,7 @@ package ck4.nvb.rsmanagement.core.module.dashboard;
 
 import ck4.nvb.rsmanagement.base.application.exception.AppException;
 import ck4.nvb.rsmanagement.core.module.order.customer.domain.CustomerRepository;
-import ck4.nvb.rsmanagement.core.module.order.order.domain.OrderRepository;
+import ck4.nvb.rsmanagement.core.module.order.saleorder.domain.SaleOrderRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.Optional;
 @Getter
 public class DashboardServiceImpl implements DashboardService {
     private final ProductRepository productRepository;
-    private final OrderRepository orderRepository;
+    private final SaleOrderRepository orderRepository;
     private final CustomerRepository customerRepository;
 
     @Override
