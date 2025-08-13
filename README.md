@@ -38,13 +38,12 @@ cp .env.example .env
 Xem mục chạy app bằng Docker Compose
 
 # 4) Mở Swagger UI
-# http://localhost:8080/swagger-ui.html
+# http://localhost:8080/swagger-ui/index.html
 ```
 
 > Ảnh:
 >
 > - `docs/images/docker-up.png` – Docker Compose up
-> - `docs/images/swagger.png` – Swagger UI
 
 ---
 
@@ -135,6 +134,7 @@ rs-management4/
 ```
 
 > Ảnh minh họa cấu trúc: `docs/images/tree.png`
+![Tree](docs/images/tree.png)
 
 ---
 
@@ -402,8 +402,10 @@ docker compose up -d --build
 
 ## API Docs (Swagger/OpenAPI)
 
-- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 - OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+
+![Swagger UI](docs/images/swagger.png)
 
 `pom.xml` snippet (springdoc):
 
