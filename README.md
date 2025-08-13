@@ -1,6 +1,6 @@
-# Tên dự án Spring Boot của anh
+# RS-MANAGEMENT
 
-> *Mục tiêu: README này hướng dẫn ****từ A → Z**** để ai clone repo cũng chạy được ngay, có kèm hình ảnh, snipcode, và checklist rõ ràng.*
+> *Chi tiết cài đặt dự án.*
 
 
 
