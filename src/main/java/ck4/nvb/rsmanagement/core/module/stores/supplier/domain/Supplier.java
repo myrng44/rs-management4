@@ -1,0 +1,23 @@
+package ck4.nvb.rsmanagement.core.module.stores.supplier.domain;
+
+
+import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.*;
+
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Entity
+@Table(name = "supplier")
+public class Supplier extends FullAuditedSerialIdEntity {
+
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "location_id")
+    private Long locationId;
+
+    @Column(name = "contact")
+    private String contact;
+}

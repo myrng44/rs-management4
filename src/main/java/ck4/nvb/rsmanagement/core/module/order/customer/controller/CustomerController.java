@@ -1,0 +1,39 @@
+package ck4.nvb.rsmanagement.core.module.order.customer.controller;
+
+import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.core.module.order.customer.domain.Customer;
+import ck4.nvb.rsmanagement.core.module.order.customer.service.CustomerCrudServiceImpl;
+import ck4.nvb.rsmanagement.core.module.order.customer.service.dto.CustomerDto;
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/${rs.api.main.baseUrl}/customer")
+public class CustomerController extends AuditedCrudController<CustomerDto, Customer, Long, UserGetDto, Long, CustomerDto, CustomerDto> {
+
+    @Autowired
+    public CustomerController(CustomerCrudServiceImpl customerCrudService) {
+        super(customerCrudService);
+    }
+
+    @Override
+    public UserGetDto extractUser(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
+            return null;
+        }
+
+        Object principal = auth.getPrincipal();
+        if (principal instanceof UserGetDto) {
+            return (UserGetDto) principal;
+        }
+        if (principal instanceof UserRoleDto) {
+            return new ModelMapper().map(principal, UserGetDto.class);
+        }
+        return null;
+    }
+}
