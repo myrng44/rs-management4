@@ -2,7 +2,7 @@ package ck4.nvb.rsmanagement.core.module.stores.supplier.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.core.module.stores.supplier.domain.Supplier;
-import ck4.nvb.rsmanagement.core.module.stores.supplier.service.SupplierServiceImpl;
+import ck4.nvb.rsmanagement.core.module.stores.supplier.service.ISupplierService;
 import ck4.nvb.rsmanagement.core.module.stores.supplier.service.dto.SupplierDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/${rs.api.main.baseUrl}/suppliers")
 public class SupplierController extends AuditedCrudController<SupplierDto, Supplier, Long, UserGetDto, Long, SupplierDto, SupplierDto> {
 
-    public SupplierController(SupplierServiceImpl supplierService) {
+    public SupplierController(ISupplierService supplierService) {
         super(supplierService);
     }
 

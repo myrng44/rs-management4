@@ -2,6 +2,7 @@ package ck4.nvb.rsmanagement.core.module.stores.product.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
+import ck4.nvb.rsmanagement.core.module.stores.product.service.IProductService;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductCreateDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductUpdateDto;
@@ -10,6 +11,7 @@ import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import lombok.Getter;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Getter
 public class ProductController extends AuditedCrudController<ProductGetDto, Product, Long, UserGetDto, Long, ProductCreateDto, ProductUpdateDto> {
 
-    private final ProductServiceImpl productService;
+    @Autowired
+    private IProductService productService;
 
     public ProductController(ProductServiceImpl productService) {
         super(productService);

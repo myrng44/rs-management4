@@ -2,8 +2,8 @@ package ck4.nvb.rsmanagement.core.module.stores.importedproduct.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.core.module.stores.importedproduct.domain.Batch;
+import ck4.nvb.rsmanagement.core.module.stores.importedproduct.service.IBatchService;
 import ck4.nvb.rsmanagement.core.module.stores.importedproduct.service.dto.BatchDto;
-import ck4.nvb.rsmanagement.core.module.stores.importedproduct.service.BatchCrudServiceImpl;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import org.modelmapper.ModelMapper;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/${rs.api.main.baseUrl}/batch")
 public class BatchController extends AuditedCrudController<BatchDto, Batch, Long, UserGetDto, Long, BatchDto, BatchDto> {
 
-    protected BatchController(BatchCrudServiceImpl batchCrudService) {
+    protected BatchController(IBatchService batchCrudService) {
         super(batchCrudService);
     }
 

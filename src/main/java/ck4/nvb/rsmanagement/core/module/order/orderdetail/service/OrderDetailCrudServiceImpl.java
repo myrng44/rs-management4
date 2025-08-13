@@ -10,6 +10,7 @@ import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.ProductServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,13 +19,13 @@ import java.util.Map;
 import java.util.Set;
 
 @Service("orderDetailService")
-public class OrderDetailCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDetailGetDto, OrderDetail, Long, UserGetDto, Long> implements OrderDetailService {
+public class OrderDetailCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDetailGetDto, OrderDetail, Long, UserGetDto, Long> implements IOrderDetailService {
 
-    private final ProductServiceImpl productService;
+    @Autowired
+    private ProductServiceImpl productService;
 
-    protected OrderDetailCrudServiceImpl(OrderDetailRepository repository, ProductServiceImpl productService) {
+    protected OrderDetailCrudServiceImpl(OrderDetailRepository repository) {
         super(repository, OrderDetail.class);
-        this.productService = productService;
     }
 
     @Override

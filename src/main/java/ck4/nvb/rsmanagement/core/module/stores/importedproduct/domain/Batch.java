@@ -17,13 +17,13 @@ import java.util.Date;
 public class Batch extends FullAuditedSerialIdEntity {
 
     @Column(name = "import_log_id")
-    private Long importLogId;
+    private String importLogId;
 
     @Column(name = "product_id")
     private Long productId;
 
     @Column(name = "initial_quantity")
-    private Integer quantity;
+    private Integer initialQuantity;
 
     @Column(name = "imported_price")
     private Integer importedPrice;

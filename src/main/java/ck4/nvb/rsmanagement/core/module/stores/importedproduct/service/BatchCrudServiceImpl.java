@@ -7,6 +7,7 @@ import ck4.nvb.rsmanagement.core.module.stores.importedproduct.domain.BatchRepos
 import ck4.nvb.rsmanagement.core.module.stores.importedproduct.service.dto.BatchDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,11 +15,14 @@ import java.util.Map;
 import java.util.Set;
 
 @Service("batchService")
-public class BatchCrudServiceImpl extends FullAuditedCrudServiceImpl<BatchDto, Batch, Long, UserGetDto, Long> {
+public class BatchCrudServiceImpl extends FullAuditedCrudServiceImpl<BatchDto, Batch, Long, UserGetDto, Long> implements IBatchService {
     
     protected BatchCrudServiceImpl(BatchRepository repository) {
         super(repository, Batch.class);
     }
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public BatchRepository getRepository() {
@@ -27,7 +31,7 @@ public class BatchCrudServiceImpl extends FullAuditedCrudServiceImpl<BatchDto, B
 
     @Override
     public BatchDto mapToEntityDto(Batch entity) {
-        return new ModelMapper().map(entity, BatchDto.class);
+        return modelMapper.map(entity, BatchDto.class);
     }
 
     @Override

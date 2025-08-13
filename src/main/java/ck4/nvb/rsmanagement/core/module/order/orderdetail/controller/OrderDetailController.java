@@ -1,12 +1,10 @@
 package ck4.nvb.rsmanagement.core.module.order.orderdetail.controller;
 
-import ck4.nvb.rsmanagement.base.application.dto.PagedResultDto;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.domain.OrderDetail;
-import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.OrderDetailCrudServiceImpl;
+import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.IOrderDetailService;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.dto.OrderDetailDto;
 import ck4.nvb.rsmanagement.core.module.order.orderdetail.service.dto.OrderDetailGetDto;
-import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import org.modelmapper.ModelMapper;
@@ -20,11 +18,11 @@ import java.util.List;
 @RequestMapping("/${rs.api.main.baseUrl}/orders/details")
 public class OrderDetailController extends AuditedCrudController<OrderDetailGetDto, OrderDetail, Long, UserGetDto, Long, OrderDetailDto, OrderDetailDto> {
 
-    private final OrderDetailCrudServiceImpl orderDetailCrudService;
+    @Autowired
+    private IOrderDetailService orderDetailCrudService;
 
-    public OrderDetailController(OrderDetailCrudServiceImpl service) {
+    public OrderDetailController(IOrderDetailService service) {
         super(service);
-        this.orderDetailCrudService = service;
     }
 
     @Override

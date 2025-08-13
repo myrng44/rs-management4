@@ -1,13 +1,13 @@
 package ck4.nvb.rsmanagement.core.module.stores.product.service;
 
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
-import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
 import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,25 +15,18 @@ import java.util.Map;
 import java.util.Set;
 
 @Service("productService")
-public class ProductServiceImpl extends FullAuditedCrudServiceImpl<ProductGetDto, Product, Long, UserGetDto, Long> implements ProductService {
+public class ProductServiceImpl extends FullAuditedCrudServiceImpl<ProductGetDto, Product, Long, UserGetDto, Long> implements IProductService {
 
     protected ProductServiceImpl(ProductRepository repository) {
         super(repository, Product.class);
     }
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @Override
     public ProductGetDto mapToEntityDto(Product entity) {
-        ProductGetDto dto = new ProductGetDto();
-        dto.setId(entity.getId());
-        dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
-        dto.setSku(entity.getSku());
-        dto.setCategoryId(entity.getCategoryId());
-        dto.setUnitPrice(entity.getUnitPrice());
-        dto.setSupplierId(entity.getSupplierId());
-
-//        return new ModelMapper().map(entity, ProductGetDto.class);
-        return dto;
+        return modelMapper.map(entity, ProductGetDto.class);
     }
 
     @Override
@@ -45,6 +38,7 @@ public class ProductServiceImpl extends FullAuditedCrudServiceImpl<ProductGetDto
     public Map<String, List<SearchOperator>> getSearchableKeys() {
         Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
         keys.put("sku", List.of(SearchOperator.CONTAINS, SearchOperator.EQUALS));
+        keys.put("name", List.of(SearchOperator.CONTAINS, SearchOperator.EQUALS));
         return keys;
     }
 

@@ -12,11 +12,11 @@ import java.util.Date;
 
 @Getter @Setter
 public class BatchDto extends EntityDto<Long> implements CreateInput<Batch>, UpdateInput<Batch> {
-    private Long importLogId;
+    private String importLogId;
     private Long productId;
     private Integer initialQuantity;
     private Integer currentQuantity;
-    private Integer importPrice;
+    private Integer importedPrice;
     private Date manufacturingDate;
     private Date expiryDate;
     private String status;

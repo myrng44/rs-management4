@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service("categoryService")
-public class CategoryServiceImpl extends FullAuditedCrudServiceImpl<CategoryDto, Category, Long, UserGetDto, Long> {
+public class CategoryServiceImpl extends FullAuditedCrudServiceImpl<CategoryDto, Category, Long, UserGetDto, Long> implements ICategoryService {
 
     protected CategoryServiceImpl(CategoryRepository repository) {
         super(repository, Category.class);

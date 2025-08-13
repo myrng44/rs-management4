@@ -1,6 +1,8 @@
 package ck4.nvb.rsmanagement.core.module.order.orderdetail.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,11 +10,13 @@ import lombok.Setter;
 @Getter @Setter @NoArgsConstructor
 public class OrderDetailGetDto extends EntityDto<Long> {
     private String orderId;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long productId;
     private String productName;
     private Integer quantity;
     private Integer unitPrice;
 
+    //jackson return response theo get method chứ không theo field
     public Integer getTotalPrice() {
         if (quantity == null || unitPrice == null) {
             return null;

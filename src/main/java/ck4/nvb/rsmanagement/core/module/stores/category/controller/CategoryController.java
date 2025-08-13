@@ -2,7 +2,7 @@ package ck4.nvb.rsmanagement.core.module.stores.category.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.core.module.stores.category.domain.Category;
-import ck4.nvb.rsmanagement.core.module.stores.category.service.CategoryServiceImpl;
+import ck4.nvb.rsmanagement.core.module.stores.category.service.ICategoryService;
 import ck4.nvb.rsmanagement.core.module.stores.category.service.dto.CategoryDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/${rs.api.main.baseUrl}/categories")
 public class CategoryController extends AuditedCrudController<CategoryDto, Category, Long, UserGetDto, Long, CategoryDto, CategoryDto> {
 
-    protected CategoryController(CategoryServiceImpl categoryService) {
+    protected CategoryController(ICategoryService categoryService) {
         super(categoryService);
     }
 

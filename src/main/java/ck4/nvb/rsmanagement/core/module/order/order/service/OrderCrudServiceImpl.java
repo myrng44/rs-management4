@@ -6,7 +6,6 @@ import ck4.nvb.rsmanagement.core.module.order.order.domain.Orders;
 import ck4.nvb.rsmanagement.core.module.order.order.domain.OrderRepository;
 import ck4.nvb.rsmanagement.core.module.order.order.service.dto.OrderDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service("orderService")
-public class OrderCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDto, Orders, String, UserGetDto, Long> {
+public class OrderCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDto, Orders, String, UserGetDto, Long> implements IOrderService {
 
     protected OrderCrudServiceImpl(OrderRepository repository) {
         super(repository, Orders.class);
@@ -27,7 +26,16 @@ public class OrderCrudServiceImpl extends FullAuditedCrudServiceImpl<OrderDto, O
 
     @Override
     public OrderDto mapToEntityDto(Orders entity) {
-        return new ModelMapper().map(entity, OrderDto.class);
+        int finalPrice = getRepository().getFinalPriceByOrderId(entity.getId());
+        OrderDto orderDto = new OrderDto();
+        orderDto.setId(entity.getId());
+        orderDto.setCustomerId(entity.getCustomerId());
+        orderDto.setStoreId(entity.getStoreId());
+        orderDto.setNote(entity.getNote());
+        orderDto.setVoucherId(entity.getVoucherId());
+        orderDto.setPaymentId(entity.getPaymentId());
+        orderDto.setFinalPrice(finalPrice);
+        return orderDto;
     }
 
     @Override

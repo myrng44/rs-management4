@@ -2,7 +2,7 @@ package ck4.nvb.rsmanagement.core.module.stores.stock.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.core.module.stores.stock.domain.Stock;
-import ck4.nvb.rsmanagement.core.module.stores.stock.service.StockServiceImpl;
+import ck4.nvb.rsmanagement.core.module.stores.stock.service.IStockService;
 import ck4.nvb.rsmanagement.core.module.stores.stock.service.dto.StockDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/${rs.api.main.baseUrl}/stock")
 public class StockController extends AuditedCrudController<StockDto, Stock, Long, UserGetDto, Long, StockDto, StockDto> {
 
-    public StockController(StockServiceImpl stockService) {
+    public StockController(IStockService stockService) {
         super(stockService);
     }
 

@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter @Setter @NoArgsConstructor
 public class VoucherDto extends EntityDto<Long> implements CreateInput<Voucher>, UpdateInput<Voucher> {
@@ -17,8 +18,8 @@ public class VoucherDto extends EntityDto<Long> implements CreateInput<Voucher>,
     private String description;
     private Integer discountPercent;
     private Integer discountValue;
-    private LocalDate startTime;
-    private LocalDate expirationTime;
+    private LocalDateTime startTime;
+    private LocalDateTime expirationTime;
 
     @Override
     public Voucher mapToEntity() {

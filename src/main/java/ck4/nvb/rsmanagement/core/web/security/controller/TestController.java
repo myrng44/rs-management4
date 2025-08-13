@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/test")
+@RequestMapping("/${rs.api.main.publicUrl}/test")
 @Slf4j
 public class TestController {
 

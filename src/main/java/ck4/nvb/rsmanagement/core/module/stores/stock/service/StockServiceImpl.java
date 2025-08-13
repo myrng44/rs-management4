@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service("stockService")
-public class StockServiceImpl extends FullAuditedCrudServiceImpl<StockDto, Stock, Long, UserGetDto, Long> {
+public class StockServiceImpl extends FullAuditedCrudServiceImpl<StockDto, Stock, Long, UserGetDto, Long> implements IStockService {
 
     protected StockServiceImpl(StockRepository repository) {
         super(repository, Stock.class);

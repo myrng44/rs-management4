@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service("supplierService")
-public class SupplierServiceImpl extends FullAuditedCrudServiceImpl<SupplierDto, Supplier, Long, UserGetDto, Long> {
+public class SupplierServiceImpl extends FullAuditedCrudServiceImpl<SupplierDto, Supplier, Long, UserGetDto, Long> implements ISupplierService {
 
     protected SupplierServiceImpl(SupplierRepository repository) {
         super(repository, Supplier.class);
