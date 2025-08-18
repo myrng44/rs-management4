@@ -14,26 +14,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/vouchers")
-public class VoucherController extends AuditedCrudController<VoucherDto, Voucher, Long, UserGetDto, Long, VoucherDto, VoucherDto> {
+public class VoucherController
+    extends AuditedCrudController<
+        VoucherDto, Voucher, Long, UserGetDto, Long, VoucherDto, VoucherDto> {
 
-    @Autowired
-    public VoucherController(VoucherCrudServiceImpl voucherCrudService) {
-        super(voucherCrudService);
+  @Autowired
+  public VoucherController(VoucherCrudServiceImpl voucherCrudService) {
+    super(voucherCrudService);
+  }
+
+  @Override
+  public UserGetDto extractUser(Authentication auth) {
+    if (auth == null || !auth.isAuthenticated()) {
+      return null;
     }
 
-    @Override
-    public UserGetDto extractUser(Authentication auth) {
-        if (auth == null || !auth.isAuthenticated()) {
-            return null;
-        }
-
-        Object principal = auth.getPrincipal();
-        if (principal instanceof UserGetDto) {
-            return (UserGetDto) principal;
-        }
-        if (principal instanceof UserRoleDto) {
-            return new ModelMapper().map(principal, UserGetDto.class);
-        }
-        return null;
+    Object principal = auth.getPrincipal();
+    if (principal instanceof UserGetDto) {
+      return (UserGetDto) principal;
     }
+    if (principal instanceof UserRoleDto) {
+      return new ModelMapper().map(principal, UserGetDto.class);
+    }
+    return null;
+  }
 }

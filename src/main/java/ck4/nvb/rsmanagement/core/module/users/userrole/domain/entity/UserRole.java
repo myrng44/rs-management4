@@ -8,16 +8,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @Table(name = "user_role")
 public class UserRole extends FullAuditedSerialIdEntity {
 
-    @Column(name = "user_id")
-    private Long userId;
+  @Column(name = "user_id")
+  private Long userId;
 
-    @Column(name = "role_id")
-    private Long roleId;
+  @Column(name = "role_id")
+  private Long roleId;
 
-    @Column(name = "store_id")
-    private Long storeId;
+  @Column(name = "store_id")
+  private Long storeId;
 }

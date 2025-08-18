@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository("permissionRepository")
 public interface PermissionRepository extends BaseFullAuditedRepository<Permission, Long, Long> {
-    Permission findByCode(String code);
+  Permission findByCode(String code);
 }

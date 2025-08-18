@@ -4,14 +4,13 @@ import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 public abstract class BaseProductDto extends EntityDto<Long> {
 
-    private String sku;
-    private String name;
-    private String description;
-    private Integer unitPrice;
-    private Long categoryId;
-    private Long supplierId;
-
+  private String sku;
+  private String name;
+  private String desc;
+  private Integer unitPrice;
+  private Long categoryId;
 }

@@ -1,38 +1,47 @@
 package ck4.nvb.rsmanagement.core.web.security.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.Dto;
+import java.io.Serial;
 import lombok.*;
 
-import java.io.Serial;
-
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TokenResponseDto extends Dto {
 
+  @Serial private static final long serialVersionUID = 1L;
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+  private String accessToken;
 
-    private String accessToken;
+  private String tokenType = "Bearer";
 
-    private String tokenType = "Bearer";
+  private String refreshToken;
 
-    private String refreshToken;
+  private long issuedAt;
 
-    private long issuedAt;
+  private long expiresIn;
 
-    private long expiresIn;
+  private long expiresAt;
 
-    private long expiresAt;
-
-    @Override
-    public String toString() {
-        return "TokenResponseDto{" +
-                "accessToken='" + accessToken + '\'' +
-                ", type='" + tokenType + '\'' +
-                ", refreshTokenID='" + refreshToken + '\'' +
-                ", issuedAt=" + issuedAt +
-                ", expiresIn=" + expiresIn +
-                ", expiresAt=" + expiresAt +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "TokenResponseDto{"
+        + "accessToken='"
+        + accessToken
+        + '\''
+        + ", type='"
+        + tokenType
+        + '\''
+        + ", refreshTokenID='"
+        + refreshToken
+        + '\''
+        + ", issuedAt="
+        + issuedAt
+        + ", expiresIn="
+        + expiresIn
+        + ", expiresAt="
+        + expiresAt
+        + '}';
+  }
 }

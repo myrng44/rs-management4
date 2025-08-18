@@ -9,13 +9,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "payment_method")
 public class PaymentMethod extends FullAuditedSerialIdEntity {
-    @Column(name = "code", nullable = false)
-    private String code;
+  @Column(name = "code", nullable = false)
+  private String code;
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 }

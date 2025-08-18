@@ -14,26 +14,34 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/payment-method")
-public class PaymentMethodController extends AuditedCrudController<PaymentMethodDto, PaymentMethod, Long, UserGetDto, Long, PaymentMethodDto, PaymentMethodDto> {
+public class PaymentMethodController
+    extends AuditedCrudController<
+        PaymentMethodDto,
+        PaymentMethod,
+        Long,
+        UserGetDto,
+        Long,
+        PaymentMethodDto,
+        PaymentMethodDto> {
 
-    @Autowired
-    public PaymentMethodController(PaymentMethodCrudServiceImpl service) {
-        super(service);
+  @Autowired
+  public PaymentMethodController(PaymentMethodCrudServiceImpl service) {
+    super(service);
+  }
+
+  @Override
+  public UserGetDto extractUser(Authentication auth) {
+    if (auth == null || !auth.isAuthenticated()) {
+      return null;
     }
 
-    @Override
-    public UserGetDto extractUser(Authentication auth) {
-        if (auth == null || !auth.isAuthenticated()) {
-            return null;
-        }
-
-        Object principal = auth.getPrincipal();
-        if (principal instanceof UserGetDto) {
-            return (UserGetDto) principal;
-        }
-        if (principal instanceof UserRoleDto) {
-            return new ModelMapper().map(principal, UserGetDto.class);
-        }
-        return null;
+    Object principal = auth.getPrincipal();
+    if (principal instanceof UserGetDto) {
+      return (UserGetDto) principal;
     }
+    if (principal instanceof UserRoleDto) {
+      return new ModelMapper().map(principal, UserGetDto.class);
+    }
+    return null;
+  }
 }

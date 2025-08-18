@@ -8,63 +8,64 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 @MappedSuperclass
 @Access(AccessType.FIELD)
 public abstract class SerialIdEntity implements IEntity<Long> {
 
-    //Fields
-    @Id
-    @Column(name = "id")
-    private Long id;
+  // Fields
+  @Id
+  @Column(name = "id")
+  private Long id;
 
-    @PrePersist
-    public void ensureId() {
-        if (id == null) {
-            id = SnowflakeIdGeneratorHolder.getInstance().nextId();
-        }
+  @PrePersist
+  public void ensureId() {
+    if (id == null) {
+      id = SnowflakeIdGeneratorHolder.getInstance().nextId();
+    }
+  }
+
+  public SerialIdEntity(Long serialId) {
+    setId(serialId);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
     }
 
-    public SerialIdEntity(Long serialId) {
-        setId(serialId);
+    if (!(obj instanceof SerialIdEntity)) {
+      return false;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-
-        if (!(obj instanceof SerialIdEntity)) {
-            return false;
-        }
-
-        if (this == obj) {
-            return true;
-        }
-
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-
-        return this.getId() != null && this.getId().equals(((SerialIdEntity) obj).getId());
+    if (this == obj) {
+      return true;
     }
 
-    @Transient
-    private boolean newEntity = false;
-
-    @Override
-    public void setNew(boolean newEntity) {
-        this.newEntity = newEntity;
+    if (getClass() != obj.getClass()) {
+      return false;
     }
 
-    @Override
-    public boolean isNew() {
-        return newEntity;
-    }
+    return this.getId() != null && this.getId().equals(((SerialIdEntity) obj).getId());
+  }
 
-    @Override
-    public String toString() {
-        return super.getClass().getSimpleName() + " " + JacksonParser.getInstance().toJson(this);
-    }
+  @Transient private boolean newEntity = false;
+
+  @Override
+  public void setNew(boolean newEntity) {
+    this.newEntity = newEntity;
+  }
+
+  @Override
+  public boolean isNew() {
+    return newEntity;
+  }
+
+  @Override
+  public String toString() {
+    return super.getClass().getSimpleName() + " " + JacksonParser.getInstance().toJson(this);
+  }
 }

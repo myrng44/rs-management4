@@ -14,26 +14,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/customer")
-public class CustomerController extends AuditedCrudController<CustomerDto, Customer, Long, UserGetDto, Long, CustomerDto, CustomerDto> {
+public class CustomerController
+    extends AuditedCrudController<
+        CustomerDto, Customer, Long, UserGetDto, Long, CustomerDto, CustomerDto> {
 
-    @Autowired
-    public CustomerController(CustomerCrudServiceImpl customerCrudService) {
-        super(customerCrudService);
+  @Autowired
+  public CustomerController(CustomerCrudServiceImpl customerCrudService) {
+    super(customerCrudService);
+  }
+
+  @Override
+  public UserGetDto extractUser(Authentication auth) {
+    if (auth == null || !auth.isAuthenticated()) {
+      return null;
     }
 
-    @Override
-    public UserGetDto extractUser(Authentication auth) {
-        if (auth == null || !auth.isAuthenticated()) {
-            return null;
-        }
-
-        Object principal = auth.getPrincipal();
-        if (principal instanceof UserGetDto) {
-            return (UserGetDto) principal;
-        }
-        if (principal instanceof UserRoleDto) {
-            return new ModelMapper().map(principal, UserGetDto.class);
-        }
-        return null;
+    Object principal = auth.getPrincipal();
+    if (principal instanceof UserGetDto) {
+      return (UserGetDto) principal;
     }
+    if (principal instanceof UserRoleDto) {
+      return new ModelMapper().map(principal, UserGetDto.class);
+    }
+    return null;
+  }
 }

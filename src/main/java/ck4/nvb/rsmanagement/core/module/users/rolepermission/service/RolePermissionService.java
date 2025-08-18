@@ -5,5 +5,5 @@ import ck4.nvb.rsmanagement.core.module.users.rolepermission.domain.entity.RoleP
 import ck4.nvb.rsmanagement.core.module.users.rolepermission.service.dto.RolePermissionDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 
-public interface RolePermissionService extends FullAuditedCrudService<RolePermissionDto, RolePermission, Long, UserGetDto, Long> {
-}
+public interface RolePermissionService
+    extends FullAuditedCrudService<RolePermissionDto, RolePermission, Long, UserGetDto, Long> {}

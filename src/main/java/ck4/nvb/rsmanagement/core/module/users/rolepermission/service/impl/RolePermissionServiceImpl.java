@@ -10,21 +10,23 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service("rolePermissionService")
-public class RolePermissionServiceImpl extends FullAuditedCrudServiceImpl<RolePermissionDto, RolePermission, Long, UserGetDto, Long> implements RolePermissionService {
+public class RolePermissionServiceImpl
+    extends FullAuditedCrudServiceImpl<RolePermissionDto, RolePermission, Long, UserGetDto, Long>
+    implements RolePermissionService {
 
-    private final ModelMapper modelMapper = new ModelMapper();
+  private final ModelMapper modelMapper = new ModelMapper();
 
-    protected RolePermissionServiceImpl(RolePermissionRepository repository) {
-        super(repository, RolePermission.class);
-    }
+  protected RolePermissionServiceImpl(RolePermissionRepository repository) {
+    super(repository, RolePermission.class);
+  }
 
-    @Override
-    public RolePermissionDto mapToEntityDto(RolePermission entity) {
-        return modelMapper.map(entity, RolePermissionDto.class);
-    }
+  @Override
+  public RolePermissionDto mapToEntityDto(RolePermission entity) {
+    return modelMapper.map(entity, RolePermissionDto.class);
+  }
 
-    @Override
-    public RolePermissionRepository getRepository() {
-        return (RolePermissionRepository) super.getRepository();
-    }
+  @Override
+  public RolePermissionRepository getRepository() {
+    return (RolePermissionRepository) super.getRepository();
+  }
 }

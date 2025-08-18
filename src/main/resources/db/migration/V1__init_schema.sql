@@ -1,322 +1,844 @@
-
-    create table batch (
-        current_quantity integer,
-        deleted boolean,
-        imported_price integer,
-        initial_quantity integer,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        expiry_date timestamp(0),
-        id bigint not null,
-        import_log_id bigint,
-        last_updated timestamp(0),
-        last_updater bigint,
-        manufacturing_date timestamp(0),
-        product_id bigint,
-        status varchar(10),
-        primary key (id)
-    );
-    create index idx_batch_product on batch(product_id);
-    create index idx_batch_import_log on batch(import_log_id);
-    create index idx_batch_product_expiry on batch(product_id, expiry_date);
-
-    create table category (
-        deleted boolean,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        description varchar(255),
-        name varchar(50) not null,
-        primary key (id)
-    );
-    create unique index uq_category_name on category(name);
-
-    create table customer (
-        deleted boolean,
-        point integer,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        gender varchar(10),
-        name varchar(50),
-        phone varchar(12),
-        primary key (id)
-    );
-    create index idx_customer_phone on customer(phone);
-    create index idx_customer_name on customer(name);
-
-    create table import_log (
-        deleted boolean,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        delivery_date timestamp(0),
-        from_stock bigint,
-        last_updated timestamp(0),
-        last_updater bigint,
-        start_date timestamp(0),
-        to_store bigint,
-        id varchar(255) not null,
-        status varchar(10),
-        primary key (id)
-    );
-    create index idx_importlog_to_store on import_log(to_store);
-    create index idx_importlog_status_store on import_log(status, to_store);
-
-    create table order_detail (
-        deleted boolean,
-        quantity integer,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        product_id bigint,
-        order_id varchar(255),
-        unit_price integer,
-        primary key (id)
-    );
-    create index idx_orderdetail_order on order_detail(order_id);
-    create index idx_orderdetail_product on order_detail(product_id);
-
-    create table orders (
-        deleted boolean,
-        final_price integer,
-        created_time timestamp(0),
-        creator_id bigint,
-        customer_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        last_updated timestamp(0),
-        last_updater bigint,
-        payment_id bigint,
-        store_id bigint not null,
-        voucher_id bigint,
-        id varchar(255) not null,
-        note varchar(50),
-        primary key (id)
-    );
-    create index idx_orders_customer on orders(customer_id);
-    create index idx_orders_store on orders(store_id);
-    create index idx_orders_payment on orders(payment_id);
-    create index idx_orders_store_voucher on orders(store_id, voucher_id);
-    create index idx_orders_created_time on orders(created_time desc);
-
-    create table payment_method (
-        deleted boolean,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        code varchar(10) not null,
-        name varchar(50),
-        primary key (id)
-    );
-
-    create table permission (
-        deleted boolean,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        code varchar(50),
-        description varchar(50),
-        primary key (id)
-    );
-
-    create table product (
-        deleted boolean,
-        unit_price integer not null,
-        category_id bigint,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        supplier_id bigint,
-        description varchar(255),
-        name varchar(50) not null,
-        sku varchar(50) not null unique,
-        primary key (id)
-    );
-    create index idx_product_category on product(category_id);
-    create index idx_product_supplier on product(supplier_id);
-    create index idx_product_name on product(name);
-
-    create table refresh_token (
-        created_time timestamp(0),
-        creator_id bigint,
-        expired_time timestamp(0) not null,
-        device_session varchar(50),
-        id varchar(255) not null,
-        ip_address varchar(50),
-        primary key (id)
-    );
-
-    create table role (
-        deleted boolean,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        description varchar(255),
-        name varchar(50) not null,
-        primary key (id)
-    );
-
-    create table role_permission (
-        deleted boolean,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        permission_id bigint,
-        role_id bigint,
-        primary key (id)
-    );
-
-    create table stock (
-        deleted boolean,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        location varchar(50),
-        name varchar(50),
-        primary key (id)
-    );
-
-    create table store (
-        deleted boolean,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        address varchar(50),
-        name varchar(50) not null,
-        phone varchar(12),
-        primary key (id)
-    );
-
-    create table store_stock (
-        deleted boolean,
-        quantity integer,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        product_id bigint,
-        store_id bigint,
-        primary key (id)
-    );
-    create index idx_storestock_store_product on store_stock(store_id, product_id);
-    create index idx_storestock_store on store_stock(store_id);
-
-    create table store_user (
-        deleted boolean,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        store_id bigint,
-        email varchar(50) unique,
-        full_name varchar(50),
-        password varchar(50) not null,
-        phone varchar(12),
-        username varchar(50) not null unique,
-        primary key (id)
-    );
-    create index idx_storeuser_store on store_user(store_id);
+CREATE TABLE "product" (
+                           "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                           "name" VARCHAR(50) NOT NULL,
+                           "sku" VARCHAR(50) NOT NULL UNIQUE,
+                           "desc" VARCHAR(255),
+                           "unit_price" INTEGER NOT NULL,
+                           "category_id" BIGINT NOT NULL,
+                           "created_at" TIMESTAMP NOT NULL,
+                           "created_by" BIGINT NOT NULL,
+                           "updated_at" TIMESTAMP NOT NULL,
+                           "updated_by" BIGINT NOT NULL,
+                           "deleted" BOOLEAN NOT NULL,
+                           PRIMARY KEY("id")
+);
 
 
-    create table supplier (
-        deleted boolean,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        address varchar(50),
-        contact varchar(50),
-        name varchar(50) not null,
-        primary key (id)
-    );
-
-    create table user_role (
-        deleted boolean,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        role_id bigint,
-        store_id bigint,
-        user_id bigint,
-        primary key (id)
-    );
-    create index idx_userrole_user on user_role(user_id);
-    create index idx_userrole_store_role on user_role(store_id, role_id);
 
 
-    create table voucher (
-        deleted boolean,
-        discount_percent integer,
-        discount_value integer,
-        created_time timestamp(0),
-        creator_id bigint,
-        deleted_time timestamp(0),
-        deleter_id bigint,
-        expiration_time timestamp(0),
-        id bigint not null,
-        last_updated timestamp(0),
-        last_updater bigint,
-        start_time timestamp(0),
-        code varchar(50),
-        description varchar(255),
-        primary key (id)
-    );
-    create unique index uq_voucher_code on voucher(code);
-    create index idx_voucher_time on voucher(start_time, expiration_time);
+CREATE TABLE "batch_stock" (
+                               "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                               "batch_id" BIGINT NOT NULL,
+                               "store_id" BIGINT NOT NULL,
+                               "qty_total" INTEGER NOT NULL,
+                               "qty_available" INTEGER NOT NULL,
+                               "qty_reversed" INTEGER NOT NULL,
+                               "status" VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+                               "version" INTEGER NOT NULL DEFAULT 0,
+                               "created_at" TIMESTAMP NOT NULL,
+                               "created_by" BIGINT NOT NULL,
+                               "updated_at" TIMESTAMP NOT NULL,
+                               "updated_by" BIGINT NOT NULL,
+                               "deleted" BOOLEAN NOT NULL,
+                               PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "store" (
+                         "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                         "name" VARCHAR(50) NOT NULL,
+                         "address" VARCHAR(50) NOT NULL,
+                         "location_id" BIGINT NOT NULL,
+                         "phone" VARCHAR(15) NOT NULL UNIQUE,
+                         "created_at" TIMESTAMP NOT NULL,
+                         "created_by" BIGINT NOT NULL,
+                         "updated_at" TIMESTAMP NOT NULL,
+                         "updated_by" BIGINT NOT NULL,
+                         "deleted" BOOLEAN NOT NULL,
+                         PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "batch" (
+                         "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                         "batch_code" VARCHAR(50) NOT NULL,
+                         "product_id" BIGINT NOT NULL,
+                         "original_qty" INTEGER NOT NULL,
+                         "supplier_id" BIGINT NOT NULL,
+                         "import_price" INTEGER NOT NULL,
+                         "manufacture_date" TIMESTAMP NOT NULL,
+                         "expiry_date" TIMESTAMP NOT NULL,
+                         "arrival_date" TIMESTAMP NOT NULL,
+                         "created_at" TIMESTAMP NOT NULL,
+                         "created_by" BIGINT NOT NULL,
+                         "updated_at" TIMESTAMP NOT NULL,
+                         "updated_by" BIGINT NOT NULL,
+                         "deleted" BOOLEAN NOT NULL,
+                         PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "category" (
+                            "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                            "name" VARCHAR(50) NOT NULL,
+                            "desc" VARCHAR(255),
+                            "created_at" TIMESTAMP NOT NULL,
+                            "created_by" BIGINT NOT NULL,
+                            "updated_at" TIMESTAMP NOT NULL,
+                            "updated_by" BIGINT NOT NULL,
+                            "deleted" BOOLEAN NOT NULL,
+                            PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "supplier" (
+                            "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                            "name" VARCHAR(50) NOT NULL,
+                            "location_id" BIGINT NOT NULL,
+                            "contact" VARCHAR(50) NOT NULL,
+                            "created_at" TIMESTAMP NOT NULL,
+                            "created_by" BIGINT NOT NULL,
+                            "updated_at" TIMESTAMP NOT NULL,
+                            "updated_by" BIGINT NOT NULL,
+                            "deleted" BOOLEAN NOT NULL,
+                            PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "sale_order" (
+                              "id" VARCHAR(50) NOT NULL UNIQUE,
+                              "store_id" BIGINT NOT NULL,
+                              "customer_id" BIGINT,
+                              "voucher_id" BIGINT,
+                              "final_price" INTEGER NOT NULL,
+                              "note" VARCHAR(255),
+                              "payment_id" BIGINT NOT NULL,
+                              "created_at" TIMESTAMP NOT NULL,
+                              "created_by" BIGINT NOT NULL,
+                              "updated_at" TIMESTAMP NOT NULL,
+                              "updated_by" BIGINT NOT NULL,
+                              "deleted" BOOLEAN NOT NULL,
+                              PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "sale_line" (
+                             "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                             "sale_order_id" VARCHAR(50) NOT NULL,
+                             "product_id" BIGINT NOT NULL,
+                             "qty_ordered" INTEGER NOT NULL DEFAULT 0,
+                             "qty_allocated" INTEGER NOT NULL DEFAULT 0,
+                             "qty_picked" INTEGER NOT NULL DEFAULT 0,
+                             "unit_price" INTEGER NOT NULL,
+                             "created_at" TIMESTAMP NOT NULL,
+                             "created_by" BIGINT NOT NULL,
+                             "updated_at" TIMESTAMP NOT NULL,
+                             "updated_by" BIGINT NOT NULL,
+                             "deleted" BOOLEAN NOT NULL,
+                             PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "customer" (
+                            "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                            "name" VARCHAR(20) NOT NULL,
+                            "phone" VARCHAR(15) NOT NULL,
+                            "point" INTEGER NOT NULL,
+                            "gender" CHAR(1) NOT NULL,
+                            "created_at" TIMESTAMP NOT NULL,
+                            "created_by" BIGINT NOT NULL,
+                            "updated_at" TIMESTAMP NOT NULL,
+                            "updated_by" BIGINT NOT NULL,
+                            "deleted" BOOLEAN NOT NULL,
+                            PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "voucher" (
+                           "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                           "code" VARCHAR(50) NOT NULL UNIQUE,
+                           "desc" VARCHAR(255),
+                           "discount_per" SMALLINT DEFAULT 0,
+                           "discount_val" INTEGER,
+                           "valid_from" TIMESTAMP NOT NULL,
+                           "valid_to" TIMESTAMP NOT NULL,
+                           "qty_total" INTEGER,
+                           "qty_redeemed" INTEGER NOT NULL DEFAULT 0,
+                           "per_customer_limit" SMALLINT NOT NULL DEFAULT 1,
+                           "audience_type" VARCHAR(20) NOT NULL DEFAULT 'ALL',
+                           "created_at" TIMESTAMP NOT NULL,
+                           "created_by" BIGINT NOT NULL,
+                           "updated_at" TIMESTAMP NOT NULL,
+                           "updated_by" BIGINT NOT NULL,
+                           "deleted" BOOLEAN NOT NULL,
+                           PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "payment_method" (
+                                  "id" BIGINT NOT NULL UNIQUE,
+                                  "code" VARCHAR(10) NOT NULL DEFAULT 'CASH',
+                                  "name" VARCHAR(50) NOT NULL,
+                                  "created_at" TIMESTAMP NOT NULL,
+                                  "created_by" BIGINT NOT NULL,
+                                  "updated_at" TIMESTAMP NOT NULL,
+                                  "updated_by" BIGINT NOT NULL,
+                                  "deleted" BOOLEAN NOT NULL,
+                                  PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "users" (
+                         "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                         "username" VARCHAR(50) NOT NULL,
+                         "password" VARCHAR(255) NOT NULL,
+                         "full_name" VARCHAR(50) NOT NULL,
+                         "email" VARCHAR(50) NOT NULL,
+                         "phone" VARCHAR(15) NOT NULL,
+                         "store_id" BIGINT NOT NULL,
+                         "last_login" TIMESTAMP NOT NULL,
+                         "created_at" TIMESTAMP NOT NULL,
+                         "created_by" BIGINT NOT NULL,
+                         "updated_at" TIMESTAMP NOT NULL,
+                         "updated_by" BIGINT NOT NULL,
+                         "deleted" BOOLEAN NOT NULL DEFAULT false,
+                         PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "role" (
+                        "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+    -- 'SYSADMIN', 'ADMIN', 'STAFF'
+                        "name" VARCHAR(20) NOT NULL UNIQUE,
+                        "desc" VARCHAR(255),
+                        "created_at" TIMESTAMP NOT NULL,
+                        "created_by" BIGINT NOT NULL,
+                        "updated_at" TIMESTAMP NOT NULL,
+                        "updated_by" BIGINT NOT NULL,
+                        "deleted" BOOLEAN NOT NULL,
+                        PRIMARY KEY("id")
+);
+
+
+COMMENT ON COLUMN "role"."name" IS '''SYSADMIN'', ''ADMIN'', ''STAFF''';
+
+
+CREATE TABLE "permission" (
+                              "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+    -- 'CREATE_ORDER', 'VIEW_REPORT'
+                              "code" VARCHAR(50) NOT NULL UNIQUE,
+                              "desc" VARCHAR(255),
+                              "created_at" TIMESTAMP NOT NULL,
+                              "created_by" BIGINT NOT NULL,
+                              "updated_at" TIMESTAMP NOT NULL,
+                              "updated_by" BIGINT NOT NULL,
+                              "deleted" BOOLEAN NOT NULL,
+                              PRIMARY KEY("id")
+);
+
+
+COMMENT ON COLUMN "permission"."code" IS '''CREATE_ORDER'', ''VIEW_REPORT''';
+
+
+CREATE TABLE "role_permission" (
+                                   "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                                   "role_id" BIGINT NOT NULL,
+                                   "permission_id" BIGINT NOT NULL,
+                                   "created_at" TIMESTAMP NOT NULL,
+                                   "created_by" BIGINT NOT NULL,
+                                   "updated_at" TIMESTAMP NOT NULL,
+                                   "updated_by" BIGINT NOT NULL,
+                                   "deleted" BOOLEAN NOT NULL,
+                                   PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "forecast_result" (
+                                   "id" INTEGER NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                                   "product_id" BIGINT NOT NULL,
+                                   "store_id" BIGINT NOT NULL,
+                                   "created_at" TIMESTAMP NOT NULL,
+                                   "target_date" TIMESTAMP NOT NULL,
+                                   "predicted_qty" INTEGER NOT NULL,
+                                   "model_version" VARCHAR(50) NOT NULL,
+                                   PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "sale_allocation" (
+                                   "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                                   "sale_line_id" BIGINT NOT NULL,
+                                   "batch_stock_id" BIGINT NOT NULL,
+                                   "qty_allocated" INTEGER NOT NULL,
+                                   "qty_picked" INTEGER NOT NULL DEFAULT 0,
+                                   "unit_cost_snap" INTEGER NOT NULL,
+                                   "created_at" TIMESTAMP NOT NULL,
+                                   "created_by" BIGINT NOT NULL,
+                                   "updated_at" TIMESTAMP NOT NULL,
+                                   "updated_by" BIGINT NOT NULL,
+                                   "deleted" BOOLEAN NOT NULL,
+                                   PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "inventory_adjustment" (
+                                        "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                                        "batch_stock_id" BIGINT NOT NULL,
+                                        "change_qty" INTEGER NOT NULL,
+                                        "reason" VARCHAR(255),
+                                        "reference_id" VARCHAR(255),
+                                        "created_at" TIMESTAMP NOT NULL,
+                                        "created_by" BIGINT NOT NULL,
+                                        "updated_at" TIMESTAMP NOT NULL,
+                                        "updated_by" BIGINT NOT NULL,
+                                        "deleted" BOOLEAN NOT NULL,
+                                        PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "location" (
+                            "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                            "long" DECIMAL(11,8) NOT NULL,
+                            "lat" DECIMAL(11,8) NOT NULL,
+                            PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "voucher_customer" (
+                                    "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                                    "voucher_id" BIGINT NOT NULL,
+                                    "customer_id" BIGINT NOT NULL,
+                                    "issued" BOOLEAN NOT NULL,
+                                    "created_at" TIMESTAMP NOT NULL,
+                                    "created_by" BIGINT NOT NULL,
+                                    "updated_at" TIMESTAMP NOT NULL,
+                                    "updated_by" BIGINT NOT NULL,
+                                    "deleted" BOOLEAN NOT NULL,
+                                    PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "voucher_redemption" (
+                                      "id" INTEGER NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                                      "voucher_id" BIGINT NOT NULL,
+                                      "customer_id" BIGINT NOT NULL,
+                                      "sale_order_id" VARCHAR(50) NOT NULL,
+                                      "applied_value" INTEGER NOT NULL,
+                                      "created_at" TIMESTAMP NOT NULL,
+                                      "created_by" BIGINT NOT NULL,
+                                      "updated_at" TIMESTAMP NOT NULL,
+                                      "updated_by" BIGINT NOT NULL,
+                                      "deleted" BOOLEAN NOT NULL,
+                                      PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "user_role" (
+                             "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                             "role_id" BIGINT NOT NULL,
+                             "store_id" BIGINT NOT NULL,
+                             "user_id" BIGINT NOT NULL,
+                             "created_at" TIMESTAMP NOT NULL,
+                             "created_by" BIGINT NOT NULL,
+                             "updated_at" TIMESTAMP NOT NULL,
+                             "updated_by" BIGINT NOT NULL,
+                             "deleted" BOOLEAN NOT NULL,
+                             PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "store_transfer" (
+                                  "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                                  "from_store_id" BIGINT NOT NULL,
+                                  "to_store_id" BIGINT NOT NULL,
+                                  "transfer_date" TIMESTAMP NOT NULL,
+                                  "status" VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+                                  "created_at" TIMESTAMP NOT NULL,
+                                  "created_by" BIGINT NOT NULL,
+                                  "updated_at" TIMESTAMP NOT NULL,
+                                  "updated_by" BIGINT NOT NULL,
+                                  "deleted" BOOLEAN NOT NULL,
+                                  PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "store_transfer_item" (
+                                       "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                                       "transfer_id" BIGINT NOT NULL,
+                                       "batch_stock_id" BIGINT NOT NULL,
+                                       "qty_requested" INTEGER NOT NULL,
+                                       "qty_transfered" INTEGER NOT NULL,
+                                       "created_at" TIMESTAMP NOT NULL,
+                                       "created_by" BIGINT NOT NULL,
+                                       "updated_at" TIMESTAMP NOT NULL,
+                                       "updated_by" BIGINT NOT NULL,
+                                       "deleted" BOOLEAN NOT NULL,
+                                       PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "sale_return" (
+                               "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                               "return_code" VARCHAR(255) NOT NULL,
+                               "original_sale_order_id" VARCHAR(50) NOT NULL,
+                               "store_id" BIGINT NOT NULL,
+                               "customer_id" BIGINT,
+                               "return_reason" VARCHAR(255),
+                               "total_return_amount" INTEGER NOT NULL,
+                               "refund_method" VARCHAR(20) NOT NULL,
+                               "is_processed" BOOLEAN NOT NULL DEFAULT false,
+                               "processed_at" TIMESTAMP,
+                               "processed_by" BIGINT,
+                               "created_at" TIMESTAMP NOT NULL,
+                               "created_by" BIGINT NOT NULL,
+                               "updated_at" TIMESTAMP NOT NULL,
+                               "updated_by" BIGINT NOT NULL,
+                               "deleted" BOOLEAN NOT NULL,
+                               PRIMARY KEY("id")
+);
+
+
+
+
+CREATE TABLE "sale_return_item" (
+                                    "id" BIGINT NOT NULL UNIQUE GENERATED BY DEFAULT AS IDENTITY,
+                                    "sale_return_id" BIGINT NOT NULL,
+                                    "product_id" BIGINT NOT NULL,
+                                    "original_sale_line_id" BIGINT NOT NULL,
+                                    "qty_returned" INTEGER NOT NULL,
+                                    "unit_price_at_sale" INTEGER NOT NULL,
+                                    "return_unit_price" INTEGER NOT NULL,
+                                    "condition_note" VARCHAR(255),
+                                    "created_at" TIMESTAMP NOT NULL,
+                                    "created_by" BIGINT NOT NULL,
+                                    "updated_at" TIMESTAMP NOT NULL,
+                                    "updated_by" BIGINT NOT NULL,
+                                    "deleted" BOOLEAN NOT NULL,
+                                    PRIMARY KEY("id")
+);
+
+
+
+ALTER TABLE "users"
+    ADD FOREIGN KEY("store_id") REFERENCES "store"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "batch_stock"
+    ADD FOREIGN KEY("store_id") REFERENCES "store"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "batch"
+    ADD FOREIGN KEY("product_id") REFERENCES "product"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "product"
+    ADD FOREIGN KEY("category_id") REFERENCES "category"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_line"
+    ADD FOREIGN KEY("product_id") REFERENCES "product"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_line"
+    ADD FOREIGN KEY("sale_order_id") REFERENCES "sale_order"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_order"
+    ADD FOREIGN KEY("payment_id") REFERENCES "payment_method"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_order"
+    ADD FOREIGN KEY("voucher_id") REFERENCES "voucher"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_order"
+    ADD FOREIGN KEY("customer_id") REFERENCES "customer"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "forecast_result"
+    ADD FOREIGN KEY("product_id") REFERENCES "product"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "forecast_result"
+    ADD FOREIGN KEY("store_id") REFERENCES "store"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "batch"
+    ADD FOREIGN KEY("supplier_id") REFERENCES "supplier"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_allocation"
+    ADD FOREIGN KEY("sale_line_id") REFERENCES "sale_line"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_allocation"
+    ADD FOREIGN KEY("batch_stock_id") REFERENCES "batch_stock"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "inventory_adjustment"
+    ADD FOREIGN KEY("batch_stock_id") REFERENCES "batch_stock"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "batch_stock"
+    ADD FOREIGN KEY("batch_id") REFERENCES "batch"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_order"
+    ADD FOREIGN KEY("store_id") REFERENCES "store"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "supplier"
+    ADD FOREIGN KEY("location_id") REFERENCES "location"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "role_permission"
+    ADD FOREIGN KEY("role_id") REFERENCES "role"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "role_permission"
+    ADD FOREIGN KEY("permission_id") REFERENCES "permission"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "voucher_redemption"
+    ADD FOREIGN KEY("voucher_id") REFERENCES "voucher"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "voucher_customer"
+    ADD FOREIGN KEY("voucher_id") REFERENCES "voucher"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "voucher_customer"
+    ADD FOREIGN KEY("customer_id") REFERENCES "customer"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "voucher_redemption"
+    ADD FOREIGN KEY("customer_id") REFERENCES "customer"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "user_role"
+    ADD FOREIGN KEY("role_id") REFERENCES "role"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "user_role"
+    ADD FOREIGN KEY("user_id") REFERENCES "users"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "user_role"
+    ADD FOREIGN KEY("store_id") REFERENCES "store"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "store_transfer"
+    ADD FOREIGN KEY("from_store_id") REFERENCES "store"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "store_transfer"
+    ADD FOREIGN KEY("to_store_id") REFERENCES "store"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "store_transfer_item"
+    ADD FOREIGN KEY("transfer_id") REFERENCES "store_transfer"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "store_transfer_item"
+    ADD FOREIGN KEY("batch_stock_id") REFERENCES "batch_stock"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_return"
+    ADD FOREIGN KEY("original_sale_order_id") REFERENCES "sale_order"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_return"
+    ADD FOREIGN KEY("store_id") REFERENCES "store"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_return"
+    ADD FOREIGN KEY("customer_id") REFERENCES "customer"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_return_item"
+    ADD FOREIGN KEY("sale_return_id") REFERENCES "sale_return"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_return_item"
+    ADD FOREIGN KEY("product_id") REFERENCES "product"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "sale_return_item"
+    ADD FOREIGN KEY("original_sale_line_id") REFERENCES "sale_line"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "store"
+    ADD FOREIGN KEY("location_id") REFERENCES "location"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "voucher_redemption"
+    ADD FOREIGN KEY("sale_order_id") REFERENCES "sale_order"("id")
+        ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+-- ================================
+-- 2. THÊM CÁC CONSTRAINT CẦN THIẾT (CHECKs / NOT NULL bổ sung)
+-- ================================
+
+-- Quantity validations (Đảm bảo tính toán kho chính xác)
+ALTER TABLE IF EXISTS batch_stock
+    ADD CONSTRAINT chk_batch_stock_qty_valid
+    CHECK (qty_available >= 0 AND qty_available <= qty_total AND qty_reversed >= 0);
+
+ALTER TABLE IF EXISTS sale_line
+    ADD CONSTRAINT chk_sale_line_qty_valid
+    CHECK (qty_ordered >= 0 AND qty_allocated >= 0 AND qty_picked >= 0
+    AND qty_picked <= qty_allocated AND qty_allocated <= qty_ordered);
+
+ALTER TABLE IF EXISTS sale_allocation
+    ADD CONSTRAINT chk_sale_allocation_qty_valid
+    CHECK (qty_allocated >= 0 AND qty_picked >= 0 AND qty_picked <= qty_allocated);
+
+-- Price validations
+ALTER TABLE IF EXISTS product
+    ADD CONSTRAINT chk_product_price_positive CHECK (unit_price > 0);
+
+ALTER TABLE IF EXISTS batch
+    ADD CONSTRAINT chk_batch_price_positive CHECK (import_price > 0);
+
+ALTER TABLE IF EXISTS sale_line
+    ADD CONSTRAINT chk_sale_line_price_positive CHECK (unit_price > 0);
+
+ALTER TABLE IF EXISTS sale_order
+    ADD CONSTRAINT chk_sale_order_price_positive CHECK (final_price >= 0);
+
+-- Date validations
+ALTER TABLE IF EXISTS batch
+    ADD CONSTRAINT chk_batch_dates_valid
+    CHECK (expiry_date > manufacture_date AND arrival_date >= manufacture_date);
+
+ALTER TABLE IF EXISTS voucher
+    ADD CONSTRAINT chk_voucher_dates_valid CHECK (valid_to > valid_from);
+
+-- Status validations
+ALTER TABLE IF EXISTS batch_stock
+    ADD CONSTRAINT chk_batch_stock_status_valid
+    CHECK (status IN ('ACTIVE', 'EXPIRED', 'DAMAGED', 'RESERVED', 'SOLD_OUT'));
+
+-- Point validation
+ALTER TABLE IF EXISTS customer
+    ADD CONSTRAINT chk_customer_point_valid CHECK (point >= 0);
+
+-- ================================
+-- 3. INDEXES CHO HIỆU SUẤT TỐI ƯU
+-- Ghi chú: IF NOT EXISTS để an toàn khi chạy trên DB đã có index
+-- ================================
+
+-- A. PRODUCT & CATEGORY INDEXES
+CREATE INDEX IF NOT EXISTS idx_product_name_active ON product (name) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_product_sku_active ON product (sku) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_product_category_active ON product (category_id) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_product_category_name ON product (category_id, name) WHERE deleted = false;
+
+-- B. BATCH & INVENTORY INDEXES
+CREATE INDEX IF NOT EXISTS idx_batch_product_supplier ON batch (product_id, supplier_id) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_batch_expiry_product ON batch (product_id, expiry_date) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_batch_code_active ON batch (batch_code) WHERE deleted = false;
+
+CREATE INDEX IF NOT EXISTS idx_batch_stock_store_status ON batch_stock (store_id, status) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_batch_stock_available ON batch_stock (batch_id, qty_available) WHERE deleted = false AND status = 'ACTIVE';
+CREATE INDEX IF NOT EXISTS idx_batch_stock_store_batch_avail ON batch_stock (store_id, batch_id, qty_available) WHERE deleted = false;
+
+-- C. SALES INDEXES
+CREATE INDEX IF NOT EXISTS idx_sale_order_store_date ON sale_order (store_id, created_at DESC) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_sale_order_customer_date ON sale_order (customer_id, created_at DESC) WHERE customer_id IS NOT NULL AND deleted = false;
+CREATE INDEX IF NOT EXISTS idx_sale_order_date_only ON sale_order (created_at DESC) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_sale_order_voucher ON sale_order (voucher_id) WHERE voucher_id IS NOT NULL AND deleted = false;
+
+CREATE INDEX IF NOT EXISTS idx_sale_line_product_date ON sale_line (product_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_sale_line_order_product ON sale_line (sale_order_id, product_id);
+
+CREATE INDEX IF NOT EXISTS idx_sale_allocation_line ON sale_allocation (sale_line_id) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_sale_allocation_batch_stock ON sale_allocation (batch_stock_id) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_sale_allocation_status ON sale_allocation (sale_line_id, qty_picked, qty_allocated) WHERE deleted = false;
+
+-- D. CUSTOMER INDEXES
+CREATE INDEX IF NOT EXISTS idx_customer_phone_active ON customer (phone) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_customer_name_active ON customer (name) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_customer_point_desc ON customer (point DESC) WHERE deleted = false;
+
+-- E. USER & PERMISSION INDEXES
+CREATE INDEX IF NOT EXISTS idx_user_role_user_store ON user_role (user_id, store_id) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_user_role_store_role ON user_role (store_id, role_id) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_users_username_active ON users (username) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_role_permission_role ON role_permission (role_id) WHERE deleted = false;
+
+-- F. VOUCHER INDEXES
+CREATE INDEX IF NOT EXISTS idx_voucher_code_active ON voucher (code) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_voucher_valid_period ON voucher (valid_from, valid_to) WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_voucher_redemption_voucher_date ON voucher_redemption (voucher_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_voucher_customer_voucher ON voucher_customer (voucher_id, customer_id);
+
+-- G. AUDIT & TRACKING INDEXES
+CREATE INDEX IF NOT EXISTS idx_inventory_adj_batch_stock_date ON inventory_adjustment (batch_stock_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_inventory_adj_reference ON inventory_adjustment (reference_id) WHERE reference_id IS NOT NULL;
+
+-- H. FORECAST INDEXES
+CREATE INDEX IF NOT EXISTS idx_forecast_product_store_date ON forecast_result (product_id, store_id, target_date DESC);
+CREATE INDEX IF NOT EXISTS idx_forecast_model_version ON forecast_result (model_version, created_at DESC);
+
+-- ================================
+-- 4. PARTITIONING STRATEGY
+-- ================================
+-- Lý do: partition giúp prune khi query theo thời gian, quản lý dữ liệu lịch sử, và drop/archive nhanh.
+
+-- A. PARTITION SALE_ORDER BY DATE (monthly)
+CREATE TABLE IF NOT EXISTS sale_order_partitioned (
+                                                      id VARCHAR(50) NOT NULL,
+                                                      store_id BIGINT NOT NULL,
+                                                      customer_id BIGINT,
+                                                      voucher_id BIGINT,
+                                                      final_price INTEGER NOT NULL,
+                                                      note TEXT,
+                                                      payment_id BIGINT NOT NULL,
+                                                      created_at timestamptz NOT NULL,
+                                                      created_by BIGINT NOT NULL,
+                                                      deleted BOOLEAN NOT NULL,
+                                                      PRIMARY KEY (id, created_at)
+) PARTITION BY RANGE (created_at);
+
+-- Example monthly partitions (tạo cho các tháng lịch sử + tương lai cần tự động)
+CREATE TABLE IF NOT EXISTS sale_order_2024_01 PARTITION OF sale_order_partitioned
+    FOR VALUES FROM ('2024-01-01') TO ('2024-02-01');
+CREATE TABLE IF NOT EXISTS sale_order_2024_02 PARTITION OF sale_order_partitioned
+    FOR VALUES FROM ('2024-02-01') TO ('2024-03-01');
+CREATE TABLE IF NOT EXISTS sale_order_2024_03 PARTITION OF sale_order_partitioned
+    FOR VALUES FROM ('2024-03-01') TO ('2024-04-01');
+
+
+-- ================================
+-- 7. PERFORMANCE VIEWS (MẪU)
+-- ================================
+
+CREATE OR REPLACE VIEW v_current_stock_detailed AS
+SELECT
+    p.id as product_id,
+    p.name as product_name,
+    p.sku,
+    p.unit_price,
+    c.name as category_name,
+    s.id as store_id,
+    s.name as store_name,
+    SUM(bs.qty_available) as total_available,
+    SUM(bs.qty_reversed) as total_reserved,
+    SUM(bs.qty_total) as total_stock,
+    MIN(b.expiry_date) as earliest_expiry,
+    COUNT(DISTINCT b.id) as batch_count,
+    AVG(b.import_price) as avg_import_price
+FROM product p
+         JOIN category c ON p.category_id = c.id
+         JOIN batch b ON p.id = b.product_id AND b.deleted = false
+         JOIN batch_stock bs ON b.id = bs.batch_id AND bs.deleted = false
+         JOIN store s ON bs.store_id = s.id AND s.deleted = false
+WHERE p.deleted = false AND bs.status = 'ACTIVE'
+GROUP BY p.id, p.name, p.sku, p.unit_price, c.name, s.id, s.name;
+
+CREATE OR REPLACE VIEW v_sales_performance AS
+SELECT
+    s.id as store_id,
+    s.name as store_name,
+    DATE(so.created_at) as sale_date,
+    COUNT(DISTINCT so.id) as order_count,
+    COUNT(DISTINCT so.customer_id) as unique_customers,
+    SUM(so.final_price) as total_revenue,
+    AVG(so.final_price) as avg_order_value,
+    SUM(sl.qty_ordered * sl.unit_price) as gross_sales,
+    SUM(COALESCE(vr.applied_value, 0)) as total_discounts
+FROM store s
+         JOIN sale_order so ON s.id = so.store_id AND so.deleted = false
+         JOIN sale_line sl ON so.id = sl.sale_order_id
+         LEFT JOIN voucher_redemption vr ON so.id = vr.sale_order_id
+WHERE s.deleted = false
+GROUP BY s.id, s.name, DATE(so.created_at);
+
+CREATE OR REPLACE VIEW v_product_performance AS
+SELECT
+    p.id as product_id,
+    p.name as product_name,
+    p.sku,
+    c.name as category_name,
+    SUM(sl.qty_ordered) as total_qty_sold,
+    SUM(sl.qty_ordered * sl.unit_price) as total_revenue,
+    AVG(sl.unit_price) as avg_selling_price,
+    COUNT(DISTINCT sl.sale_order_id) as order_count,
+    MIN(sl.created_at) as first_sale_date,
+    MAX(sl.created_at) as last_sale_date
+FROM product p
+         JOIN category c ON p.category_id = c.id
+         JOIN sale_line sl ON p.id = sl.product_id
+         JOIN sale_order so ON sl.sale_order_id = so.id AND so.deleted = false
+WHERE p.deleted = false
+GROUP BY p.id, p.name, p.sku, c.name;
+
+-- ================================
+-- 8. TRIGGERS VÀ FUNCTIONS
+-- ================================
+
+-- A. Trigger cập nhật batch_stock khi có sale_allocation
+CREATE OR REPLACE FUNCTION update_batch_stock_on_allocation()
+    RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE batch_stock
+        SET qty_available = qty_available - NEW.qty_allocated,
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = NEW.batch_stock_id;
+
+        UPDATE batch_stock
+        SET status = 'SOLD_OUT'
+        WHERE id = NEW.batch_stock_id AND qty_available = 0;
+
+    ELSIF TG_OP = 'UPDATE' THEN
+        UPDATE batch_stock
+        SET qty_available = qty_available + (OLD.qty_allocated - NEW.qty_allocated),
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = NEW.batch_stock_id;
+
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE batch_stock
+        SET qty_available = qty_available + OLD.qty_allocated,
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1,
+            status = CASE WHEN status = 'SOLD_OUT' AND qty_available + OLD.qty_allocated > 0 THEN 'ACTIVE' ELSE status END
+        WHERE id = OLD.batch_stock_id;
+    END IF;
+
+    RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS tr_update_batch_stock_on_allocation ON sale_allocation;
+CREATE TRIGGER tr_update_batch_stock_on_allocation
+    AFTER INSERT OR UPDATE OR DELETE ON sale_allocation
+    FOR EACH ROW EXECUTE FUNCTION update_batch_stock_on_allocation();
+
+-- B. Function tự động tạo partition monthly cho một bảng partitioned theo created_at
+CREATE OR REPLACE FUNCTION create_monthly_partition(parent_table TEXT, start_date DATE)
+    RETURNS VOID AS $$
+DECLARE
+    partition_name TEXT;
+    start_month TEXT;
+    end_date DATE;
+BEGIN
+    start_month := to_char(start_date, 'YYYY_MM');
+    partition_name := parent_table || '_' || start_month;
+    end_date := start_date + INTERVAL '1 month';
+    EXECUTE format('CREATE TABLE IF NOT EXISTS %I PARTITION OF %I FOR VALUES FROM (%L) TO (%L)',
+                   partition_name, parent_table, start_date, end_date);
+    -- Tạo index cơ bản cho partition nếu cần
+    EXECUTE format('CREATE INDEX IF NOT EXISTS %I ON %I (store_id, created_at DESC)',
+                   'idx_' || partition_name || '_store_date', partition_name);
+END;
+$$ LANGUAGE plpgsql;
+
+-- C. Cleanup function (mẫu)
+CREATE OR REPLACE FUNCTION cleanup_old_data()
+    RETURNS VOID AS $$
+BEGIN
+    -- Xóa audit cũ hơn 2 năm
+    DELETE FROM inventory_adjustment WHERE created_at < CURRENT_DATE - INTERVAL '2 years';
+    -- Xóa forecast result cũ hơn 6 tháng
+    DELETE FROM forecast_result WHERE created_at < CURRENT_DATE - INTERVAL '6 months';
+    -- (Không xóa sale_order tự động trừ khi có policy)
+END;
+$$ LANGUAGE plpgsql;

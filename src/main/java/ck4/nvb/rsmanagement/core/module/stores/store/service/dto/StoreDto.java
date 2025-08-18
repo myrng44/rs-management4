@@ -8,38 +8,45 @@ import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
-@Getter @Setter
+@Getter
+@Setter
 public class StoreDto extends EntityDto<Long> implements CreateInput<Store>, UpdateInput<Store> {
 
-    private String name;
+  private String name;
 
-    private String address;
+  private Long locationId;
 
-    private String phone;
+  private String address;
 
-    @Override
-    public Store mapToEntity() {
-        return new ModelMapper().map(this, Store.class);
+  private String phone;
+
+  @Override
+  public Store mapToEntity() {
+    return new ModelMapper().map(this, Store.class);
+  }
+
+  @Override
+  public boolean mapToEntity(Store entity) {
+    boolean isModified = false;
+
+    if (entity.getName() != null) {
+      this.name = entity.getName();
+      isModified = true;
     }
 
-    @Override
-    public boolean mapToEntity(Store entity) {
-        boolean isModified = false;
-
-        if (entity.getName() != null) {
-            this.name = entity.getName();
-            isModified = true;
-        }
-
-        if (entity.getAddress() != null) {
-            this.address = entity.getAddress();
-            isModified = true;
-        }
-
-        if (entity.getPhone() != null) {
-            this.phone = entity.getPhone();
-            isModified = true;
-        }
-        return isModified;
+    if (entity.getLocationId() != null) {
+      this.locationId = entity.getLocationId();
     }
+
+    if (entity.getAddress() != null) {
+      this.address = entity.getAddress();
+      isModified = true;
+    }
+
+    if (entity.getPhone() != null) {
+      this.phone = entity.getPhone();
+      isModified = true;
+    }
+    return isModified;
+  }
 }

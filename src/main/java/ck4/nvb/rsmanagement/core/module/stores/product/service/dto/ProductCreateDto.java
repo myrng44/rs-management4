@@ -6,25 +6,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 public class ProductCreateDto extends BaseProductDto implements CreateInput<Product> {
 
-    private String sku;
-    private String name;
-    private String description;
-    private Integer unitPrice;
-    private Long categoryId;
-    private Long supplierId;
+  private String sku;
+  private String name;
+  private String desc;
+  private Integer unitPrice;
+  private Long categoryId;
 
-    @Override
-    public Product mapToEntity() {
-        Product product = new Product();
-        product.setSku(sku);
-        product.setName(name);
-        product.setDescription(description);
-        product.setUnitPrice(unitPrice);
-        product.setCategoryId(categoryId);
-        product.setSupplierId(supplierId);
-        return product;
-    }
+  @Override
+  public Product mapToEntity() {
+    Product product = new Product();
+    product.setSku(sku);
+    product.setName(name);
+    product.setDesc(desc);
+    product.setUnitPrice(unitPrice);
+    product.setCategoryId(categoryId);
+    return product;
+  }
 }

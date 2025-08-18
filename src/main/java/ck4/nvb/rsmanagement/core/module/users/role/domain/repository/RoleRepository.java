@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository("roleRepository")
 public interface RoleRepository extends BaseFullAuditedRepository<Role, Long, Long> {
-    Role findByName(String name);
+  Role findByName(String name);
 }

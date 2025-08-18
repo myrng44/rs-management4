@@ -7,35 +7,36 @@ import ck4.nvb.rsmanagement.core.module.users.role.domain.repository.RoleReposit
 import ck4.nvb.rsmanagement.core.module.users.role.service.RoleService;
 import ck4.nvb.rsmanagement.core.module.users.role.service.dto.RoleDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+import java.util.List;
+import java.util.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-
 @Service("roleService")
-public class RoleServiceImpl extends FullAuditedCrudServiceImpl<RoleDto, Role, Long, UserGetDto, Long> implements RoleService {
+public class RoleServiceImpl
+    extends FullAuditedCrudServiceImpl<RoleDto, Role, Long, UserGetDto, Long>
+    implements RoleService {
 
-    private final ModelMapper modelMapper = new ModelMapper();
+  private final ModelMapper modelMapper = new ModelMapper();
 
-    protected RoleServiceImpl(RoleRepository repository) {
-        super(repository, Role.class);
-    }
+  protected RoleServiceImpl(RoleRepository repository) {
+    super(repository, Role.class);
+  }
 
-    @Override
-    public RoleDto mapToEntityDto(Role entity) {
-        return modelMapper.map(entity, RoleDto.class);
-    }
+  @Override
+  public RoleDto mapToEntityDto(Role entity) {
+    return modelMapper.map(entity, RoleDto.class);
+  }
 
-    @Override
-    public RoleRepository getRepository() {
-        return (RoleRepository) super.getRepository();
-    }
+  @Override
+  public RoleRepository getRepository() {
+    return (RoleRepository) super.getRepository();
+  }
 
-    @Override
-    public Map<String, List<SearchOperator>> getSearchableKeys() {
-        Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
-        keys.put("name", List.of(SearchOperator.EQUALS));
-        return keys;
-    }
+  @Override
+  public Map<String, List<SearchOperator>> getSearchableKeys() {
+    Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
+    keys.put("name", List.of(SearchOperator.EQUALS));
+    return keys;
+  }
 }

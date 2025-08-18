@@ -4,13 +4,13 @@ import java.time.LocalDateTime;
 
 public interface HasCreatedTime {
 
-    /**
-     * @return Date - the date the object was created
-     */
-    LocalDateTime getCreatedTime();
+  /**
+   * @return Date - the date the object was created
+   */
+  LocalDateTime getCreatedTime();
 
-    /**
-     * @param createdTime - the date the object was created
-     */
-    void setCreatedTime(LocalDateTime createdTime);
+  /**
+   * @param createdTime - the date the object was created
+   */
+  void setCreatedTime(LocalDateTime createdTime);
 }

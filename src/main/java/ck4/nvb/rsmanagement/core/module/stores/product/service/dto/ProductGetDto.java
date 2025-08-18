@@ -4,12 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 public class ProductGetDto extends BaseProductDto {
-    private String sku;
-    private String name;
-    private String description;
-    private Integer unitPrice;
-    private Long categoryId;
-    private Long supplierId;
+  private String sku;
+  private String name;
+  private String desc;
+  private Integer unitPrice;
+  private Long categoryId;
 }
