@@ -4,12 +4,14 @@ import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.Voucher;
+import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter @Setter @NoArgsConstructor
 public class VoucherDto extends EntityDto<Long> implements CreateInput<Voucher>, UpdateInput<Voucher> {
@@ -17,8 +19,12 @@ public class VoucherDto extends EntityDto<Long> implements CreateInput<Voucher>,
     private String description;
     private Integer discountPercent;
     private Integer discountValue;
-    private LocalDate startTime;
-    private LocalDate expirationTime;
+    private LocalDateTime validFrom;
+    private LocalDateTime validTo;
+    private Integer quantityTotal;
+    private Integer quantityRedeemed;
+    private Integer perCustomerLimit;
+    private String audienceType;
 
     @Override
     public Voucher mapToEntity() {
@@ -47,8 +53,13 @@ public class VoucherDto extends EntityDto<Long> implements CreateInput<Voucher>,
             entity.setDiscountValue(discountValue);
             isModified = true;
         }
-        //haven't add time modify yet (sua sau)
-
+        if (!validFrom.equals(entity.getValidFrom())) {
+            entity.setValidFrom(validFrom);
+            isModified = true;
+        }
+        if (!validTo.equals(entity.getValidTo())) {
+            entity.setValidTo(validTo);
+        }
         return isModified;
     }
 }

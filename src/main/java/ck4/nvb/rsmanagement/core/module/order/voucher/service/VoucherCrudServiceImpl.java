@@ -45,8 +45,7 @@ public class VoucherCrudServiceImpl extends FullAuditedCrudServiceImpl<VoucherDt
                 SearchOperator.GREATER_THAN,
                 SearchOperator.LESS_THAN_OR_EQUAL,
                 SearchOperator.GREATER_THAN_OR_EQUAL));
-        keys.put("startTime", List.of(SearchOperator.BETWEEN));
-        keys.put("expirationTime", List.of(SearchOperator.BETWEEN));
+
         return keys;
     }
 

@@ -11,7 +11,10 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "voucher")
 public class Voucher extends FullAuditedSerialIdEntity {
@@ -28,9 +31,21 @@ public class Voucher extends FullAuditedSerialIdEntity {
     @Column(name = "discount_value")
     private Integer discountValue;
 
-    @Column(name = "start_time")
-    private LocalDateTime startTime;
+    @Column(name = "valid_from")
+    private LocalDateTime validFrom;
 
-    @Column(name = "expiration_time")
-    private LocalDateTime expirationTime;
+    @Column(name = "valid_to")
+    private LocalDateTime validTo;
+
+    @Column(name = "quantity_total")
+    private Integer quantityTotal;
+
+    @Column(name = "quantity_redeemed")
+    private Integer quantityRedeemed;
+
+    @Column(name = "per_customer_limit")
+    private Integer perCustomerLimit;
+
+    @Column(name = "audience_type")
+    private String audienceType;
 }
