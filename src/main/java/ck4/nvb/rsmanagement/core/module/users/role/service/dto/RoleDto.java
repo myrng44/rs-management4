@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 public class RoleDto extends EntityDto<Long> {
   private String name;
-  private String description;
+  private String desc;
 }

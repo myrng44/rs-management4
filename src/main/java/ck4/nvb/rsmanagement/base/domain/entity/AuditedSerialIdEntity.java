@@ -10,10 +10,10 @@ import lombok.Generated;
 public abstract class AuditedSerialIdEntity extends CreationAuditedSerialIdEntity
     implements Audited<Long> {
   // Fields
-  @Column(name = "last_updated")
+  @Column(name = "updated_at")
   private LocalDateTime lastUpdatedTime;
 
-  @Column(name = "last_updater")
+  @Column(name = "updated_by")
   private Long updaterId;
 
   @Generated

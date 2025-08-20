@@ -17,10 +17,14 @@ public class VoucherDto extends EntityDto<Long>
     implements CreateInput<Voucher>, UpdateInput<Voucher> {
   private String code;
   private String desc;
-  private Integer discountPercent;
-  private Integer discountValue;
-  private LocalDateTime startTime;
-  private LocalDateTime expirationTime;
+  private Integer discountPer;
+  private Integer discountVal;
+  private LocalDateTime validFrom;
+  private LocalDateTime validTo;
+  private Long qtyTotal;
+  private Long qtyRedeemed;
+  private Integer perCustomerLimit;
+  private String audienceType;
 
   @Override
   public Voucher mapToEntity() {
@@ -41,12 +45,12 @@ public class VoucherDto extends EntityDto<Long>
       entity.setDesc(desc);
       isModified = true;
     }
-    if (!discountPercent.equals(entity.getDiscountPercent())) {
-      entity.setDiscountPercent(discountPercent);
+    if (!discountPer.equals(entity.getDiscountPer())) {
+      entity.setDiscountPer(discountPer);
       isModified = true;
     }
-    if (!discountValue.equals(entity.getDiscountValue())) {
-      entity.setDiscountValue(discountValue);
+    if (!discountVal.equals(entity.getDiscountVal())) {
+      entity.setDiscountVal(discountVal);
       isModified = true;
     }
     // haven't add time modify yet (sua sau)

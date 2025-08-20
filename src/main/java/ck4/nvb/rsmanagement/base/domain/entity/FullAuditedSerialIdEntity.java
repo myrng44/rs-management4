@@ -11,10 +11,10 @@ import lombok.Generated;
 public abstract class FullAuditedSerialIdEntity extends AuditedSerialIdEntity
     implements FullAudited<Long>, SoftDeletable {
   // Fields
-  @Column(name = "deleted_time")
+  @Column(name = "deleted_at")
   private LocalDateTime deletedTime;
 
-  @Column(name = "deleter_id")
+  @Column(name = "deleted_by")
   private Long deleterId;
 
   @Column(name = "deleted")

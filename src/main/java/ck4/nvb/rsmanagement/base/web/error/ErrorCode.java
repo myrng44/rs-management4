@@ -1,6 +1,7 @@
 package ck4.nvb.rsmanagement.base.web.error;
 
 public enum ErrorCode {
+  OK(200),
   NO_CONTENT(204),
 
   BAD_REQUEST(400),
@@ -42,7 +43,16 @@ public enum ErrorCode {
   INSUFFICIENT_STORAGE(507),
   LOOP_DETECTED(508),
   NOT_EXTENDED(510),
-  NETWORK_AUTHENTICATION_REQUIRED(511);
+  NETWORK_AUTHENTICATION_REQUIRED(511),
+
+  CREATED(201),
+  ACCEPTED(202),
+
+  FOUND(209),
+  DELETED(211),
+  UPDATED(212),
+  SOFTDELETED(213),
+  UNSOFTDELETED(214);
 
   private final int value;
 

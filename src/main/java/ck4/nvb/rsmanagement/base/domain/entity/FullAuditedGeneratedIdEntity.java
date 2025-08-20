@@ -10,10 +10,10 @@ import lombok.Generated;
 public abstract class FullAuditedGeneratedIdEntity extends AuditedGeneratedIdEntity
     implements FullAudited<Long> {
   // Fields
-  @Column(name = "deleted_time")
+  @Column(name = "deleted_at")
   private LocalDateTime deletedTime;
 
-  @Column(name = "deleter_id")
+  @Column(name = "deleted_by")
   private Long deleterId;
 
   @Column(name = "deleted")

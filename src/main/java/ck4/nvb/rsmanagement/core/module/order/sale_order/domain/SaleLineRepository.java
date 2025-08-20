@@ -13,11 +13,11 @@ public interface SaleLineRepository extends BaseFullAuditedRepository<SaleLine, 
   @Query(
       value = """
     SELECT *
-    FROM order_detail
-    WHERE order_id = :orderId
+    FROM sale_line
+    WHERE sale_order_id = :saleOrderId
     """,
       nativeQuery = true)
-  List<SaleLine> findAllByOrderId(String orderId);
+  List<SaleLine> findBySaleOrderId(String saleOrderId);
 
   @Query(
       value =
@@ -25,11 +25,11 @@ public interface SaleLineRepository extends BaseFullAuditedRepository<SaleLine, 
     SELECT p.*
     FROM product p
     JOIN (
-        SELECT od.product_id, SUM(od.quantity) AS total_quantity
-        FROM order_detail od
-        JOIN orders o ON od.order_id = o.id
-        WHERE o.created_time BETWEEN :start AND :end
-        GROUP BY od.product_id
+        SELECT sl.product_id, SUM(sl.qty_ordered) AS total_quantity
+        FROM sale_line sl
+        JOIN sale_order so ON sl.sale_order_id = so.id
+        WHERE so.created_at BETWEEN :start AND :end
+        GROUP BY sl.product_id
         ORDER BY total_quantity DESC
         LIMIT :numberOfProducts
     ) AS top_sold ON p.id = top_sold.product_id

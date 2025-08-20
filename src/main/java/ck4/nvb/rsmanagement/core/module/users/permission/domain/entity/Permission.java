@@ -16,6 +16,6 @@ public class Permission extends FullAuditedSerialIdEntity {
   @Column(name = "code")
   private String code;
 
-  @Column(name = "description")
-  private String description;
+  @Column(name = "desc")
+  private String desc;
 }

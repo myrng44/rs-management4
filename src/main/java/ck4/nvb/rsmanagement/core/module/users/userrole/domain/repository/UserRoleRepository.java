@@ -29,7 +29,7 @@ public interface UserRoleRepository extends BaseFullAuditedRepository<UserRole, 
       r.name AS roleName,
       STRING_AGG(p.code, ',') AS permissions
     FROM user_role ur
-    JOIN store_user u ON ur.user_id = u.id
+    JOIN users u ON ur.user_id = u.id
     JOIN role r ON ur.role_id = r.id
     LEFT JOIN role_permission rp ON r.id = rp.role_id
     LEFT JOIN permission p ON rp.permission_id = p.id

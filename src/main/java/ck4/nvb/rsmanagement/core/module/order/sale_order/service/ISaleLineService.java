@@ -19,11 +19,11 @@ public interface ISaleLineService
    */
   List<ProductGetDto> getMostSoldProductsLastDay(int days, int noProducts) throws AppException;
 
-  /**
+/*  *//**
    * Get all order detail by orderId
    *
    * @param orderId identifier of an order
    * @return list of orderDetailDto
-   */
-  List<SaleLineGetDto> getDetailByOrderId(String orderId) throws AppException;
+   *//*
+  List<SaleLineGetDto> getDetailByOrderId(String orderId) throws AppException;*/
 }

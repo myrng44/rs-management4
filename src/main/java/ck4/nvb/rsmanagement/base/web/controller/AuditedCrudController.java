@@ -8,8 +8,9 @@ import ck4.nvb.rsmanagement.base.application.service.CreationAuditedCrudService;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.CreationAudited;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
 import java.io.Serializable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,24 +29,26 @@ public abstract class AuditedCrudController<
   }
 
   @PostMapping
-  public D create(Authentication auth, @RequestBody C entity) {
+  public APIResponse<D> create(Authentication auth, @RequestBody C entity) {
     User user = extractUser(auth);
-    return getService().create(entity, user);
+    D result = getService().create(entity, user);
+    return APIResponseBuilder.created(result, "created successfully!");
   }
 
   @PutMapping("/{id}")
-  public D update(Authentication auth, @PathVariable ID id, @RequestBody U entity) {
+  public APIResponse<D> update(Authentication auth, @PathVariable ID id, @RequestBody U entity) {
     User user = extractUser(auth);
-    return getService().update(id, entity, user);
+    D result = getService().update(id, entity, user);
+    return APIResponseBuilder.success(result, "updated successfully!");
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> delete(Authentication auth, @PathVariable ID id) {
+  public APIResponse<Void> delete(Authentication auth, @PathVariable ID id) {
     User user = extractUser(auth);
     if (!getService().exists(id, user))
       throw new ObjectNotFoundException("Object not found. Invalid ID: " + id);
 
     getService().delete(id, user);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return APIResponseBuilder.success(null, "deleted successfully!");
   }
 }

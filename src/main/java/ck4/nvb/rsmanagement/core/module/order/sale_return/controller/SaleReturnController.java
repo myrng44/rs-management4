@@ -4,7 +4,9 @@ import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.core.module.order.sale_return.domain.SaleReturn;
 import ck4.nvb.rsmanagement.core.module.order.sale_return.service.ISaleReturnItemService;
 import ck4.nvb.rsmanagement.core.module.order.sale_return.service.ISaleReturnService;
-import ck4.nvb.rsmanagement.core.module.order.sale_return.service.dto.SaleReturnDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_return.service.dto.SaleReturnCreateDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_return.service.dto.SaleReturnGetDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_return.service.dto.SaleReturnUpdateDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import org.modelmapper.ModelMapper;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/return")
-public class SaleReturnController extends AuditedCrudController<SaleReturnDto, SaleReturn, Long, UserGetDto, Long, SaleReturnDto, SaleReturnDto> {
+public class SaleReturnController extends AuditedCrudController<SaleReturnGetDto, SaleReturn, Long, UserGetDto, Long, SaleReturnCreateDto, SaleReturnUpdateDto> {
 
     @Autowired
     private ISaleReturnItemService saleReturnItemService;
@@ -37,8 +39,13 @@ public class SaleReturnController extends AuditedCrudController<SaleReturnDto, S
         if (principal instanceof UserGetDto) {
             return (UserGetDto) principal;
         }
+
         if (principal instanceof UserRoleDto) {
-            return modelMapper.map(principal, UserGetDto.class);
+            UserRoleDto userRoleDto = (UserRoleDto) principal;
+            UserGetDto userGetDto = new UserGetDto();
+            userGetDto.setId(userRoleDto.getUserId());
+            userGetDto.setUserName(userRoleDto.getUserName());
+            return userGetDto;
         }
         return null;
     }

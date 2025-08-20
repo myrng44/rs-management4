@@ -17,7 +17,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service("orderDetailService")
+@Service("saleLineService")
 public class SaleLineServiceImpl
     extends FullAuditedCrudServiceImpl<SaleLineGetDto, SaleLine, Long, UserGetDto, Long>
     implements ISaleLineService {
@@ -35,24 +35,33 @@ public class SaleLineServiceImpl
 
   @Override
   public SaleLineGetDto mapToEntityDto(SaleLine entity) {
+    SaleLineGetDto dto = new SaleLineGetDto();
+
+    dto.setId(entity.getId());
+
+    dto.setSaleOrderId(entity.getSaleOrderId());
+
     Product product = productService.getEntity(entity.getProductId());
     // snapshot
     entity.setUnitPrice(
-        product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
-    SaleLineGetDto dto = new SaleLineGetDto();
-    dto.setId(entity.getId());
-    dto.setSaleOrderId(entity.getOrderId());
+            product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
     dto.setProductId(product.getId());
     dto.setProductName(product.getName());
+
     dto.setQtyOrdered(entity.getQtyOrdered());
+
     dto.setUnitPrice(entity.getUnitPrice());
+
+    Long totalPrice = (long) entity.getQtyOrdered() * entity.getUnitPrice();
+    dto.setTotalPrice(totalPrice);
+
     return dto;
   }
 
   @Override
   public Map<String, List<SearchOperator>> getSearchableKeys() {
     Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
-    keys.put("orderId", List.of(SearchOperator.EQUALS));
+    keys.put("saleOrderId", List.of(SearchOperator.EQUALS));
     keys.put("productId", List.of(SearchOperator.EQUALS));
     return keys;
   }
@@ -74,8 +83,8 @@ public class SaleLineServiceImpl
         getRepository().findMostSoldProductsOfInterval(start, end, noProducts));
   }
 
-  @Override
+/*  @Override
   public List<SaleLineGetDto> getDetailByOrderId(String orderId) throws AppException {
-    return mapToGetListOutputDto(getRepository().findAllByOrderId(orderId));
-  }
+    return mapToGetListOutputDto(getRepository().findBySaleOrderId(orderId));
+  }*/
 }

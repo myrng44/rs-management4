@@ -33,8 +33,8 @@ public class SaleLineDto extends EntityDto<Long>
     if (entity == null) {
       return false;
     }
-    if (!saleOrderId.equals(entity.getOrderId())) {
-      entity.setOrderId(saleOrderId);
+    if (!saleOrderId.equals(entity.getSaleOrderId())) {
+      entity.setSaleOrderId(saleOrderId);
       isModified = true;
     }
     if (!productId.equals(entity.getProductId())) {

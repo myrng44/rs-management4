@@ -36,16 +36,21 @@ public class SaleLineController
     if (principal instanceof UserGetDto) {
       return (UserGetDto) principal;
     }
+
     if (principal instanceof UserRoleDto) {
-      return modelMapper.map(principal, UserGetDto.class);
+      UserRoleDto userRoleDto = (UserRoleDto) principal;
+      UserGetDto userGetDto = new UserGetDto();
+      userGetDto.setId(userRoleDto.getUserId());
+      userGetDto.setUserName(userRoleDto.getUserName());
+      return userGetDto;
     }
     return null;
   }
 
-  @GetMapping("/summary/{orderId}")
+/*  @GetMapping("/summary/{orderId}")
   public List<SaleLineGetDto> getOrderDetails(
       @PathVariable String orderId, Authentication auth) {
     UserGetDto user = extractUser(auth);
     return orderDetailCrudService.getDetailByOrderId(orderId);
-  }
+  }*/
 }

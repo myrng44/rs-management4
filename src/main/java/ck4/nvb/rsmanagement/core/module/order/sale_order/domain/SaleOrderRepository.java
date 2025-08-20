@@ -13,9 +13,9 @@ public interface SaleOrderRepository extends BaseFullAuditedRepository<SaleOrder
   @Query(
       value =
           """
-    SELECT SUM(o.final_price) AS revenue
-    FROM orders o
-    WHERE o.deleted=false
+    SELECT SUM(so.final_price) AS revenue
+    FROM sale_order so
+    WHERE so.deleted=false
 """,
       nativeQuery = true)
   long sumTotalFinalPriceBetween(LocalDateTime from, LocalDateTime to);
@@ -23,10 +23,10 @@ public interface SaleOrderRepository extends BaseFullAuditedRepository<SaleOrder
   @Query(
       value =
           """
-    SELECT COALESCE(SUM(odt.quantity * odt.unit_price), 0)
-    FROM order_detail odt
-    WHERE odt.order_id = :orderId
+    SELECT COALESCE(SUM(sl.qty_ordered * sl.unit_price), 0)
+    FROM sale_line sl
+    WHERE sl.sale_order_id = :saleOrderId
 """,
       nativeQuery = true)
-  int getFinalPriceByOrderId(@Param("orderId") String orderId);
+  int getFinalPriceByOrderId(@Param("saleOrderId") String saleOrderId);
 }

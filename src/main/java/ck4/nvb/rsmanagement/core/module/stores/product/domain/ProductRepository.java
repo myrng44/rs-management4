@@ -9,8 +9,8 @@ public interface ProductRepository extends BaseFullAuditedRepository<Product, Lo
   @Query(
       value =
           """
-    SELECT quantity
-    FROM store_stock
+    SELECT qty_available
+    FROM batch_stock
     WHERE product_id = :productId
       AND store_id = :storeId
       AND deleted = false;

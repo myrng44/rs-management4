@@ -39,7 +39,7 @@ public class SaleReturn extends FullAuditedSerialIdEntity {
     @Column(name = "refund_method")
     private String refundMethod;
 
-    @Column(name = "is_processd")
+    @Column(name = "is_processed")
     private Boolean isProcessed;
 
     @Column(name = "processed_at")

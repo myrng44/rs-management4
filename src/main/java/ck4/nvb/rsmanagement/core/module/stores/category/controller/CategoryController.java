@@ -28,11 +28,16 @@ public class CategoryController
     }
 
     Object principal = auth.getPrincipal();
-
     if (principal instanceof UserGetDto) {
       return (UserGetDto) principal;
-    } else if (principal instanceof UserRoleDto) {
-      return new ModelMapper().map(principal, UserGetDto.class);
+    }
+
+    if (principal instanceof UserRoleDto) {
+      UserRoleDto userRoleDto = (UserRoleDto) principal;
+      UserGetDto userGetDto = new UserGetDto();
+      userGetDto.setId(userRoleDto.getUserId());
+      userGetDto.setUserName(userRoleDto.getUserName());
+      return userGetDto;
     }
     return null;
   }

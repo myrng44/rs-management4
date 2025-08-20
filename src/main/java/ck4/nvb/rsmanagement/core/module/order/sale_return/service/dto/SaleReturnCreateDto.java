@@ -2,25 +2,25 @@ package ck4.nvb.rsmanagement.core.module.order.sale_return.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
-import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.order.sale_return.domain.SaleReturn;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaleReturnDto extends EntityDto<Long> implements CreateInput<SaleReturn>, UpdateInput<SaleReturn> {
+public class SaleReturnCreateDto extends EntityDto<Long> implements CreateInput<SaleReturn> {
     private String returnCode;
     private String originalSaleOrderId;
     private Long storeId;
     private Long customerId;
+    List<SaleReturnItemDto> items;
     private String returnReason;
     private Integer totalReturnAmount;
     private String refundMethod;
@@ -30,11 +30,6 @@ public class SaleReturnDto extends EntityDto<Long> implements CreateInput<SaleRe
 
     @Override
     public SaleReturn mapToEntity() {
-        return new ModelMapper().map(this, SaleReturn.class);
-    }
-
-    @Override
-    public boolean mapToEntity(SaleReturn entity) {
-        return false;
+        return null;
     }
 }

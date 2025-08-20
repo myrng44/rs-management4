@@ -20,7 +20,7 @@ public class Product extends FullAuditedSerialIdEntity {
   @Column(name = "sku", nullable = false, unique = true)
   private String sku;
 
-  @Column(name = "desc")
+  @Column(name = "\"desc\"")
   private String desc;
 
   @Column(name = "unit_price", nullable = false)

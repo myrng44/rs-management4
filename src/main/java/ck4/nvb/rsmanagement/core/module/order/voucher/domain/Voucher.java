@@ -24,11 +24,11 @@ public class Voucher extends FullAuditedSerialIdEntity {
   @Column(name = "desc")
   private String desc;
 
-  @Column(name = "discount_percent")
-  private Integer discountPercent;
+  @Column(name = "discount_per")
+  private Integer discountPer;
 
-  @Column(name = "discount_value")
-  private Integer discountValue;
+  @Column(name = "discount_val")
+  private Integer discountVal;
 
   @Column(name = "valid_from")
   private LocalDateTime validFrom;

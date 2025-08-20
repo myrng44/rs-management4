@@ -13,7 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
-@Table(name = "store_user")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor

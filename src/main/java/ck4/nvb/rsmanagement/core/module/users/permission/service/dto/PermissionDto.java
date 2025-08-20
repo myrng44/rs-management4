@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 public class PermissionDto extends EntityDto<Long> {
   private String code;
-  private String description;
+  private String desc;
 }

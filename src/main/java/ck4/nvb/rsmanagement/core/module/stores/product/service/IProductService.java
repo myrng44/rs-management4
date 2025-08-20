@@ -1,5 +1,11 @@
 package ck4.nvb.rsmanagement.core.module.stores.product.service;
 
-public interface IProductService {
+import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudService;
+import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
+import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+
+public interface IProductService extends FullAuditedCrudService<ProductGetDto, Product, Long, UserGetDto, Long> {
   int getRemainQuantity(long productId, long storeId);
 }

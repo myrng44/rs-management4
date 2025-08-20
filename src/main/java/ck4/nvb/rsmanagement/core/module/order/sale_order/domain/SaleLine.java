@@ -18,7 +18,7 @@ import lombok.Setter;
 public class SaleLine extends FullAuditedSerialIdEntity {
 
   @Column(name = "sale_order_id")
-  private String orderId;
+  private String saleOrderId;
 
   @Column(name = "product_id")
   private Long productId;

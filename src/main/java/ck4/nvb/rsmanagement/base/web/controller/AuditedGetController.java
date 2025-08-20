@@ -8,9 +8,12 @@ import ck4.nvb.rsmanagement.base.application.exception.ObjectNotFoundException;
 import ck4.nvb.rsmanagement.base.application.service.CreationAuditedCrudService;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.CreationAudited;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteriaParser;
-import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
+
 import java.io.Serializable;
 import java.util.List;
 import lombok.Getter;
@@ -41,7 +44,7 @@ public abstract class AuditedGetController<
   public abstract User extractUser(Authentication auth);
 
   @GetMapping
-  public PagedResultDto<D> getList(
+  public APIListResponse<List<D>> getList(
       Authentication auth,
       @RequestParam(required = false, name = "query") List<String> query,
       @RequestParam(required = false, name = "sort") String sort,
@@ -49,31 +52,36 @@ public abstract class AuditedGetController<
       @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
     User user = extractUser(auth);
 
+    PagedResultDto<D> page;
     if (query != null) {
       List<SearchCriteria> params = SearchCriteriaParser.parse(query);
-      if (params.isEmpty())
-        return getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort), user);
-
-      return getService()
-          .getPage(params, new PagedAndSortedResultRequestDto(offset, limit, sort), user);
+      if (params.isEmpty()) {
+        page = getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort), user);
+      } else {
+        page = getService().getPage(params, new PagedAndSortedResultRequestDto(offset, limit, sort), user);
+      }
+    } else {
+      page = getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort), user);
     }
-    return getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort), user);
+
+    return APIResponseBuilder.paged(page, offset, limit);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<D> getById(Authentication auth, @PathVariable ID id) {
+  public APIResponse<D> getById(Authentication auth, @PathVariable ID id) {
     User user = extractUser(auth);
 
     D output = getService().get(id, user);
 
     if (output == null) throw new ObjectNotFoundException("Object not found. Invalid ID: " + id);
-    return ResponseEntity.ok(output);
+    return APIResponseBuilder.ok(output);
   }
 
-  public PagedResultDto<D> getList(Authentication auth, FilterInput request) {
+  public APIListResponse<List<D>> getList(Authentication auth, FilterInput request) {
     User user = extractUser(auth);
     if (request.getPaging() == null) request.setPaging(new PagedAndSortedResultRequestDto());
-    return getService().getPage(request.mapToSearchCriteria(), request.getPaging(), user);
+    PagedResultDto<D> page = getService().getPage(request.mapToSearchCriteria(), request.getPaging(), user);
+    return APIResponseBuilder.paged(page, request.getPaging().getOffset(), request.getPaging().getLimit());
   }
 
   @GetMapping("/count")
@@ -83,7 +91,7 @@ public abstract class AuditedGetController<
       List<SearchCriteria> params = SearchCriteriaParser.parse(query);
       return ResponseEntity.ok(getService().count(params));
     }
-    return ResponseEntity.ok(
-        getService().count(List.of(new SearchCriteria("deleted", SearchOperator.EQUALS, "false"))));
+    // Remove this line - let the service handle deleted filter automatically
+    return ResponseEntity.ok(getService().count(null)); // or empty list
   }
 }

@@ -1,6 +1,5 @@
 package ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain;
 
-import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedGeneratedIdEntity;
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "import_log")
+@Table(name = "batch_stock")
 public class BatchStock extends FullAuditedSerialIdEntity {
     @Column(name = "batch_id")
     private Long batchId;

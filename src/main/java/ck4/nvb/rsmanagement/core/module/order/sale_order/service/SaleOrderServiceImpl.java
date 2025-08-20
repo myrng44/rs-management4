@@ -1,12 +1,22 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.service;
 
+import ck4.nvb.rsmanagement.base.application.exception.AppException;
+import ck4.nvb.rsmanagement.base.application.exception.DuplicateIdentifierException;
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
+import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
 import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.order.customer.domain.Customer;
 import ck4.nvb.rsmanagement.core.module.order.customer.domain.CustomerRepository;
+import ck4.nvb.rsmanagement.core.module.order.paymentmethod.domain.PaymentMethod;
+import ck4.nvb.rsmanagement.core.module.order.paymentmethod.domain.PaymentMethodRepository;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrderRepository;
-import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineGetDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderCreateDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderGetDto;
+import ck4.nvb.rsmanagement.core.module.order.voucher.domain.Voucher;
+import ck4.nvb.rsmanagement.core.module.order.voucher.domain.VoucherRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Service("orderService")
 public class SaleOrderServiceImpl
-    extends FullAuditedCrudServiceImpl<SaleOrderDto, SaleOrder, String, UserGetDto, Long>
+    extends FullAuditedCrudServiceImpl<SaleOrderGetDto, SaleOrder, String, UserGetDto, Long>
     implements ISaleOrderService {
 
   protected SaleOrderServiceImpl(SaleOrderRepository repository) {
@@ -31,11 +41,18 @@ public class SaleOrderServiceImpl
 
   @Autowired
   private CustomerRepository customerRepository;
+  @Autowired
+  private VoucherRepository voucherRepository;
+  @Autowired
+  private PaymentMethodRepository paymentMethodRepository;
+  @Autowired
+  private ISaleLineService saleLineService;
 
   @Override
-  public SaleOrderDto mapToEntityDto(SaleOrder entity) {
+  public SaleOrderGetDto mapToEntityDto(SaleOrder entity) {
     int finalPrice = getRepository().getFinalPriceByOrderId(entity.getId());
-    SaleOrderDto orderDto = new SaleOrderDto();
+
+    SaleOrderGetDto orderDto = new SaleOrderGetDto();
     orderDto.setId(entity.getId());
 
     if (entity.getCustomerId() != null) {
@@ -44,12 +61,39 @@ public class SaleOrderServiceImpl
       orderDto.setCustomerName(customer.getName());
     }
 
+    List<SaleLineGetDto> lines = saleLineService.getAll(List.of(new SearchCriteria("saleOrderId", SearchOperator.EQUALS, entity.getId())));
+    orderDto.setSaleLines(lines);
+
     orderDto.setStoreId(entity.getStoreId());
     orderDto.setNote(entity.getNote());
-    orderDto.setVoucherId(entity.getVoucherId());
-    orderDto.setPaymentId(entity.getPaymentId());
+
+    if (entity.getVoucherId() != null) {
+      Voucher voucher = voucherRepository.findFirstByIdAndDeletedIsFalse(entity.getVoucherId());
+      orderDto.setVoucherCode(voucher.getCode());
+    }
+
+    PaymentMethod paymentMethod = paymentMethodRepository.getReferenceById(entity.getPaymentId());
+    orderDto.setPaymentMethodName(paymentMethod.getName());
+
     orderDto.setFinalPrice(finalPrice);
     return orderDto;
+  }
+
+  public SaleOrderGetDto create(SaleOrderCreateDto createDto, UserGetDto user) throws AppException {
+    super.checkCreatePermission(createDto, user);
+    SaleOrder saleOrder = createDto.mapToEntity();
+    if (saleOrder.getId() != null && exists(saleOrder.getId())) {
+      getLogger().error("Duplicate id {}", saleOrder.getId());
+      throw new DuplicateIdentifierException("Duplicate identifier " + saleOrder.getId());
+    }
+    saleOrder = getRepository().save(saleOrder);
+    getLogger().info("Created order id {} by user {}: {}", saleOrder.getId(), saleOrder.getCreatorId(), saleOrder);
+
+    for (SaleLineDto saleLineDto: createDto.getLines()) {
+      saleLineDto.setSaleOrderId(saleOrder.getId());
+      saleLineService.create(saleLineDto, user);
+    }
+    return mapToEntityDto(saleOrder);
   }
 
   @Override
@@ -75,4 +119,6 @@ public class SaleOrderServiceImpl
     keys.add("finalPrice");
     return keys;
   }
+
+
 }

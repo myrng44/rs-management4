@@ -1,11 +1,11 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_return.service;
 
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
-import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
 import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.order.sale_return.domain.SaleReturn;
 import ck4.nvb.rsmanagement.core.module.order.sale_return.domain.SaleReturnRepository;
-import ck4.nvb.rsmanagement.core.module.order.sale_return.service.dto.SaleReturnDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_return.service.dto.SaleReturnGetDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_return.service.dto.SaleReturnUpdateDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +13,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service("saleReturnService")
-public class SaleReturnServiceImpl extends FullAuditedCrudServiceImpl<SaleReturnDto, SaleReturn, Long, UserGetDto, Long> implements ISaleReturnService {
+public class SaleReturnServiceImpl extends FullAuditedCrudServiceImpl<SaleReturnGetDto, SaleReturn, Long, UserGetDto, Long> implements ISaleReturnService {
 
+    @Autowired
+    private ISaleReturnItemService saleReturnItemService;
     @Autowired
     private ModelMapper modelMapper;
 
@@ -30,14 +33,21 @@ public class SaleReturnServiceImpl extends FullAuditedCrudServiceImpl<SaleReturn
     }
 
     @Override
-    public SaleReturnDto mapToEntityDto(SaleReturn entity) {
-        return modelMapper.map(entity, SaleReturnDto.class);
+    public SaleReturnGetDto mapToEntityDto(SaleReturn entity) {
+        return modelMapper.map(entity, SaleReturnGetDto.class);
     }
 
     @Override
     public Map<String, List<SearchOperator>> getSearchableKeys() {
         Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
         keys.put("return_code", List.of(SearchOperator.EQUALS));
+        return keys;
+    }
+
+    @Override
+    public Set<String> getSortableKeys() {
+        Set<String> keys = super.getSortableKeys();
+        keys.add("processed_at");
         return keys;
     }
 }

@@ -28,7 +28,7 @@ public class ProductController
 
   @Autowired private IProductService productService;
 
-  public ProductController(ProductServiceImpl productService) {
+  public ProductController(IProductService productService) {
     super(productService);
     this.productService = productService;
   }
@@ -43,8 +43,13 @@ public class ProductController
     if (principal instanceof UserGetDto) {
       return (UserGetDto) principal;
     }
+
     if (principal instanceof UserRoleDto) {
-      return new ModelMapper().map(principal, UserGetDto.class);
+      UserRoleDto userRoleDto = (UserRoleDto) principal;
+      UserGetDto userGetDto = new UserGetDto();
+      userGetDto.setId(userRoleDto.getUserId());
+      userGetDto.setUserName(userRoleDto.getUserName());
+      return userGetDto;
     }
     return null;
   }

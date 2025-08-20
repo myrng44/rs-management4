@@ -13,9 +13,9 @@ import lombok.Setter;
 public class CreationAuditedSerialIdEntity extends SerialIdEntity implements CreationAudited<Long> {
 
   // Fields
-  @Column(name = "created_time")
+  @Column(name = "created_at")
   private LocalDateTime createdTime;
 
-  @Column(name = "creator_id")
+  @Column(name = "created_by")
   private Long creatorId;
 }

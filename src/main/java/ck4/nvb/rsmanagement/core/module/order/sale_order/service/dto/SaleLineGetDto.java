@@ -20,11 +20,5 @@ public class SaleLineGetDto extends EntityDto<Long> {
   private Integer qtyOrdered;
   private Integer unitPrice;
 
-  // jackson return response theo get method chứ không theo field
-  public Integer getTotalPrice() {
-    if (qtyOrdered == null || unitPrice == null) {
-      return null;
-    }
-    return qtyOrdered * unitPrice;
-  }
+  private Long totalPrice;
 }

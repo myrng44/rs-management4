@@ -33,8 +33,13 @@ public class VoucherController
     if (principal instanceof UserGetDto) {
       return (UserGetDto) principal;
     }
+
     if (principal instanceof UserRoleDto) {
-      return new ModelMapper().map(principal, UserGetDto.class);
+      UserRoleDto userRoleDto = (UserRoleDto) principal;
+      UserGetDto userGetDto = new UserGetDto();
+      userGetDto.setId(userRoleDto.getUserId());
+      userGetDto.setUserName(userRoleDto.getUserName());
+      return userGetDto;
     }
     return null;
   }
