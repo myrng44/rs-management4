@@ -9,26 +9,28 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service("refreshTokenCrudService")
-public class RefreshTokenCrudServiceImpl extends CreationAuditedCrudServiceImpl<RefreshTokenDto, RefreshToken, String, UserGetDto, Long> implements RefreshTokenCrudService {
+public class RefreshTokenCrudServiceImpl
+    extends CreationAuditedCrudServiceImpl<RefreshTokenDto, RefreshToken, String, UserGetDto, Long>
+    implements RefreshTokenCrudService {
 
-    private final ModelMapper modelMapper = new ModelMapper();
+  private final ModelMapper modelMapper = new ModelMapper();
 
-    protected RefreshTokenCrudServiceImpl(RefreshTokenRepository repository) {
-        super(repository, RefreshToken.class);
-    }
+  protected RefreshTokenCrudServiceImpl(RefreshTokenRepository repository) {
+    super(repository, RefreshToken.class);
+  }
 
-    @Override
-    public RefreshTokenRepository getRepository() {
-        return (RefreshTokenRepository) super.getRepository();
-    }
+  @Override
+  public RefreshTokenRepository getRepository() {
+    return (RefreshTokenRepository) super.getRepository();
+  }
 
-    @Override
-    public RefreshTokenDto mapToEntityDto(RefreshToken entity) {
-        return modelMapper.map(entity, RefreshTokenDto.class);
-    }
+  @Override
+  public RefreshTokenDto mapToEntityDto(RefreshToken entity) {
+    return modelMapper.map(entity, RefreshTokenDto.class);
+  }
 
-    @Override
-    public void deleteAll(String deviceSession, Long creatorId) {
-        getRepository().deleteByCreatorIdAndDeviceSession(creatorId, deviceSession);
-    }
+  @Override
+  public void deleteAll(String deviceSession, Long creatorId) {
+    getRepository().deleteByCreatorIdAndDeviceSession(creatorId, deviceSession);
+  }
 }

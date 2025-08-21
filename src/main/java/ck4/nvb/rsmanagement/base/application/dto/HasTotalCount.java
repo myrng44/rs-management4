@@ -1,7 +1,7 @@
 package ck4.nvb.rsmanagement.base.application.dto;
 
 public interface HasTotalCount {
-    long getTotalElements();
+  long getTotalElements();
 
-    void setTotalElements(long count);
+  void setTotalElements(long count);
 }

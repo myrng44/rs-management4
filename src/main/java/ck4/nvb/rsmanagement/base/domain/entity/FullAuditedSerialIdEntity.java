@@ -2,21 +2,19 @@ package ck4.nvb.rsmanagement.base.domain.entity;
 
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.FullAudited;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.SoftDeletable;
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import java.time.LocalDateTime;
 import lombok.Generated;
 
-import java.time.LocalDateTime;
-
 @MappedSuperclass
-public abstract class FullAuditedSerialIdEntity extends AuditedSerialIdEntity implements FullAudited<Long>, SoftDeletable {
+public abstract class FullAuditedSerialIdEntity extends AuditedSerialIdEntity
+        implements FullAudited<Long>, SoftDeletable {
     // Fields
-    @Column(name = "deleted_time")
+    @Column(name = "deleted_at")
     private LocalDateTime deletedTime;
 
-    @Column(name = "deleter_id")
+    @Column(name = "deleted_by")
     private Long deleterId;
 
     @Column(name = "deleted")

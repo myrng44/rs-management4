@@ -14,33 +14,42 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/inventory_adjustment")
-public class InventoryAdjustmentController extends AuditedCrudController<InventoryAdjustmentDto, InventoryAdjustment, Long, UserGetDto, Long, InventoryAdjustmentDto, InventoryAdjustmentDto> {
+public class InventoryAdjustmentController
+    extends AuditedCrudController<
+        InventoryAdjustmentDto,
+        InventoryAdjustment,
+        Long,
+        UserGetDto,
+        Long,
+        InventoryAdjustmentDto,
+        InventoryAdjustmentDto> {
 
-    public InventoryAdjustmentController(InventoryAdjustmentServiceImpl service) {
-        super(service);
+  public InventoryAdjustmentController(InventoryAdjustmentServiceImpl service) {
+    super(service);
+  }
+
+  @Override
+  public UserGetDto extractUser(Authentication auth) {
+    if (auth == null || !auth.isAuthenticated()) {
+      return null;
     }
 
-    @Override
-    public UserGetDto extractUser(Authentication auth) {
-        if (auth == null || !auth.isAuthenticated()) {
-            return null;
-        }
+    Object principal = auth.getPrincipal();
 
-        Object principal = auth.getPrincipal();
-
-        if (principal instanceof UserGetDto) {
-            return (UserGetDto) principal;
-        }
-
-        if (principal instanceof UserRoleDto) {
-            return new ModelMapper().map(principal, UserGetDto.class);
-        }
-
-        return null;
+    if (principal instanceof UserGetDto) {
+      return (UserGetDto) principal;
     }
 
-    @PostMapping("/filtered")
-    public PagedResultDto<InventoryAdjustmentDto> getList(Authentication auth, @RequestBody InventoryAdjustmentFilterInputDto request) {
-        return super.getList(auth, request);
+    if (principal instanceof UserRoleDto) {
+      return new ModelMapper().map(principal, UserGetDto.class);
     }
+
+    return null;
+  }
+
+//  @PostMapping("/filtered")
+//  public PagedResultDto<InventoryAdjustmentDto> getList(
+//      Authentication auth, @RequestBody InventoryAdjustmentFilterInputDto request) {
+//    return super.getList(auth, request);
+//  }
 }

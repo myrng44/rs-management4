@@ -1,21 +1,19 @@
 package ck4.nvb.rsmanagement.base.domain.entity;
 
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.Audited;
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import java.time.LocalDateTime;
 import lombok.Generated;
 
-import java.time.LocalDateTime;
-
 @MappedSuperclass
-public abstract class AuditedSerialIdEntity extends CreationAuditedSerialIdEntity implements Audited<Long> {
+public abstract class AuditedSerialIdEntity extends CreationAuditedSerialIdEntity
+        implements Audited<Long> {
     // Fields
-    @Column(name = "last_updated")
+    @Column(name = "updated_at")
     private LocalDateTime lastUpdatedTime;
 
-    @Column(name = "last_updater")
+    @Column(name = "updated_by")
     private Long updaterId;
 
     @Generated

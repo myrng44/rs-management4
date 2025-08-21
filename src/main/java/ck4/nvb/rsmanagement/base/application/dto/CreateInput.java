@@ -4,5 +4,5 @@ import java.io.Serializable;
 
 public interface CreateInput<T extends Serializable> {
 
-    T mapToEntity();
+  T mapToEntity();
 }

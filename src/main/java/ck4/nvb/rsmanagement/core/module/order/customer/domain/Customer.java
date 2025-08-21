@@ -9,19 +9,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "customer")
 public class Customer extends FullAuditedSerialIdEntity {
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @Column(name = "phone")
-    private String phone;
+  @Column(name = "phone")
+  private String phone;
 
-    @Column(name = "gender")
-    private String gender;
+  @Column(name = "gender")
+  private String gender;
 
-    @Column(name = "point")
-    private Integer point;
+  @Column(name = "point")
+  private Integer point;
 }

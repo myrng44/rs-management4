@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository("refreshTokenRepository")
 public interface RefreshTokenRepository extends BaseRepository<RefreshToken, String> {
 
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM RefreshToken u WHERE u.creatorId = ?1 AND u.deviceSession = ?2")
-    void deleteByCreatorIdAndDeviceSession(Long userId, String deviceSession);
+  @Modifying
+  @Transactional
+  @Query("DELETE FROM RefreshToken u WHERE u.creatorId = ?1 AND u.deviceSession = ?2")
+  void deleteByCreatorIdAndDeviceSession(Long userId, String deviceSession);
 }

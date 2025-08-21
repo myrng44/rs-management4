@@ -7,22 +7,19 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommonPasswordEncoder {
-    //singleton
-    @Getter
-    private static final CommonPasswordEncoder instance = new CommonPasswordEncoder();
+  // singleton
+  @Getter private static final CommonPasswordEncoder instance = new CommonPasswordEncoder();
 
-    @Getter
-    private final PasswordEncoder encoder = new BCryptPasswordEncoder(8);
+  @Getter private final PasswordEncoder encoder = new BCryptPasswordEncoder(8);
 
-    //make the constructor private so that this class cannot be instantiated
-    private CommonPasswordEncoder() {
-    }
+  // make the constructor private so that this class cannot be instantiated
+  private CommonPasswordEncoder() {}
 
-    public String encode(String raw) {
-        return encoder.encode(raw);
-    }
+  public String encode(String raw) {
+    return encoder.encode(raw);
+  }
 
-    public boolean matches(String raw, String encoded) {
-        return encoder.matches(raw, encoded);
-    }
+  public boolean matches(String raw, String encoded) {
+    return encoder.matches(raw, encoded);
+  }
 }

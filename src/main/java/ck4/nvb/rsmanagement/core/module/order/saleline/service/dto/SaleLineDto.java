@@ -12,47 +12,47 @@ import org.modelmapper.ModelMapper;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SaleLineDto extends EntityDto<Long> implements CreateInput<SaleLine>, UpdateInput<SaleLine> {
+public class SaleLineDto extends EntityDto<Long>
+        implements CreateInput<SaleLine>, UpdateInput<SaleLine> {
 
-    private String saleOrderId;
-    private Long productId;
-    private Integer quantityOrdered;
-    private Integer quantityAllocated;
-    private Integer quantityPicked;
+  private String saleOrderId;
+  private Long productId;
+  private Integer qtyOrdered;
+  private Integer qtyAllocated;
+  private Integer qtyPicked;
 
-    @Override
-    public SaleLine mapToEntity() {
-        return new ModelMapper().map(this, SaleLine.class);
+  @Override
+  public SaleLine mapToEntity() {
+    return new ModelMapper().map(this, SaleLine.class);
+  }
+
+  @Override
+  public boolean mapToEntity(SaleLine entity) {
+    boolean isModified = false;
+
+    if (entity == null) {
+      return false;
     }
-
-    @Override
-    public boolean mapToEntity(SaleLine entity) {
-        boolean isModified = false;
-
-        if (entity == null) {
-            return false;
-        }
-        if (!saleOrderId.equals(entity.getSaleOrderId())) {
-            entity.setSaleOrderId(saleOrderId);
-            isModified = true;
-        }
-        if (!productId.equals(entity.getProductId())) {
-            entity.setProductId(productId);
-            isModified = true;
-        }
-        if (!quantityOrdered.equals(entity.getQuantityOrdered())) {
-            entity.setQuantityOrdered(quantityOrdered);
-            isModified = true;
-        }
-
-        if (!quantityAllocated.equals(entity.getQuantityAllocated())) {
-            entity.setQuantityAllocated(quantityAllocated);
-            isModified = true;
-        }
-
-        if (!quantityPicked.equals(entity.getQuantityPicked())) {
-            entity.setQuantityPicked(quantityPicked);
-        }
-        return isModified;
+    if (!saleOrderId.equals(entity.getSaleOrderId())) {
+      entity.setSaleOrderId(saleOrderId);
+      isModified = true;
     }
+    if (!productId.equals(entity.getProductId())) {
+      entity.setProductId(productId);
+      isModified = true;
+    }
+    if (!qtyOrdered.equals(entity.getQtyOrdered())) {
+      entity.setQtyOrdered(qtyOrdered);
+      isModified = true;
+    }
+    if (!qtyAllocated.equals(entity.getQtyAllocated())) {
+      entity.setQtyAllocated(qtyAllocated);
+      isModified = true;
+    }
+    if (!qtyPicked.equals(entity.getQtyPicked())) {
+      entity.setQtyPicked(qtyPicked);
+      isModified = true;
+    }
+    return isModified;
+  }
 }

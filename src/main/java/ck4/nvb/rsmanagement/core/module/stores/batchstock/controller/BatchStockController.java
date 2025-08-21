@@ -12,26 +12,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/${rs.api.main.baseUrl}/batchStock")
-public class BatchStockController extends AuditedCrudController<BatchStockDto, BatchStock, String, UserGetDto, Long, BatchStockDto, BatchStockDto> {
+@RequestMapping("/${rs.api.main.baseUrl}/import-log")
+public class BatchStockController
+        extends AuditedCrudController<
+        BatchStockDto, BatchStock, Long, UserGetDto, Long, BatchStockDto, BatchStockDto> {
 
-    public BatchStockController(BatchStockServiceImpl importLogService) {
-        super(importLogService);
+  public BatchStockController(BatchStockServiceImpl importLogService) {
+    super(importLogService);
+  }
+
+  @Override
+  public UserGetDto extractUser(Authentication auth) {
+    if (auth == null || !auth.isAuthenticated()) {
+      return null;
     }
 
-    @Override
-    public UserGetDto extractUser(Authentication auth) {
-        if (auth == null || !auth.isAuthenticated()) {
-            return null;
-        }
-
-        Object principal = auth.getPrincipal();
-        if (principal instanceof UserGetDto) {
-            return (UserGetDto) principal;
-        }
-        if (principal instanceof UserRoleDto) {
-            return new ModelMapper().map(principal, UserGetDto.class);
-        }
-        return null;
+    Object principal = auth.getPrincipal();
+    if (principal instanceof UserGetDto) {
+      return (UserGetDto) principal;
     }
+
+    if (principal instanceof UserRoleDto) {
+      UserRoleDto userRoleDto = (UserRoleDto) principal;
+      UserGetDto userGetDto = new UserGetDto();
+      userGetDto.setId(userRoleDto.getUserId());
+      userGetDto.setUserName(userRoleDto.getUserName());
+      return userGetDto;
+    }
+    return null;
+  }
 }

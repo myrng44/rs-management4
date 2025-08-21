@@ -8,39 +8,41 @@ import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
-@Getter @Setter
-public class InventoryAdjustmentDto extends EntityDto<Long> implements CreateInput<InventoryAdjustment>, UpdateInput<InventoryAdjustment> {
+@Getter
+@Setter
+public class InventoryAdjustmentDto extends EntityDto<Long>
+    implements CreateInput<InventoryAdjustment>, UpdateInput<InventoryAdjustment> {
 
-    private Long batchStockId;
+  private Long batchStockId;
 
-    private Integer changeQuantity;
+  private Integer changeQuantity;
 
-    private String reason;
+  private String reason;
 
-    @Override
-    public InventoryAdjustment mapToEntity() {
-        return new ModelMapper().map(this, InventoryAdjustment.class);
+  @Override
+  public InventoryAdjustment mapToEntity() {
+    return new ModelMapper().map(this, InventoryAdjustment.class);
+  }
+
+  @Override
+  public boolean mapToEntity(InventoryAdjustment entity) {
+    boolean isModified = false;
+
+    if (batchStockId != entity.getBatchStockId()) {
+      entity.setBatchStockId(batchStockId);
+      isModified = true;
     }
 
-    @Override
-    public boolean mapToEntity(InventoryAdjustment entity) {
-        boolean isModified = false;
-
-        if (batchStockId != entity.getBatchStockId()) {
-            entity.setBatchStockId(batchStockId);
-            isModified = true;
-        }
-
-        if ( changeQuantity!= entity.getChangeQuantity()) {
-            entity.setChangeQuantity(changeQuantity);
-            isModified = true;
-        }
-
-        if (reason != entity.getReason()) {
-            entity.setReason(reason);
-            isModified = true;
-        }
-
-        return isModified;
+    if (changeQuantity != entity.getChangeQuantity()) {
+      entity.setChangeQuantity(changeQuantity);
+      isModified = true;
     }
+
+    if (reason != entity.getReason()) {
+      entity.setReason(reason);
+      isModified = true;
+    }
+
+    return isModified;
+  }
 }

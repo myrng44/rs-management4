@@ -8,13 +8,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @Table(name = "permission")
 public class Permission extends FullAuditedSerialIdEntity {
 
-    @Column(name = "code")
-    private String code;
+  @Column(name = "code")
+  private String code;
 
-    @Column(name = "description")
-    private String description;
+  @Column(name = "description")
+  private String description;
 }

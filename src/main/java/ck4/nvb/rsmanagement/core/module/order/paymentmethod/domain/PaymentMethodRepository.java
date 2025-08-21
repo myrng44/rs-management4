@@ -4,5 +4,5 @@ import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository("paymentMethodRepository")
-public interface PaymentMethodRepository extends BaseFullAuditedRepository<PaymentMethod, Long, Long> {
-}
+public interface PaymentMethodRepository
+    extends BaseFullAuditedRepository<PaymentMethod, Long, Long> {}

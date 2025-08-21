@@ -1,6 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.stores.batchstock.domain;
 
-import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedGeneratedIdEntity;
+import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -9,34 +9,32 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "import_log")
-public class BatchStock extends FullAuditedGeneratedIdEntity {
+@Table(name = "batch_stock")
+public class BatchStock extends FullAuditedSerialIdEntity {
+  @Column(name = "batch_id")
+  private Long batchId;
 
-    @Column(name = "batch_id")
-    private Long batchId;
+  @Column(name = "store_id")
+  private Long storeId;
 
-    @Column(name = "store_id")
-    private Long toStore;
+  @Column(name = "qty_total")
+  private Integer qtyTotal;
 
-    @Column(name = "quantity_total")
-    private Integer quantityTotal;
+  @Column(name = "qty_available")
+  private Integer qtyAvailable;
 
-    @Column(name = "quantity_available")
-    private Integer quantityAvailable;
+  @Column(name = "qty_reversed")
+  private Integer qtyReversed;
 
-    @Column(name = "quantity_reserved")
-    private Integer quantityReserved;
+  @Column(name = "status")
+  private String status;
 
-    @Column(name =  "version")
-    private Integer version;
+  @Column(name = "version")
+  private Integer version;
 
-    @Column(name = "start_date")
-    private Date startDate;
-
-    @Column(name = "status")
-    private String status;
 }

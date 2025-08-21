@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 public class TokenRefreshRequestDto extends RefreshTokenInput {
 
-    private String ipAddress;
+  private String ipAddress;
 
-    private String deviceSession;
+  private String deviceSession;
 }

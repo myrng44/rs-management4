@@ -13,28 +13,29 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("${rs.api.main.baseUrl}/store")
-public class StoreController extends AuditedCrudController<StoreDto, Store, Long, UserGetDto, Long, StoreDto, StoreDto> {
+public class StoreController
+    extends AuditedCrudController<StoreDto, Store, Long, UserGetDto, Long, StoreDto, StoreDto> {
 
-    public StoreController(StoreCrudServiceImpl storeCrudService) {
-        super(storeCrudService);
+  public StoreController(StoreCrudServiceImpl storeCrudService) {
+    super(storeCrudService);
+  }
+
+  @Override
+  public UserGetDto extractUser(Authentication auth) {
+    if (auth == null || !auth.isAuthenticated()) {
+      return null;
     }
 
-    @Override
-    public UserGetDto extractUser(Authentication auth) {
-        if (auth == null || !auth.isAuthenticated()) {
-            return null;
-        }
+    Object principal = auth.getPrincipal();
 
-        Object principal = auth.getPrincipal();
-
-        if (principal instanceof UserGetDto) {
-            return (UserGetDto) principal;
-        }
-
-        if (principal instanceof UserRoleDto) {
-            return new ModelMapper().map(principal, UserGetDto.class);
-        }
-
-        return null;
+    if (principal instanceof UserGetDto) {
+      return (UserGetDto) principal;
     }
+
+    if (principal instanceof UserRoleDto) {
+      return new ModelMapper().map(principal, UserGetDto.class);
+    }
+
+    return null;
+  }
 }

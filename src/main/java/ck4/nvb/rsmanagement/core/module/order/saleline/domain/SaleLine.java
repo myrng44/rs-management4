@@ -9,26 +9,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "sale_line")
 public class SaleLine extends FullAuditedSerialIdEntity {
 
-    @Column(name = "sale_order_id")
-    private String saleOrderId;
+  @Column(name = "sale_order_id")
+  private String saleOrderId;
 
-    @Column(name = "product_id")
-    private Long productId;
+  @Column(name = "product_id")
+  private Long productId;
 
-    @Column(name = "quantity_ordered")
-    private Integer quantityOrdered;
+  @Column(name = "qty_ordered")
+  private Integer qtyOrdered;
 
-    @Column(name = "quantity_allocated")
-    private Integer quantityAllocated;
+  @Column(name = "qty_allocated")
+  private Integer qtyAllocated;
 
-    @Column(name = "quantity_picked")
-    private Integer quantityPicked;
+  @Column(name = "qty_picked")
+  private Integer qtyPicked;
 
-    @Column(name = "unit_price")
-    private Integer unitPrice;
+  @Column(name = "unit_price")
+  private Integer unitPrice;
 }

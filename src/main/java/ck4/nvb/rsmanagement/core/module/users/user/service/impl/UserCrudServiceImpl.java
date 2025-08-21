@@ -10,30 +10,34 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service("userCrudService")
-public class UserCrudServiceImpl extends FullAuditedCrudServiceImpl<BaseUserDto, User, Long, BaseUserDto, Long> implements FullAuditedCrudService<BaseUserDto, User, Long, BaseUserDto, Long> {
+public class UserCrudServiceImpl
+    extends FullAuditedCrudServiceImpl<BaseUserDto, User, Long, BaseUserDto, Long>
+    implements FullAuditedCrudService<BaseUserDto, User, Long, BaseUserDto, Long> {
 
-    private final ModelMapper modelMapper = new ModelMapper();
-    private final CommonPasswordEncoder commonPasswordEncoder;
+  private final ModelMapper modelMapper = new ModelMapper();
+  private final CommonPasswordEncoder commonPasswordEncoder;
 
-    protected UserCrudServiceImpl(UserRepository repository, CommonPasswordEncoder commonPasswordEncoder) {
-        super(repository, User.class);
-        this.commonPasswordEncoder = commonPasswordEncoder;
-    }
+  protected UserCrudServiceImpl(
+      UserRepository repository, CommonPasswordEncoder commonPasswordEncoder) {
+    super(repository, User.class);
+    this.commonPasswordEncoder = commonPasswordEncoder;
+  }
 
-    @Override
-    public UserRepository getRepository() {
-        return (UserRepository) super.getRepository();
-    }
+  @Override
+  public UserRepository getRepository() {
+    return (UserRepository) super.getRepository();
+  }
 
-    @Override
-    public BaseUserDto mapToEntityDto(User entity) {
-        return modelMapper.map(entity, BaseUserDto.class);
-    }
+  @Override
+  public BaseUserDto mapToEntityDto(User entity) {
+    return modelMapper.map(entity, BaseUserDto.class);
+  }
 
-    @Override
-    protected BaseUserDto createEntity(User entity) { //ma hoa password truoc khi luu entity vao database
-        String encodedPassword = commonPasswordEncoder.encode(entity.getPassword());
-        entity.setPassword(encodedPassword);
-        return super.createEntity(entity);
-    }
+  @Override
+  protected BaseUserDto createEntity(
+      User entity) { // ma hoa password truoc khi luu entity vao database
+    String encodedPassword = commonPasswordEncoder.encode(entity.getPassword());
+    entity.setPassword(encodedPassword);
+    return super.createEntity(entity);
+  }
 }

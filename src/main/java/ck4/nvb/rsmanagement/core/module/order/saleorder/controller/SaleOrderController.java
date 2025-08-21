@@ -1,53 +1,65 @@
 package ck4.nvb.rsmanagement.core.module.order.saleorder.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.core.module.order.saleline.service.ISaleLineService;
 import ck4.nvb.rsmanagement.core.module.order.saleorder.domain.SaleOrder;
-import ck4.nvb.rsmanagement.core.module.order.saleorder.service.SaleOrderCrudServiceImpl;
-import ck4.nvb.rsmanagement.core.module.order.saleorder.service.dto.SaleOrderDto;
-import ck4.nvb.rsmanagement.core.module.order.saleline.service.SaleLineCrudServiceImpl;
+import ck4.nvb.rsmanagement.core.module.order.saleorder.service.ISaleOrderService;
+import ck4.nvb.rsmanagement.core.module.order.saleorder.service.dto.SaleOrderCreateDto;
+import ck4.nvb.rsmanagement.core.module.order.saleorder.service.dto.SaleOrderGetDto;
+import ck4.nvb.rsmanagement.core.module.order.saleorder.service.dto.SaleOrderUpdateDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+import java.util.List;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/orders")
-public class SaleOrderController extends AuditedCrudController<SaleOrderDto, SaleOrder, String, UserGetDto, Long, SaleOrderDto, SaleOrderDto> {
+public class SaleOrderController
+        extends AuditedCrudController<SaleOrderGetDto, SaleOrder, String, UserGetDto, Long, SaleOrderCreateDto, SaleOrderUpdateDto> {
 
-    private final SaleLineCrudServiceImpl orderDetailCrudService;
+  @Autowired
+  private ISaleLineService orderDetailCrudService;
 
-    public SaleOrderController(SaleOrderCrudServiceImpl service, SaleLineCrudServiceImpl orderDetailCrudService) {
-        super(service);
-        this.orderDetailCrudService = orderDetailCrudService;
+  @Autowired
+  private ModelMapper modelMapper;
+
+  public SaleOrderController(ISaleOrderService service) {
+    super(service);
+  }
+
+  @Override
+  public UserGetDto extractUser(Authentication auth) {
+    if (auth == null || !auth.isAuthenticated()) {
+      return null;
     }
 
-    @Override
-    public UserGetDto extractUser(Authentication auth) {
-        if (auth == null || !auth.isAuthenticated()) {
-            return null;
-        }
-
-        Object principal = auth.getPrincipal();
-        if (principal instanceof UserGetDto) {
-            return (UserGetDto) principal;
-        }
-        if (principal instanceof UserRoleDto) {
-            return new ModelMapper().map(principal, UserGetDto.class);
-        }
-        return null;
+    Object principal = auth.getPrincipal();
+    if (principal instanceof UserGetDto) {
+      return (UserGetDto) principal;
     }
 
-    @GetMapping("/most")
-    public List<ProductGetDto> getMostSoldProductsLastDay(Authentication auth, @RequestParam int days, @RequestParam int noProducts) {
-        UserGetDto user = extractUser(auth);
-
-        return orderDetailCrudService.getMostSoldProductsLastDay(days, noProducts);
+    if (principal instanceof UserRoleDto) {
+      UserRoleDto userRoleDto = (UserRoleDto) principal;
+      UserGetDto userGetDto = new UserGetDto();
+      userGetDto.setId(userRoleDto.getUserId());
+      userGetDto.setUserName(userRoleDto.getUserName());
+      return userGetDto;
     }
+    return null;
+  }
+
+  @GetMapping("/most")
+  public List<ProductGetDto> getMostSoldProductsLastDay(
+          Authentication auth, @RequestParam int days, @RequestParam int noProducts) {
+    UserGetDto user = extractUser(auth);
+
+    return orderDetailCrudService.getMostSoldProductsLastDay(days, noProducts);
+  }
 }

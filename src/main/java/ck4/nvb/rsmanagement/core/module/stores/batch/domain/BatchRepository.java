@@ -4,5 +4,4 @@ import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository("batchRepository")
-public interface BatchRepository extends BaseFullAuditedRepository<Batch, Long, Long> {
-}
+public interface BatchRepository extends BaseFullAuditedRepository<Batch, Long, Long> {}

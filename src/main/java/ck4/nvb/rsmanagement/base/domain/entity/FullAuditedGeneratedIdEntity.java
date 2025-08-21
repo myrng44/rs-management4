@@ -3,17 +3,17 @@ package ck4.nvb.rsmanagement.base.domain.entity;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.FullAudited;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import java.time.LocalDateTime;
 import lombok.Generated;
 
-import java.time.LocalDateTime;
-
 @MappedSuperclass
-public abstract class FullAuditedGeneratedIdEntity extends AuditedGeneratedIdEntity implements FullAudited<Long> {
+public abstract class FullAuditedGeneratedIdEntity extends AuditedGeneratedIdEntity
+        implements FullAudited<Long> {
     // Fields
-    @Column(name = "deleted_time")
+    @Column(name = "deleted_at")
     private LocalDateTime deletedTime;
 
-    @Column(name = "deleter_id")
+    @Column(name = "deleted_by")
     private Long deleterId;
 
     @Column(name = "deleted")

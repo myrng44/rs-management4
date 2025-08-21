@@ -6,38 +6,46 @@ import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.base.application.exception.ObjectNotFoundException;
 import ck4.nvb.rsmanagement.base.application.service.CrudService;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.io.Serializable;
 
-public class CrudController<D extends EntityDto<ID>, T extends IEntity<ID>, ID extends Comparable<ID> & Serializable,
-        C extends CreateInput<T>, U extends UpdateInput<T>> extends GetController<D, T, ID> {
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
+import org.springframework.web.bind.annotation.*;
 
-    protected CrudController(CrudService<D, T, ID> service) {
-        super(service);
-    }
+public class CrudController<
+        D extends EntityDto<ID>,
+        T extends IEntity<ID>,
+        ID extends Comparable<ID> & Serializable,
+        C extends CreateInput<T>,
+        U extends UpdateInput<T>>
+        extends GetController<D, T, ID> {
 
-    public CrudService<D, T, ID> getService() {
-        return (CrudService<D, T, ID>) super.getService();
-    }
+  protected CrudController(CrudService<D, T, ID> service) {
+    super(service);
+  }
 
-    @PostMapping
-    public D create(@RequestBody C entity) {
-        return getService().create(entity);
-    }
+  public CrudService<D, T, ID> getService() {
+    return (CrudService<D, T, ID>) super.getService();
+  }
 
-    @PutMapping("/{id}")
-    public D update(@PathVariable ID id, @RequestBody U entity) {
-        return getService().update(id, entity);
-    }
+  @PostMapping
+  public APIResponse<D> create(@RequestBody C entity) {
+    D result = getService().create(entity);
+    return APIResponseBuilder.created(result, "created success!");
+  }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable ID id) {
-        if (!getService().exists(id)) throw new ObjectNotFoundException("Object not found. Invalid ID: " + id);
+  @PutMapping("/{id}")
+  public APIResponse<D> update(@PathVariable ID id, @RequestBody U entity) {
+    D result = getService().update(id, entity);
+    return APIResponseBuilder.success(result, "updated success!");
+  }
 
-        getService().delete(id);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+  @DeleteMapping("/{id}")
+  public APIResponse<Void> delete(@PathVariable ID id) {
+    if (!getService().exists(id))
+      throw new ObjectNotFoundException("Object not found. Invalid ID: " + id);
+
+    getService().delete(id);
+    return APIResponseBuilder.success(null, "deleted success!");
+  }
 }

@@ -8,30 +8,38 @@ import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
-import java.util.Date;
+@Getter
+@Setter
+public class BatchStockDto extends EntityDto<Long>
+    implements CreateInput<BatchStock>, UpdateInput<BatchStock> {
 
-@Getter @Setter
-public class BatchStockDto extends EntityDto<String> implements CreateInput<BatchStock>, UpdateInput<BatchStock> {
+  private Long batchId;
+  private Long storeId;
+  private Integer qtyTotal;
+  private Integer qtyAvailable;
+  private Integer qtyReversed;
+  private String status;
+  private Integer version;
 
-    private Long batchId;
+/*  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss",
+      timezone = "Asia/Ho_Chi_Minh")
+  private Date startDate;
 
-    private Long storeId;
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss",
+      timezone = "Asia/Ho_Chi_Minh")
+  private Date deliveryDate;*/
 
-    private Integer quantityTotal;
+  @Override
+  public BatchStock mapToEntity() {
+    return new ModelMapper().map(this, BatchStock.class);
+  }
 
-    private Integer quantityAvailable;
-
-    private Integer quantityReserved;
-
-    private String status;
-
-    @Override
-    public BatchStock mapToEntity() {
-        return new ModelMapper().map(this, BatchStock.class);
-    }
-
-    @Override
-    public boolean mapToEntity(BatchStock entity) {
-        return false;
-    }
+  @Override
+  public boolean mapToEntity(BatchStock entity) {
+    return false;
+  }
 }
