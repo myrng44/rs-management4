@@ -1,0 +1,98 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype polyline
+
+class AppAuthenticationException {
+  + AppAuthenticationException(): 
+  + AppAuthenticationException(List<FieldError>, String, Object[]): 
+  + AppAuthenticationException(List<FieldError>): 
+  + AppAuthenticationException(String, Object[]): 
+  + AppAuthenticationException(String): 
+  + AppAuthenticationException(List<FieldError>, String): 
+  + AppAuthenticationException(Throwable): 
+  + AppAuthenticationException(List<FieldError>, Throwable): 
+  + AppAuthenticationException(String, Throwable): 
+  + AppAuthenticationException(List<FieldError>, String, Throwable): 
+}
+class AppException {
+  + AppException(List<FieldError>): 
+  + AppException(String): 
+  + AppException(String, Throwable): 
+  + AppException(Throwable): 
+  + AppException(List<FieldError>, Throwable): 
+  + AppException(List<FieldError>, String): 
+  + AppException(String, Object[]): 
+  + AppException(): 
+  + AppException(List<FieldError>, String, Object[]): 
+  + AppException(List<FieldError>, String, Throwable): 
+  - fieldErrors: List<FieldError>
+   fieldErrors: List<FieldError>
+}
+class AppPersistenceException {
+  + AppPersistenceException(): 
+  + AppPersistenceException(String, Throwable): 
+  + AppPersistenceException(String): 
+  + AppPersistenceException(Throwable): 
+  + AppPersistenceException(String, Object[]): 
+}
+class BlankIdentifierException {
+  + BlankIdentifierException(): 
+  + BlankIdentifierException(String, Throwable): 
+  + BlankIdentifierException(String): 
+  + BlankIdentifierException(String, Object[]): 
+  + BlankIdentifierException(Throwable): 
+}
+class DuplicateIdentifierException {
+  + DuplicateIdentifierException(String): 
+  + DuplicateIdentifierException(Throwable): 
+  + DuplicateIdentifierException(): 
+  + DuplicateIdentifierException(String, Object[]): 
+  + DuplicateIdentifierException(String, Throwable): 
+}
+class IllegalPropertyException {
+  + IllegalPropertyException(String, Throwable): 
+  + IllegalPropertyException(Throwable): 
+  + IllegalPropertyException(String): 
+  + IllegalPropertyException(List<FieldError>, String): 
+  + IllegalPropertyException(List<FieldError>, String, Throwable): 
+  + IllegalPropertyException(List<FieldError>, String, Object[]): 
+  + IllegalPropertyException(List<FieldError>, Throwable): 
+  + IllegalPropertyException(List<FieldError>): 
+  + IllegalPropertyException(String, Object[]): 
+  + IllegalPropertyException(): 
+}
+class InvalidFormatException {
+  + InvalidFormatException(String, Throwable): 
+  + InvalidFormatException(Throwable): 
+  + InvalidFormatException(): 
+  + InvalidFormatException(String): 
+  + InvalidFormatException(String, Object[]): 
+}
+class MissingRequiredPropertyException {
+  + MissingRequiredPropertyException(List<FieldError>, String, Throwable): 
+  + MissingRequiredPropertyException(String, Throwable): 
+  + MissingRequiredPropertyException(List<FieldError>): 
+  + MissingRequiredPropertyException(): 
+  + MissingRequiredPropertyException(List<FieldError>, String): 
+  + MissingRequiredPropertyException(Throwable): 
+  + MissingRequiredPropertyException(List<FieldError>, Throwable): 
+  + MissingRequiredPropertyException(String, Object[]): 
+  + MissingRequiredPropertyException(List<FieldError>, String, Object[]): 
+  + MissingRequiredPropertyException(String): 
+}
+class ObjectNotFoundException {
+  + ObjectNotFoundException(): 
+  + ObjectNotFoundException(String, Object[]): 
+  + ObjectNotFoundException(String): 
+  + ObjectNotFoundException(String, Throwable): 
+}
+
+AppAuthenticationException        -[#000082,plain]-^  AppException                     
+AppPersistenceException           -[#000082,plain]-^  AppException                     
+IllegalPropertyException          -[#000082,plain]-^  AppException                     
+InvalidFormatException            -[#000082,plain]-^  AppException                     
+MissingRequiredPropertyException  -[#000082,plain]-^  AppException                     
+ObjectNotFoundException           -[#000082,plain]-^  AppException                     
+@enduml

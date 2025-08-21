@@ -1,0 +1,30 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class APIRequest<T> {
+  + APIRequest(APIRequestHeader, T): 
+  + APIRequest(): 
+  - header: APIRequestHeader
+  - body: T
+  + toString(): String
+   body: T
+   header: APIRequestHeader
+}
+class APIRequestHeader {
+  + APIRequestHeader(String, String): 
+  + APIRequestHeader(): 
+  - requestId: String
+  - requestTime: String
+  + toString(): String
+   requestTime: String
+   requestId: String
+}
+class RequestIdFilter {
+  + RequestIdFilter(): 
+  + doFilter(ServletRequest, ServletResponse, FilterChain): void
+}
+
+@enduml

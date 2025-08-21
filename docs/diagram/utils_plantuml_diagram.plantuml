@@ -1,0 +1,56 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class InputUtils {
+  + InputUtils(): 
+  + getString(String): String
+  + toSet(String): Set<String>
+  + getString(Collection<String>): String
+  + getID(Long): Long
+}
+class JacksonParser {
+  - JacksonParser(): 
+  - objectMapper: ObjectMapper
+  - instance: JacksonParser
+  + fromJson(String, Class<T>): T
+  + toJson(Object): String
+   instance: JacksonParser
+   objectMapper: ObjectMapper
+}
+class LocalDateTimeDeserial {
+  + LocalDateTimeDeserial(): 
+  + deserialize(JsonParser, DeserializationContext): LocalDateTime
+}
+class LocalDateTimeSerial {
+  + LocalDateTimeSerial(): 
+  + serialize(LocalDateTime, JsonGenerator, SerializerProvider): void
+}
+class SnowflakeIdGenerator {
+  + SnowflakeIdGenerator(long, long): 
+  - tilNextMillis(long): long
+  + nextId(): long
+  - timeGen(): long
+}
+class SnowflakeIdGeneratorHolder {
+  + SnowflakeIdGeneratorHolder(): 
+  - INSTANCE: SnowflakeIdGenerator
+   INSTANCE: SnowflakeIdGenerator
+}
+class TextUtils {
+  - TextUtils(): 
+  - instance: TextUtils
+  - toASCII(char, boolean, Boolean): Character?
+  + toASCIIUpperCase(char, boolean): Character
+  - toASCII(String, boolean, Boolean): String
+  + toSearchText(String): String
+  + toASCIIUpperCase(String, boolean): String
+  + toASCIILowerCase(String, boolean): String
+  + toTrimmedText(String): String
+  + toASCIILowerCase(char, boolean): Character
+   instance: TextUtils
+}
+
+@enduml

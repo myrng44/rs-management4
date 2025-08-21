@@ -13,11 +13,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BaseAPIResponse<H extends BaseApiResponseHeader, T> implements Serializable {
+public class BaseAPIResponse<M extends BaseApiResponseMetadata, T> implements Serializable {
 
   @Serial private static final long serialVersionUID = 1L;
 
-  private H header;
+  private M metadata;
   private T body;
 
   @Override

@@ -1,0 +1,569 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class Customer {
+  + Customer(String, String, String, Integer): 
+  + Customer(): 
+  - name: String
+  - gender: String
+  - phone: String
+  - point: Integer
+   name: String
+   gender: String
+   point: Integer
+   phone: String
+}
+class CustomerController {
+  + CustomerController(CustomerCrudServiceImpl): 
+  + extractUser(Authentication): UserGetDto
+}
+class CustomerCrudServiceImpl {
+  # CustomerCrudServiceImpl(CustomerRepository): 
+  + mapToEntityDto(Customer): CustomerDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   repository: CustomerRepository
+   sortableKeys: Set<String>
+}
+class CustomerDto {
+  + CustomerDto(): 
+  - phone: String
+  - gender: String
+  - name: String
+  - point: Integer
+  + mapToEntity(): Customer
+  + mapToEntity(Customer): boolean
+   name: String
+   gender: String
+   point: Integer
+   phone: String
+}
+interface CustomerRepository << interface >> {
+  + countCustomerByDeletedIsFalse(): int
+}
+interface ISaleAllocationService << interface >>
+interface ISaleLineService << interface >> {
+  + getMostSoldProductsLastDay(int, int): List<ProductGetDto>
+}
+interface ISaleOrderService << interface >>
+interface ISaleReturnItemService << interface >>
+interface ISaleReturnService << interface >>
+class PaymentMethod {
+  + PaymentMethod(String, String): 
+  + PaymentMethod(): 
+  - code: String
+  - name: String
+   name: String
+   code: String
+}
+class PaymentMethodController {
+  + PaymentMethodController(PaymentMethodCrudServiceImpl): 
+  + extractUser(Authentication): UserGetDto
+}
+class PaymentMethodCrudServiceImpl {
+  # PaymentMethodCrudServiceImpl(PaymentMethodRepository): 
+  + mapToEntityDto(PaymentMethod): PaymentMethodDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   sortableKeys: Set<String>
+   repository: PaymentMethodRepository
+}
+class PaymentMethodDto {
+  + PaymentMethodDto(): 
+  - code: String
+  - name: String
+  + mapToEntity(): PaymentMethod
+  + mapToEntity(PaymentMethod): boolean
+   name: String
+   code: String
+}
+interface PaymentMethodRepository << interface >>
+class SaleAllocation {
+  + SaleAllocation(Long, Long, Integer, Integer, Integer): 
+  + SaleAllocation(): 
+  - qtyAllocated: Integer
+  - qtyPicked: Integer
+  - saleLineId: Long
+  - unitCostSnap: Integer
+  - batchStockId: Long
+   batchStockId: Long
+   unitCostSnap: Integer
+   qtyAllocated: Integer
+   saleLineId: Long
+   qtyPicked: Integer
+}
+class SaleAllocationController {
+  + SaleAllocationController(ISaleAllocationService): 
+  + extractUser(Authentication): UserGetDto
+}
+class SaleAllocationDto {
+  + SaleAllocationDto(Long, Long, Integer, Integer, Integer): 
+  + SaleAllocationDto(): 
+  - qtyPicked: Integer
+  - unitCostSnap: Integer
+  - batchStockId: Long
+  - qtyAllocated: Integer
+  - saleLineId: Long
+  + mapToEntity(SaleAllocation): boolean
+  + mapToEntity(): SaleAllocation
+   batchStockId: Long
+   unitCostSnap: Integer
+   qtyAllocated: Integer
+   saleLineId: Long
+   qtyPicked: Integer
+}
+interface SaleAllocationRepository << interface >>
+class SaleAllocationServiceImpl {
+  # SaleAllocationServiceImpl(SaleAllocationRepository): 
+  + mapToEntityDto(SaleAllocation): SaleAllocationDto
+   repository: SaleAllocationRepository
+}
+class SaleLine {
+  + SaleLine(String, Long, Integer, Integer, Integer, Integer): 
+  + SaleLine(): 
+  - productId: Long
+  - qtyAllocated: Integer
+  - qtyPicked: Integer
+  - unitPrice: Integer
+  - qtyOrdered: Integer
+  - saleOrderId: String
+   unitPrice: Integer
+   saleOrderId: String
+   productId: Long
+   qtyOrdered: Integer
+   qtyAllocated: Integer
+   qtyPicked: Integer
+}
+class SaleLineController {
+  + SaleLineController(ISaleLineService): 
+  + extractUser(Authentication): UserGetDto
+}
+class SaleLineDto {
+  + SaleLineDto(): 
+  - qtyAllocated: Integer
+  - saleOrderId: String
+  - qtyPicked: Integer
+  - productId: Long
+  - qtyOrdered: Integer
+  + mapToEntity(SaleLine): boolean
+  + mapToEntity(): SaleLine
+   saleOrderId: String
+   productId: Long
+   qtyOrdered: Integer
+   qtyAllocated: Integer
+   qtyPicked: Integer
+}
+class SaleLineGetDto {
+  + SaleLineGetDto(): 
+  - saleOrderId: String
+  - productName: String
+  - unitPrice: Integer
+  - totalPrice: Long
+  - productId: Long
+  - qtyOrdered: Integer
+   unitPrice: Integer
+   saleOrderId: String
+   productId: Long
+   totalPrice: Long
+   qtyOrdered: Integer
+   productName: String
+}
+interface SaleLineRepository << interface >> {
+  + findMostSoldProductsOfInterval(LocalDateTime, LocalDateTime, int): List<Product>
+  + findBySaleOrderId(String): List<SaleLine>
+}
+class SaleLineServiceImpl {
+  # SaleLineServiceImpl(SaleLineRepository): 
+  + mapToEntityDto(SaleLine): SaleLineGetDto
+  + getMostSoldProductsLastDay(int, int): List<ProductGetDto>
+   searchableKeys: Map<String, List<SearchOperator>>
+   repository: SaleLineRepository
+   sortableKeys: Set<String>
+}
+class SaleOrder {
+  + SaleOrder(): 
+  + SaleOrder(Long, Long, Long, Integer, String, Long): 
+  - customerId: Long
+  - voucherId: Long
+  - storeId: Long
+  - finalPrice: Integer
+  - note: String
+  - paymentId: Long
+   finalPrice: Integer
+   voucherId: Long
+   note: String
+   paymentId: Long
+   storeId: Long
+   customerId: Long
+}
+class SaleOrderController {
+  + SaleOrderController(ISaleOrderService): 
+  + getMostSoldProductsLastDay(Authentication, int, int): List<ProductGetDto>
+  + extractUser(Authentication): UserGetDto
+}
+class SaleOrderCreateDto {
+  + SaleOrderCreateDto(Long, Long, List<SaleLineDto>, Long, Integer, String, Long): 
+  + SaleOrderCreateDto(): 
+  - paymentId: Long
+  - lines: List<SaleLineDto>
+  - finalPrice: Integer
+  - storeId: Long
+  - voucherId: Long
+  - customerId: Long
+  - note: String
+  + mapToEntity(): SaleOrder
+   note: String
+   lines: List<SaleLineDto>
+   customerId: Long
+   finalPrice: Integer
+   voucherId: Long
+   paymentId: Long
+   storeId: Long
+}
+class SaleOrderGetDto {
+  + SaleOrderGetDto(Long, String, List<SaleLineGetDto>, Long, String, Integer, String, String): 
+  + SaleOrderGetDto(): 
+  - saleLines: List<SaleLineGetDto>
+  - storeId: Long
+  - customerId: Long
+  - paymentMethodName: String
+  - customerName: String
+  - finalPrice: Integer
+  - note: String
+  - voucherCode: String
+   note: String
+   customerName: String
+   customerId: Long
+   saleLines: List<SaleLineGetDto>
+   finalPrice: Integer
+   paymentMethodName: String
+   storeId: Long
+   voucherCode: String
+}
+interface SaleOrderRepository << interface >> {
+  + sumTotalFinalPriceBetween(LocalDateTime, LocalDateTime): long
+  + getFinalPriceByOrderId(String): int
+  + countOrdersByCreatedTimeBetween(LocalDateTime, LocalDateTime): int
+}
+class SaleOrderServiceImpl {
+  # SaleOrderServiceImpl(SaleOrderRepository): 
+  + mapToEntityDto(SaleOrder): SaleOrderGetDto
+  + create(SaleOrderCreateDto, UserGetDto): SaleOrderGetDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   sortableKeys: Set<String>
+   repository: SaleOrderRepository
+}
+class SaleOrderUpdateDto {
+  + SaleOrderUpdateDto(Long, Long, List<SaleLineDto>, Long, Integer, String, Long): 
+  + SaleOrderUpdateDto(): 
+  - finalPrice: Integer
+  - storeId: Long
+  - lines: List<SaleLineDto>
+  - voucherId: Long
+  - paymentId: Long
+  - note: String
+  - customerId: Long
+  + mapToEntity(SaleOrder): boolean
+   note: String
+   lines: List<SaleLineDto>
+   customerId: Long
+   finalPrice: Integer
+   voucherId: Long
+   paymentId: Long
+   storeId: Long
+}
+class SaleReturn {
+  + SaleReturn(String, String, Long, Long, String, Integer, String, Boolean, LocalDateTime, Long): 
+  + SaleReturn(): 
+  - processedAt: LocalDateTime
+  - processedBy: Long
+  - returnCode: String
+  - isProcessed: Boolean
+  - returnReason: String
+  - customerId: Long
+  - storeId: Long
+  - originalSaleOrderId: String
+  - totalReturnAmount: Integer
+  - refundMethod: String
+   returnCode: String
+   returnReason: String
+   processedAt: LocalDateTime
+   processedBy: Long
+   customerId: Long
+   originalSaleOrderId: String
+   refundMethod: String
+   isProcessed: Boolean
+   totalReturnAmount: Integer
+   storeId: Long
+}
+class SaleReturnController {
+  + SaleReturnController(ISaleReturnService): 
+  + extractUser(Authentication): UserGetDto
+}
+class SaleReturnCreateDto {
+  + SaleReturnCreateDto(String, String, Long, Long, List<SaleReturnItemDto>, String, Integer, String, Boolean, LocalDateTime, Long): 
+  + SaleReturnCreateDto(): 
+  - storeId: Long
+  - customerId: Long
+  - originalSaleOrderId: String
+  - processedAt: LocalDateTime
+  - processedBy: Long
+  - totalReturnAmount: Integer
+  - returnReason: String
+  - isProcessed: Boolean
+  ~ items: List<SaleReturnItemDto>
+  - returnCode: String
+  - refundMethod: String
+  + mapToEntity(): SaleReturn
+   returnCode: String
+   returnReason: String
+   processedAt: LocalDateTime
+   processedBy: Long
+   customerId: Long
+   originalSaleOrderId: String
+   refundMethod: String
+   isProcessed: Boolean
+   totalReturnAmount: Integer
+   storeId: Long
+   items: List<SaleReturnItemDto>
+}
+class SaleReturnGetDto {
+  + SaleReturnGetDto(): 
+  + SaleReturnGetDto(String, String, Long, Long, List<SaleReturnItemGetDto>, String, Integer, String, Boolean, LocalDateTime, Long): 
+  - returnCode: String
+  - customerId: Long
+  - processedBy: Long
+  - totalReturnAmount: Integer
+  - originalSaleOrderId: String
+  ~ items: List<SaleReturnItemGetDto>
+  - returnReason: String
+  - isProcessed: Boolean
+  - refundMethod: String
+  - processedAt: LocalDateTime
+  - storeId: Long
+   returnCode: String
+   returnReason: String
+   processedAt: LocalDateTime
+   processedBy: Long
+   customerId: Long
+   originalSaleOrderId: String
+   refundMethod: String
+   isProcessed: Boolean
+   totalReturnAmount: Integer
+   storeId: Long
+   items: List<SaleReturnItemGetDto>
+}
+class SaleReturnItem {
+  + SaleReturnItem(Long, Long, Long, Integer, Integer, Integer, String): 
+  + SaleReturnItem(): 
+  - productId: Long
+  - originalSaleLineId: Long
+  - unitPriceAtSale: Integer
+  - returnUnitPrice: Integer
+  - saleReturnId: Long
+  - qtyReturned: Integer
+  - conditionNote: String
+   returnUnitPrice: Integer
+   saleReturnId: Long
+   productId: Long
+   originalSaleLineId: Long
+   unitPriceAtSale: Integer
+   conditionNote: String
+   qtyReturned: Integer
+}
+class SaleReturnItemDto {
+  + SaleReturnItemDto(Long, Long, Long, Integer, Integer, Integer, String): 
+  + SaleReturnItemDto(): 
+  - saleReturnId: Long
+  - qtyReturned: Integer
+  - productId: Long
+  - unitPriceAtSale: Integer
+  - conditionNote: String
+  - originalSaleLineId: Long
+  - returnUnitPrice: Integer
+  + mapToEntity(SaleReturnItem): boolean
+  + mapToEntity(): SaleReturnItem
+   returnUnitPrice: Integer
+   saleReturnId: Long
+   productId: Long
+   originalSaleLineId: Long
+   unitPriceAtSale: Integer
+   conditionNote: String
+   qtyReturned: Integer
+}
+class SaleReturnItemGetDto {
+  + SaleReturnItemGetDto(Long, String, Long, Integer, Integer, Integer, String): 
+  + SaleReturnItemGetDto(): 
+  - unitPriceAtSale: Integer
+  - qtyReturned: Integer
+  - productName: String
+  - originalSaleLineId: Long
+  - returnUnitPrice: Integer
+  - conditionNote: String
+  - saleReturnId: Long
+   returnUnitPrice: Integer
+   saleReturnId: Long
+   originalSaleLineId: Long
+   unitPriceAtSale: Integer
+   conditionNote: String
+   qtyReturned: Integer
+   productName: String
+}
+interface SaleReturnItemRepository << interface >>
+class SaleReturnItemServiceImpl {
+  # SaleReturnItemServiceImpl(SaleReturnItemRepository): 
+  + mapToEntityDto(SaleReturnItem): SaleReturnItemDto
+   repository: SaleReturnItemRepository
+}
+interface SaleReturnRepository << interface >>
+class SaleReturnServiceImpl {
+  # SaleReturnServiceImpl(SaleReturnRepository): 
+  + mapToEntityDto(SaleReturn): SaleReturnGetDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   sortableKeys: Set<String>
+   repository: SaleReturnRepository
+}
+class SaleReturnUpdateDto {
+  + SaleReturnUpdateDto(String, String, Long, Long, String, Integer, String, Boolean, LocalDateTime, Long): 
+  + SaleReturnUpdateDto(): 
+  - isProcessed: Boolean
+  - processedBy: Long
+  - totalReturnAmount: Integer
+  - processedAt: LocalDateTime
+  - storeId: Long
+  - returnCode: String
+  - originalSaleOrderId: String
+  - customerId: Long
+  - returnReason: String
+  - refundMethod: String
+  + mapToEntity(SaleReturn): boolean
+   returnCode: String
+   returnReason: String
+   processedAt: LocalDateTime
+   processedBy: Long
+   customerId: Long
+   originalSaleOrderId: String
+   refundMethod: String
+   isProcessed: Boolean
+   totalReturnAmount: Integer
+   storeId: Long
+}
+class Voucher {
+  + Voucher(String, String, Integer, Integer, LocalDateTime, LocalDateTime, Long, Long, Integer, String): 
+  + Voucher(): 
+  - validFrom: LocalDateTime
+  - audienceType: String
+  - discountPer: Integer
+  - perCustomerLimit: Integer
+  - desc: String
+  - validTo: LocalDateTime
+  - discountVal: Integer
+  - qtyRedeemed: Long
+  - code: String
+  - qtyTotal: Long
+   validFrom: LocalDateTime
+   validTo: LocalDateTime
+   audienceType: String
+   qtyTotal: Long
+   code: String
+   qtyRedeemed: Long
+   desc: String
+   discountVal: Integer
+   perCustomerLimit: Integer
+   discountPer: Integer
+}
+class VoucherController {
+  + VoucherController(VoucherCrudServiceImpl): 
+  + extractUser(Authentication): UserGetDto
+}
+class VoucherCrudServiceImpl {
+  # VoucherCrudServiceImpl(VoucherRepository): 
+  + mapToEntityDto(Voucher): VoucherDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   repository: VoucherRepository
+   sortableKeys: Set<String>
+}
+class VoucherCustomer {
+  + VoucherCustomer(Long, Long, Boolean): 
+  + VoucherCustomer(): 
+  - issued: Boolean
+  - voucherId: Long
+  - customerId: Long
+   voucherId: Long
+   customerId: Long
+   issued: Boolean
+}
+class VoucherCustomerDto {
+  + VoucherCustomerDto(Long, Long, Boolean): 
+  + VoucherCustomerDto(): 
+  - voucherId: Long
+  - issued: Boolean
+  - customerId: Long
+  + mapToEntity(VoucherCustomer): boolean
+  + mapToEntity(): VoucherCustomer
+   voucherId: Long
+   customerId: Long
+   issued: Boolean
+}
+interface VoucherCustomerRepository << interface >>
+class VoucherDto {
+  + VoucherDto(): 
+  - qtyRedeemed: Long
+  - validFrom: LocalDateTime
+  - code: String
+  - discountPer: Integer
+  - perCustomerLimit: Integer
+  - qtyTotal: Long
+  - discountVal: Integer
+  - desc: String
+  - validTo: LocalDateTime
+  - audienceType: String
+  + mapToEntity(): Voucher
+  + mapToEntity(Voucher): boolean
+   validFrom: LocalDateTime
+   validTo: LocalDateTime
+   audienceType: String
+   qtyTotal: Long
+   code: String
+   qtyRedeemed: Long
+   desc: String
+   discountVal: Integer
+   perCustomerLimit: Integer
+   discountPer: Integer
+}
+class VoucherRedemption {
+  + VoucherRedemption(Long, Long, String, Integer): 
+  + VoucherRedemption(): 
+  - voucherId: Long
+  - customerId: Long
+  - saleOrderId: String
+  - appliedValue: Integer
+   saleOrderId: String
+   voucherId: Long
+   appliedValue: Integer
+   customerId: Long
+}
+class VoucherRedemptionDto {
+  + VoucherRedemptionDto(Long, Long, String, Integer): 
+  + VoucherRedemptionDto(): 
+  - customerId: Long
+  - voucherId: Long
+  - saleOrderId: String
+  - appliedValue: Integer
+  + mapToEntity(VoucherRedemption): boolean
+  + mapToEntity(): VoucherRedemption
+   saleOrderId: String
+   voucherId: Long
+   appliedValue: Integer
+   customerId: Long
+}
+interface VoucherRedemptionRepository << interface >>
+interface VoucherRepository << interface >>
+
+SaleAllocationServiceImpl     -[#008200,dashed]-^  ISaleAllocationService       
+SaleLineServiceImpl           -[#008200,dashed]-^  ISaleLineService             
+SaleOrderServiceImpl          -[#008200,dashed]-^  ISaleOrderService            
+SaleReturnItemServiceImpl     -[#008200,dashed]-^  ISaleReturnItemService       
+SaleReturnServiceImpl         -[#008200,dashed]-^  ISaleReturnService           
+@enduml

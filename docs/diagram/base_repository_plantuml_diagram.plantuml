@@ -1,0 +1,31 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+interface BaseFullAuditedRepository<T, ID, UID> << interface >> {
+  + existsByIdAndDeletedIsFalse(ID): boolean
+  + findFirstByIdAndDeletedIsFalse(ID): T
+}
+interface BaseRepository<T, ID> << interface >>
+class OffsetBasedPageable {
+  + OffsetBasedPageable(long, int, Direction, String[]): 
+  + OffsetBasedPageable(long, int, Sort): 
+  + OffsetBasedPageable(long, int): 
+  - sort: Sort
+  - offset: long
+  + previous(): OffsetBasedPageable
+  + hasPrevious(): boolean
+  + previousOrFirst(): Pageable
+  + first(): Pageable
+  + withPage(int): Pageable
+  + next(): Pageable
+   pageNumber: int
+   sort: Sort
+   offset: long
+   pageSize: int
+}
+
+BaseFullAuditedRepository  -[#008200,plain]-^  BaseRepository            
+@enduml

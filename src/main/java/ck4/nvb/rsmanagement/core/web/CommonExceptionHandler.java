@@ -2,7 +2,7 @@ package ck4.nvb.rsmanagement.core.web;
 
 import ck4.nvb.rsmanagement.base.application.exception.ObjectNotFoundException;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseHeader;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseMetadata;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.ValidationErrorResponse;
 import ck4.nvb.rsmanagement.base.web.error.ErrorCode;
 import ck4.nvb.rsmanagement.base.web.error.FieldError;
@@ -28,7 +28,7 @@ public class CommonExceptionHandler {
 
   @ExceptionHandler(ObjectNotFoundException.class)
   public ResponseEntity<APIResponse<Object>> handleNotFound(ObjectNotFoundException ex) {
-    APIResponseHeader header = new APIResponseHeader(ErrorCode.NOT_FOUND, ex.getMessage());
+    APIResponseMetadata header = new APIResponseMetadata(ErrorCode.NOT_FOUND, ex.getMessage());
     header.setTimestamp(LocalDateTime.now());
     header.setTraceId(traceId());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new APIResponse<>(header, null));
@@ -52,7 +52,7 @@ public class CommonExceptionHandler {
     }
 
     ValidationErrorResponse val = new ValidationErrorResponse(fieldErrors);
-    APIResponseHeader header = new APIResponseHeader(ErrorCode.BAD_REQUEST, "Validation failed");
+    APIResponseMetadata header = new APIResponseMetadata(ErrorCode.BAD_REQUEST, "Validation failed");
     header.setTimestamp(LocalDateTime.now());
     header.setTraceId(traceId());
     return ResponseEntity.badRequest().body(new APIResponse<>(header, val));
@@ -62,8 +62,8 @@ public class CommonExceptionHandler {
   public ResponseEntity<APIResponse<Object>> handleGeneric(Exception ex) {
     // log full stack with traceId
     // logger.error("Unhandled", ex);
-    APIResponseHeader header =
-        new APIResponseHeader(ErrorCode.INTERNAL_SERVER_ERROR, "Internal server error");
+    APIResponseMetadata header =
+        new APIResponseMetadata(ErrorCode.INTERNAL_SERVER_ERROR, "Internal server error");
     header.setTimestamp(LocalDateTime.now());
     header.setTraceId(traceId());
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -1,0 +1,29 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class PredicateBase<T> {
+  + PredicateBase(Class<T>, String): 
+  - getStringPredicate(String, SearchOperator, String, PathBuilder<?>): BooleanExpression?
+  + getPredicate(String, SearchOperator, String): BooleanExpression
+  - getDatePredicate(String, SearchOperator, String, PathBuilder<?>): BooleanExpression?
+  - getPropertyType(Class<?>, String): Class<?>
+  - getRecursiveType(Class<?>, List<String>): Class<?>
+  - getNumberPredicate(NumberPath<?>, SearchOperator, Object[]): BooleanExpression?
+  - getInheritType(Class<?>, String): Class<?>?
+  - getPredicate(String, SearchOperator, String, PathBuilder<?>, Class<?>): BooleanExpression?
+  - getNumberPredicate(NumberPath<N>, SearchOperator, N): BooleanExpression?
+  - getDateTimePredicate(String, SearchOperator, String, PathBuilder<?>): BooleanExpression?
+}
+class PredicateBuilder<T> {
+  + PredicateBuilder(Class<T>): 
+  + and(List<SearchCriteria>): PredicateBuilder<T>
+  + replaceKeyMap(Map<String, String>): PredicateBuilder<T>
+  + and(SearchCriteria): PredicateBuilder<T>
+  - getEntityVariable(String): String
+  + build(): BooleanExpression
+}
+
+@enduml

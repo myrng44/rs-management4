@@ -1,0 +1,139 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+interface AuditedCrudService<D, T, ID, U, UID> << interface >>
+class AuditedCrudServiceImpl<D, T, ID, U, UID> {
+  # AuditedCrudServiceImpl(BaseRepository<T, ID>, Class<T>): 
+  + mapToEntity(UpdateInput<T>, T, U): boolean
+  + mapToEntity(CreateInput<T>, U): T
+}
+interface CreationAuditedCrudService<D, T, ID, U, UID> << interface >> {
+  + update(ID, UpdateInput<T>, U): D
+  + create(CreateInput<T>, U): D
+  + delete(ID, U): void
+}
+class CreationAuditedCrudServiceImpl<D, T, ID, U, UID> {
+  # CreationAuditedCrudServiceImpl(BaseRepository<T, ID>, Class<T>): 
+  + delete(ID, U): void
+  # createEntity(T): D
+  + mapToEntity(CreateInput<T>, U): T
+  + checkUpdatePermission(ID, U): void
+  + mapToEntity(UpdateInput<T>, T, U): boolean
+  + checkCreatePermission(CreateInput<T>, U): void
+  + update(ID, UpdateInput<T>, U): D
+  + checkDeletePermission(ID, U): void
+  + create(CreateInput<T>, U): D
+}
+interface CreationAuditedGetService<D, T, ID, U, UID> << interface >> {
+  + get(ID, U): D
+  + getPage(PagedAndSortedResultRequestDto, U): PagedResultDto<D>
+  + exists(ID, U): boolean
+  + getAll(List<SearchCriteria>, U): List<D>
+  + getPage(List<SearchCriteria>, PagedAndSortedResultRequestDto, U): PagedResultDto<D>
+}
+class CreationAuditedGetServiceImpl<D, T, ID, U, UID> {
+  # CreationAuditedGetServiceImpl(BaseRepository<T, ID>, Class<T>): 
+  + getAll(List<SearchCriteria>, U): List<D>
+  + getPage(PagedAndSortedResultRequestDto, U): PagedResultDto<D>
+  + postCheckGetListPermission(List<D>, U): void
+  + getPage(List<SearchCriteria>, PagedAndSortedResultRequestDto, U): PagedResultDto<D>
+  + preCheckGetPermission(ID, U): void
+  + postCheckGetPermission(D, U): void
+  + preCheckGetListPermission(List<SearchCriteria>, U): void
+  + exists(ID, U): boolean
+  + get(ID, U): D
+   searchableKeys: Map<String, List<SearchOperator>>
+   sortableKeys: Set<String>
+}
+interface CrudService<D, T, ID> << interface >> {
+  + delete(ID): void
+  + create(CreateInput<T>): D
+  + update(ID, UpdateInput<T>): D
+}
+class CrudServiceImpl<D, T, ID> {
+  # CrudServiceImpl(BaseRepository<T, ID>, Class<T>): 
+  # createEntity(T): D
+  + mapToEntity(UpdateInput<T>, T): boolean
+  + update(ID, UpdateInput<T>): D
+  + mapToEntity(CreateInput<T>): T
+  + create(CreateInput<T>): D
+  + delete(ID): void
+}
+interface FullAuditedCrudService<D, T, ID, U, UID> << interface >> {
+  + addDeletedFalse(List<SearchCriteria>): List<SearchCriteria>
+}
+class FullAuditedCrudServiceImpl<D, T, ID, U, UID> {
+  # FullAuditedCrudServiceImpl(BaseRepository<T, ID>, Class<T>): 
+  + getPage(PagedAndSortedResultRequestDto, U): PagedResultDto<D>
+  + getEntity(ID): T
+  + getPage(List<SearchCriteria>, PagedAndSortedResultRequestDto): PagedResultDto<D>
+  + count(List<SearchCriteria>): long
+  + getAll(List<SearchCriteria>, U): List<D>
+  + delete(ID, U): void
+  + mapToEntity(CreateInput<T>, U): T
+  + addDeletedFalse(List<SearchCriteria>): List<SearchCriteria>
+  + getPage(PagedAndSortedResultRequestDto): PagedResultDto<D>
+  + exists(ID): boolean
+  + getPage(List<SearchCriteria>, PagedAndSortedResultRequestDto, U): PagedResultDto<D>
+  + getAll(List<SearchCriteria>): List<D>
+   all: List<D>
+   searchableKeys: Map<String, List<SearchOperator>>
+   repository: BaseFullAuditedRepository<T, ID, UID>
+}
+interface GetService<D, T, ID> << interface >> {
+  + getPage(PagedAndSortedResultRequestDto): PagedResultDto<D>
+  + getPage(List<SearchCriteria>, PagedAndSortedResultRequestDto): PagedResultDto<D>
+  + exists(ID): boolean
+  + getAll(List<SearchCriteria>): List<D>
+  + count(List<SearchCriteria>): long
+  + get(ID): D
+   all: List<D>
+}
+class GetServiceImpl<D, T, ID> {
+  # GetServiceImpl(BaseRepository<T, ID>, Class<T>): 
+  - entityManager: EntityManager
+  - type: Class<T>
+  - logger: Logger
+  - repository: BaseRepository<T, ID>
+  + getPage(List<SearchCriteria>, PagedAndSortedResultRequestDto): PagedResultDto<D>
+  + mapToPredicate(List<SearchCriteria>): Predicate
+  + mapToGetListOutputDto(List<T>): List<D>
+  + count(List<SearchCriteria>): long
+  - mapToPageable(PagedAndSortedResultRequestDto): OffsetBasedPageable
+  + getAll(List<SearchCriteria>): List<D>
+  + getEntity(ID): T
+  + exists(ID): boolean
+  + mapToEntityDto(T): D
+  + getPage(PagedAndSortedResultRequestDto): PagedResultDto<D>
+  + mapToGetOutputDto(T): D
+  + get(ID): D
+   searchableKeys: Map<String, List<SearchOperator>>
+   type: Class<T>
+   logger: Logger
+   entityManager: EntityManager
+   sortableKeys: Set<String>
+   repository: BaseRepository<T, ID>
+   all: List<D>
+   replaceKeyMap: Map<String, String>
+}
+
+AuditedCrudService              -[#008200,plain]-^  CreationAuditedCrudService     
+AuditedCrudServiceImpl          -[#008200,dashed]-^  AuditedCrudService             
+AuditedCrudServiceImpl          -[#000082,plain]-^  CreationAuditedCrudServiceImpl 
+CreationAuditedCrudService      -[#008200,plain]-^  CreationAuditedGetService      
+CreationAuditedCrudServiceImpl  -[#008200,dashed]-^  CreationAuditedCrudService     
+CreationAuditedCrudServiceImpl  -[#000082,plain]-^  CreationAuditedGetServiceImpl  
+CreationAuditedGetService       -[#008200,plain]-^  GetService                     
+CreationAuditedGetServiceImpl   -[#008200,dashed]-^  CreationAuditedGetService      
+CreationAuditedGetServiceImpl   -[#000082,plain]-^  GetServiceImpl                 
+CrudService                     -[#008200,plain]-^  GetService                     
+CrudServiceImpl                 -[#008200,dashed]-^  CrudService                    
+CrudServiceImpl                 -[#000082,plain]-^  GetServiceImpl                 
+FullAuditedCrudService          -[#008200,plain]-^  AuditedCrudService             
+FullAuditedCrudServiceImpl      -[#000082,plain]-^  AuditedCrudServiceImpl         
+FullAuditedCrudServiceImpl      -[#008200,dashed]-^  FullAuditedCrudService         
+GetServiceImpl                  -[#008200,dashed]-^  GetService                     
+@enduml

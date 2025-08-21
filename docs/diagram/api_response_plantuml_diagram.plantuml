@@ -1,0 +1,81 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class APIListResponse<T> {
+  + APIListResponse(APIListResponseMetadata, T): 
+  + APIListResponse(): 
+}
+class APIListResponseMetadata {
+  + APIListResponseMetadata(): 
+  + APIListResponseMetadata(int, String, long, int, long): 
+  + APIListResponseMetadata(ErrorCode, String, long, int, long): 
+  - offset: long
+  - limit: int
+  - totalRecords: long
+   offset: long
+   totalRecords: long
+   limit: int
+}
+class APIResponse<T> {
+  + APIResponse(): 
+  + APIResponse(APIResponseMetadata, T): 
+}
+class APIResponseBuilder {
+  - APIResponseBuilder(): 
+  + noContent(String): APIResponse<T>
+  + error(ErrorCode, String): APIResponse<T>
+  + ok(T): APIResponse<T>
+  + created(T, String): APIResponse<T>
+  + successList(List<T>, long, int, long, String): APIListResponse<List<T>>
+  - traceIdFromMdc(): String
+  + success(T, String): APIResponse<T>
+  + paged(PagedResultDto<T>, int, int): APIListResponse<List<T>>
+   commonHeaderFields: APIResponseMetadata
+}
+class APIResponseMetadata {
+  + APIResponseMetadata(ErrorCode, String): 
+  + APIResponseMetadata(): 
+  + APIResponseMetadata(int, String): 
+  - code: int
+  - traceId: String
+  - timestamp: LocalDateTime
+  - message: String
+  + toString(): String
+   traceId: String
+   code: int
+   timestamp: LocalDateTime
+   message: String
+}
+class BaseAPIResponse<M, T> {
+  + BaseAPIResponse(M, T): 
+  + BaseAPIResponse(): 
+  - metadata: M
+  - body: T
+  + toString(): String
+   body: T
+   metadata: M
+}
+interface BaseApiResponseMetadata << interface >> {
+   code: int
+   message: String
+}
+class ValidationErrorResponse {
+  + ValidationErrorResponse(List<FieldError>): 
+  + ValidationErrorResponse(List<FieldError>, String): 
+  - objectName: String
+  - fieldErrors: List<FieldError>
+  - errorCount: int
+   fieldErrors: List<FieldError>
+   errorCount: int
+   objectName: String
+}
+
+APIListResponse          -[#000082,plain]-^  BaseAPIResponse         
+APIListResponseMetadata  -[#000082,plain]-^  APIResponseMetadata     
+APIResponse              -[#000082,plain]-^  BaseAPIResponse         
+APIResponseMetadata      -[#008200,dashed]-^  BaseApiResponseMetadata 
+BaseAPIResponse          -[#595959,dashed]->  BaseApiResponseMetadata 
+@enduml

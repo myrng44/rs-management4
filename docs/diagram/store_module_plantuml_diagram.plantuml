@@ -1,0 +1,393 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class BaseProductDto {
+  + BaseProductDto(): 
+  - name: String
+  - unitPrice: Integer
+  - categoryId: Long
+  - sku: String
+  - desc: String
+   name: String
+   unitPrice: Integer
+   desc: String
+   sku: String
+   categoryId: Long
+}
+class Batch {
+  + Batch(String, Long, Integer, Long, Integer, LocalDateTime, LocalDateTime, LocalDateTime): 
+  + Batch(): 
+  - supplierId: Long
+  - productId: Long
+  - manufactureDate: LocalDateTime
+  - originalQty: Integer
+  - batchCode: String
+  - expiryDate: LocalDateTime
+  - arrivalDate: LocalDateTime
+  - importedPrice: Integer
+   importedPrice: Integer
+   originalQty: Integer
+   supplierId: Long
+   productId: Long
+   expiryDate: LocalDateTime
+   manufactureDate: LocalDateTime
+   batchCode: String
+   arrivalDate: LocalDateTime
+}
+class BatchController {
+  # BatchController(IBatchService): 
+  + extractUser(Authentication): UserGetDto
+}
+class BatchCrudServiceImpl {
+  # BatchCrudServiceImpl(BatchRepository): 
+  + mapToEntityDto(Batch): BatchDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   repository: BatchRepository
+   sortableKeys: Set<String>
+}
+class BatchDto {
+  + BatchDto(): 
+  - arrivalDate: LocalDateTime
+  - batchCode: String
+  - productId: Long
+  - manufactureDate: LocalDateTime
+  - supplierId: Long
+  - importedPrice: Integer
+  - expiryDate: LocalDateTime
+  - originalQty: Integer
+  + mapToEntity(Batch): boolean
+  + mapToEntity(): Batch
+   importedPrice: Integer
+   originalQty: Integer
+   supplierId: Long
+   productId: Long
+   expiryDate: LocalDateTime
+   manufactureDate: LocalDateTime
+   batchCode: String
+   arrivalDate: LocalDateTime
+}
+interface BatchRepository << interface >>
+class BatchStock {
+  + BatchStock(): 
+  + BatchStock(Long, Long, Integer, Integer, Integer, String, Integer): 
+  - qtyAvailable: Integer
+  - batchId: Long
+  - qtyReversed: Integer
+  - status: String
+  - qtyTotal: Integer
+  - storeId: Long
+  - version: Integer
+   qtyReversed: Integer
+   qtyAvailable: Integer
+   qtyTotal: Integer
+   status: String
+   version: Integer
+   storeId: Long
+   batchId: Long
+}
+class BatchStockController {
+  + BatchStockController(BatchStockServiceImpl): 
+  + extractUser(Authentication): UserGetDto
+}
+class BatchStockDto {
+  + BatchStockDto(): 
+  - storeId: Long
+  - qtyTotal: Integer
+  - qtyAvailable: Integer
+  - status: String
+  - version: Integer
+  - batchId: Long
+  - qtyReversed: Integer
+  + mapToEntity(BatchStock): boolean
+  + mapToEntity(): BatchStock
+   qtyReversed: Integer
+   qtyAvailable: Integer
+   qtyTotal: Integer
+   status: String
+   version: Integer
+   storeId: Long
+   batchId: Long
+}
+interface BatchStockRepository << interface >>
+class BatchStockServiceImpl {
+  # BatchStockServiceImpl(BatchStockRepository): 
+  + mapToEntityDto(BatchStock): BatchStockDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   sortableKeys: Set<String>
+   repository: BatchStockRepository
+}
+class Category {
+  + Category(): 
+  - desc: String
+  - name: String
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + toString(): String
+   name: String
+   desc: String
+}
+class CategoryController {
+  # CategoryController(ICategoryService): 
+  + extractUser(Authentication): UserGetDto
+}
+class CategoryDto {
+  + CategoryDto(): 
+  - name: String
+  - desc: String
+  + mapToEntity(): Category
+  + mapToEntity(Category): boolean
+   name: String
+   desc: String
+}
+interface CategoryRepository << interface >>
+class CategoryServiceImpl {
+  # CategoryServiceImpl(CategoryRepository): 
+  + mapToEntityDto(Category): CategoryDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   repository: CategoryRepository
+   sortableKeys: Set<String>
+}
+interface IBatchService << interface >>
+interface ICategoryService << interface >>
+interface IProductService << interface >> {
+  + getRemainQuantity(long, long): int
+}
+interface IStoreTransferItemService << interface >>
+interface IStoreTransferService << interface >>
+interface ISupplierService << interface >>
+class Product {
+  + Product(): 
+  + Product(String, String, String, Integer, Long): 
+  - name: String
+  - sku: String
+  - categoryId: Long
+  - unitPrice: Integer
+  - desc: String
+   name: String
+   unitPrice: Integer
+   desc: String
+   sku: String
+   categoryId: Long
+}
+class ProductController {
+  + ProductController(IProductService): 
+  - productService: IProductService
+  + remainQuantity(Authentication, long): ResponseEntity<Integer>
+  + extractUser(Authentication): UserGetDto
+   productService: IProductService
+}
+class ProductCreateDto {
+  + ProductCreateDto(): 
+  - name: String
+  - categoryId: Long
+  - desc: String
+  - sku: String
+  - unitPrice: Integer
+  + mapToEntity(): Product
+   name: String
+   unitPrice: Integer
+   desc: String
+   sku: String
+   categoryId: Long
+}
+class ProductFilterInputDto {
+  + ProductFilterInputDto(): 
+  - name: String
+  - desc: String
+  - paging: PagedAndSortedResultRequestDto
+  - minPrice: Integer
+  - categoryId: Long
+  - maxPrice: Integer
+  + mapToSearchCriteria(): List<SearchCriteria>
+   name: String
+   minPrice: Integer
+   maxPrice: Integer
+   desc: String
+   paging: PagedAndSortedResultRequestDto
+   categoryId: Long
+}
+class ProductGetDto {
+  + ProductGetDto(): 
+  - name: String
+  - unitPrice: Integer
+  - desc: String
+  - sku: String
+  - categoryId: Long
+   name: String
+   unitPrice: Integer
+   desc: String
+   sku: String
+   categoryId: Long
+}
+interface ProductRepository << interface >> {
+  + countProductsByDeletedIsFalse(): int
+  + remainQuantity(Long, Long): int
+}
+class ProductServiceImpl {
+  # ProductServiceImpl(ProductRepository): 
+  + getRemainQuantity(long, long): int
+  + mapToEntityDto(Product): ProductGetDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   repository: ProductRepository
+   sortableKeys: Set<String>
+}
+class ProductUpdateDto {
+  + ProductUpdateDto(): 
+  - unitPrice: Integer
+  - categoryId: Long
+  - name: String
+  - sku: String
+  - desc: String
+  + mapToEntity(Product): boolean
+   name: String
+   unitPrice: Integer
+   desc: String
+   sku: String
+   categoryId: Long
+}
+class Store {
+  + Store(String, String, Long, String): 
+  + Store(): 
+  - name: String
+  - address: String
+  - phone: String
+  - locationId: Long
+   name: String
+   address: String
+   locationId: Long
+   phone: String
+}
+class StoreController {
+  + StoreController(StoreCrudServiceImpl): 
+  + extractUser(Authentication): UserGetDto
+}
+class StoreCrudServiceImpl {
+  # StoreCrudServiceImpl(StoreRepository): 
+  + mapToEntityDto(Store): StoreDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   sortableKeys: Set<String>
+   repository: StoreRepository
+}
+class StoreDto {
+  + StoreDto(): 
+  - phone: String
+  - locationId: Long
+  - address: String
+  - name: String
+  + mapToEntity(Store): boolean
+  + mapToEntity(): Store
+   name: String
+   address: String
+   locationId: Long
+   phone: String
+}
+interface StoreRepository << interface >>
+class StoreTransfer {
+  + StoreTransfer(Long, Long, LocalDateTime, String): 
+  + StoreTransfer(): 
+  - toStoreId: Long
+  - fromStoreId: Long
+  - transferDate: LocalDateTime
+  - status: String
+   fromStoreId: Long
+   toStoreId: Long
+   status: String
+   transferDate: LocalDateTime
+}
+class StoreTransferController {
+  + StoreTransferController(IStoreTransferService): 
+  + extractUser(Authentication): UserGetDto
+}
+class StoreTransferDto {
+  + StoreTransferDto(Long, Long, LocalDateTime, String): 
+  + StoreTransferDto(): 
+  - toStoreId: Long
+  - transferDate: LocalDateTime
+  - status: String
+  - fromStoreId: Long
+  + mapToEntity(): StoreTransfer
+  + mapToEntity(StoreTransfer): boolean
+   fromStoreId: Long
+   toStoreId: Long
+   status: String
+   transferDate: LocalDateTime
+}
+class StoreTransferItem {
+  + StoreTransferItem(Long, Long, Integer, Integer): 
+  + StoreTransferItem(): 
+  - qtyTransferred: Integer
+  - batchStockId: Long
+  - qtyRequested: Integer
+  - transferId: Long
+   batchStockId: Long
+   qtyTransferred: Integer
+   qtyRequested: Integer
+   transferId: Long
+}
+class StoreTransferItemDto {
+  + StoreTransferItemDto(Long, Long, Integer, Integer): 
+  + StoreTransferItemDto(): 
+  - batchStockId: Long
+  - transferId: Long
+  - qtyRequested: Integer
+  - qtyTransferred: Integer
+  + mapToEntity(): StoreTransferItemDto
+   batchStockId: Long
+   qtyTransferred: Integer
+   qtyRequested: Integer
+   transferId: Long
+}
+interface StoreTransferItemRepository << interface >>
+interface StoreTransferRepository << interface >>
+class StoreTransferServiceImpl {
+  # StoreTransferServiceImpl(StoreTransferRepository): 
+  + mapToEntityDto(StoreTransfer): StoreTransferDto
+   repository: StoreTransferRepository
+}
+class Supplier {
+  + Supplier(String, Long, String): 
+  + Supplier(): 
+  - locationId: Long
+  - name: String
+  - contact: String
+   name: String
+   contact: String
+   locationId: Long
+}
+class SupplierController {
+  + SupplierController(ISupplierService): 
+  + extractUser(Authentication): UserGetDto
+}
+class SupplierDto {
+  + SupplierDto(): 
+  - locationId: Long
+  - contact: String
+  - name: String
+  + mapToEntity(): Supplier
+  + mapToEntity(Supplier): boolean
+   name: String
+   contact: String
+   locationId: Long
+}
+interface SupplierRepository << interface >>
+class SupplierServiceImpl {
+  # SupplierServiceImpl(SupplierRepository): 
+  + mapToEntityDto(Supplier): SupplierDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   repository: SupplierRepository
+   sortableKeys: Set<String>
+}
+
+BatchCrudServiceImpl         -[#008200,dashed]-^  IBatchService               
+CategoryServiceImpl          -[#008200,dashed]-^  ICategoryService            
+ProductCreateDto             -[#000082,plain]-^  BaseProductDto              
+ProductGetDto                -[#000082,plain]-^  BaseProductDto              
+ProductServiceImpl           -[#008200,dashed]-^  IProductService             
+ProductUpdateDto             -[#000082,plain]-^  BaseProductDto              
+StoreTransferServiceImpl     -[#008200,dashed]-^  IStoreTransferService       
+SupplierServiceImpl          -[#008200,dashed]-^  ISupplierService            
+@enduml

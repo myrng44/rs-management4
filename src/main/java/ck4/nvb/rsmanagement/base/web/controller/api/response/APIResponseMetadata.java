@@ -9,20 +9,20 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class APIResponseHeader implements BaseApiResponseHeader {
+public class APIResponseMetadata implements BaseApiResponseMetadata {
   private LocalDateTime timestamp;
   private int code; // business-level code or HTTP status code
   private String message;
   private String traceId;
 
-  public APIResponseHeader() {}
+  public APIResponseMetadata() {}
 
-  public APIResponseHeader(int code, String message) {
+  public APIResponseMetadata(int code, String message) {
     this.code = code;
     this.message = message;
   }
 
-  public APIResponseHeader(ErrorCode status, String message) {
+  public APIResponseMetadata(ErrorCode status, String message) {
     this.code = status.getValue();
     this.message = message;
   }

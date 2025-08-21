@@ -1,0 +1,255 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class BaseUserDto {
+  + BaseUserDto(): 
+  - phone: String
+  - userName: String
+  - fullName: String
+  - email: String
+  - storeId: Long
+   fullName: String
+   email: String
+   phone: String
+   userName: String
+   storeId: Long
+}
+class Permission {
+  + Permission(): 
+  - desc: String
+  - code: String
+   code: String
+   desc: String
+}
+class PermissionDto {
+  + PermissionDto(): 
+  - code: String
+  - desc: String
+   code: String
+   desc: String
+}
+interface PermissionRepository << interface >> {
+  + findByCode(String): Permission
+}
+interface PermissionService << interface >>
+class PermissionServiceImpl {
+  # PermissionServiceImpl(PermissionRepository): 
+  + mapToEntityDto(Permission): PermissionDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   repository: PermissionRepository
+}
+class Role {
+  + Role(): 
+  - name: String
+  - desc: String
+   name: String
+   desc: String
+}
+class RoleDto {
+  + RoleDto(): 
+  - name: String
+  - desc: String
+   name: String
+   desc: String
+}
+class RolePermission {
+  + RolePermission(): 
+  - permissionId: Long
+  - roleId: Long
+   permissionId: Long
+   roleId: Long
+}
+class RolePermissionDto {
+  + RolePermissionDto(): 
+  - permissionId: Long
+  - roleId: Long
+   permissionId: Long
+   roleId: Long
+}
+interface RolePermissionRepository << interface >> {
+  + findByRoleId(Long): List<RolePermission>
+}
+interface RolePermissionService << interface >>
+class RolePermissionServiceImpl {
+  # RolePermissionServiceImpl(RolePermissionRepository): 
+  + mapToEntityDto(RolePermission): RolePermissionDto
+   repository: RolePermissionRepository
+}
+interface RoleRepository << interface >> {
+  + findByName(String): Role
+}
+interface RoleService << interface >>
+class RoleServiceImpl {
+  # RoleServiceImpl(RoleRepository): 
+  + mapToEntityDto(Role): RoleDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   repository: RoleRepository
+}
+class User {
+  + User(String, String, String, String, String, Long): 
+  + User(): 
+  + User(Long): 
+  - email: String
+  - name: String
+  - phone: String
+  - storeId: Long
+  - username: String
+  - password: String
+   name: String
+   password: String
+   accountNonLocked: boolean
+   accountNonExpired: boolean
+   email: String
+   phone: String
+   authorities: Collection<GrantedAuthority>
+   username: String
+   credentialsNonExpired: boolean
+   storeId: Long
+}
+class UserCreateDto {
+  + UserCreateDto(): 
+  - password: String
+  - fullName: String
+  - userName: String
+  - storeId: Long
+  - email: String
+  - phone: String
+  + mapToEntity(): User
+   password: String
+   fullName: String
+   email: String
+   phone: String
+   userName: String
+   storeId: Long
+}
+class UserCrudServiceImpl {
+  # UserCrudServiceImpl(UserRepository, CommonPasswordEncoder): 
+  # createEntity(User): BaseUserDto
+  + mapToEntityDto(User): BaseUserDto
+   repository: UserRepository
+}
+class UserGetDto {
+  + UserGetDto(): 
+  + UserGetDto(Long): 
+  - userName: String
+  - storeId: Long
+  - enabled: boolean
+  - fullName: String
+  - id: Long
+  - phone: String
+  - email: String
+   id: Long
+   email: String
+   phone: String
+   userName: String
+   fullName: String
+   storeId: Long
+   enabled: boolean
+}
+interface UserGetServiceWithRole << interface >> {
+  + getAllUserRoles(Long): List<UserRoleDto>
+  + getUserSession(Long, Long): UserSessionDto
+  + getByUsername(String): UserRoleDto
+  + getByUsernameAndPasswordAndStore(String, String, Long): UserRoleDto
+  + getByUsernameAndPassword(String, String): UserRoleDto
+  + get(Long): UserRoleDto
+}
+class UserGetServiceWithRoleImpl {
+  + UserGetServiceWithRoleImpl(UserRepository, UserRoleRepository, RoleRepository, RolePermissionRepository, PermissionRepository, CommonPasswordEncoder): 
+  + getByUsername(String): UserRoleDto
+  - authenticateUser(String, String): User
+  + get(Long): UserRoleDto
+  - getUserRoleForStore(User, Long): UserRoleDto
+  + getByUsernameAndPassword(String, String): UserRoleDto
+  - buildUserRoleDto(UserRole): UserRoleDto
+  - getPrimaryUserRole(User): UserRoleDto
+  + getAllUserRoles(Long): List<UserRoleDto>
+  + getByUsernameAndPasswordAndStore(String, String, Long): UserRoleDto
+  + getUserSession(Long, Long): UserSessionDto
+  - buildUserRoleDto(UserRole, User): UserRoleDto
+}
+interface UserRepository << interface >> {
+  + findByEmail(String): Optional<User>
+  + findByUsername(String): Optional<User>
+}
+class UserRole {
+  + UserRole(): 
+  - roleId: Long
+  - userId: Long
+  - storeId: Long
+   userId: Long
+   storeId: Long
+   roleId: Long
+}
+class UserRoleDto {
+  + UserRoleDto(Long, Long, Long, String, String, String, String, String, List<String>): 
+  + UserRoleDto(): 
+  - phone: String
+  - fullName: String
+  - storeId: Long
+  - roleName: String
+  - roleId: Long
+  - userName: String
+  - userId: Long
+  - email: String
+  - permissions: List<String>
+   email: String
+   phone: String
+   permissions: List<String>
+   userName: String
+   userId: Long
+   roleName: String
+   fullName: String
+   storeId: Long
+   roleId: Long
+}
+interface UserRoleProjection << interface >> {
+   email: String
+   phone: String
+   userName: String
+   permissions: String
+   userId: Long
+   roleName: String
+   fullName: String
+   storeId: Long
+   roleId: Long
+}
+interface UserRoleRepository << interface >> {
+  + findByUserId(Long): List<UserRole>
+  + findByStoreId(Long): List<UserRole>
+  + findInfoByUserIdAndRoleId(Long, Long): UserRoleProjection
+  + deleteByUserIdAndRoleIdAndStoreId(Long, Long, Long): void
+}
+class UserRoleServiceImpl {
+  # UserRoleServiceImpl(UserRoleRepository): 
+  + getFullInfoByUserIdAndRoleId(long, long): UserRoleDto
+  + mapToEntityDto(UserRole): UserRoleDto
+   searchableKeys: Map<String, List<SearchOperator>>
+   repository: UserRoleRepository
+}
+class UserUpdateDto {
+  + UserUpdateDto(): 
+  - fullName: String
+  - phone: String
+  - email: String
+  - storeId: Long
+  - enabled: boolean
+  + mapToEntity(User): boolean
+   fullName: String
+   email: String
+   phone: String
+   storeId: Long
+   enabled: boolean
+}
+
+PermissionServiceImpl       -[#008200,dashed]-^  PermissionService          
+RolePermissionServiceImpl   -[#008200,dashed]-^  RolePermissionService      
+RoleServiceImpl             -[#008200,dashed]-^  RoleService                
+UserCreateDto               -[#000082,plain]-^  BaseUserDto                
+UserGetDto                  -[#000082,plain]-^  BaseUserDto                
+UserGetServiceWithRoleImpl  -[#008200,dashed]-^  UserGetServiceWithRole     
+UserUpdateDto               -[#000082,plain]-^  BaseUserDto                
+@enduml

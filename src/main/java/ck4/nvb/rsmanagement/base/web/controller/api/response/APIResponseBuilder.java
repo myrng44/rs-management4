@@ -16,7 +16,7 @@ public final class APIResponseBuilder {
     return t == null ? java.util.UUID.randomUUID().toString() : t;
   }
 
-  private static void setCommonHeaderFields(APIResponseHeader header) {
+  private static void setCommonHeaderFields(APIResponseMetadata header) {
     header.setTimestamp(LocalDateTime.now());
     header.setTraceId(traceIdFromMdc());
   }
@@ -27,7 +27,7 @@ public final class APIResponseBuilder {
 
   // success (single)
   public static <T> APIResponse<T> success(T data, String message) {
-    APIResponseHeader header = new APIResponseHeader(200, message);
+    APIResponseMetadata header = new APIResponseMetadata(200, message);
     setCommonHeaderFields(header);
     return new APIResponse<>(header, data);
   }
@@ -35,8 +35,8 @@ public final class APIResponseBuilder {
   // success (paged)
   public static <T extends Dto> APIListResponse<List<T>> paged(
       PagedResultDto<T> page, int offset, int limit) {
-    APIListResponseHeader header =
-        new APIListResponseHeader(ErrorCode.OK, "OK", offset, limit, page.getTotalElements());
+    APIListResponseMetadata header =
+        new APIListResponseMetadata(ErrorCode.OK, "OK", offset, limit, page.getTotalElements());
     setCommonHeaderFields(header);
     return new APIListResponse<>(header, page.getElements());
   }
@@ -44,29 +44,29 @@ public final class APIResponseBuilder {
   // success (list)
   public static <T> APIListResponse<List<T>> successList(
       List<T> data, long offset, int limit, long totalRecords, String message) {
-    APIListResponseHeader header =
-        new APIListResponseHeader(200, message, offset, limit, totalRecords);
+    APIListResponseMetadata header =
+        new APIListResponseMetadata(200, message, offset, limit, totalRecords);
     setCommonHeaderFields(header);
     return new APIListResponse<>(header, data);
   }
 
   // created
   public static <T> APIResponse<T> created(T data, String message) {
-    APIResponseHeader header = new APIResponseHeader(201, message);
+    APIResponseMetadata header = new APIResponseMetadata(201, message);
     setCommonHeaderFields(header);
     return new APIResponse<>(header, data);
   }
 
   // No content
   public static <T> APIResponse<T> noContent(String message) {
-    APIResponseHeader header = new APIResponseHeader(ErrorCode.NO_CONTENT.getValue(), message);
+    APIResponseMetadata header = new APIResponseMetadata(ErrorCode.NO_CONTENT.getValue(), message);
     setCommonHeaderFields(header);
     return new APIResponse<>(header, null);
   }
 
   // error
   public static <T> APIResponse<T> error(ErrorCode errorCode, String message) {
-    APIResponseHeader header = new APIResponseHeader(errorCode.getValue(), message);
+    APIResponseMetadata header = new APIResponseMetadata(errorCode.getValue(), message);
     setCommonHeaderFields(header);
     return new APIResponse<>(header, null);
   }

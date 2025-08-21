@@ -1,0 +1,161 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+interface Audited<UID> << interface >>
+class AuditedEntity<ID, UID> {
+  + AuditedEntity(): 
+  - lastUpdated: LocalDateTime
+   lastUpdated: LocalDateTime
+   updaterID: UID
+}
+class AuditedGeneratedIdEntity {
+  + AuditedGeneratedIdEntity(): 
+   updatedTime: LocalDateTime
+   updaterID: Long
+}
+class AuditedSerialIdEntity {
+  + AuditedSerialIdEntity(): 
+   updatedTime: LocalDateTime
+   updaterID: Long
+}
+interface CreationAudited<UID> << interface >> {
+   creatorId: UID
+}
+class CreationAuditedEntity<ID, UID> {
+  + CreationAuditedEntity(): 
+  - createdTime: LocalDateTime
+  - creatorId: UID
+   creatorId: UID
+   createdTime: LocalDateTime
+}
+class CreationAuditedGeneratedIdEntity {
+  + CreationAuditedGeneratedIdEntity(): 
+  - creatorId: Long
+  - createdTime: LocalDateTime
+   createdTime: LocalDateTime
+   creatorId: Long
+}
+class CreationAuditedSerialIdEntity {
+  + CreationAuditedSerialIdEntity(): 
+  - creatorId: Long
+  - createdTime: LocalDateTime
+   createdTime: LocalDateTime
+   creatorId: Long
+}
+interface DeletionAudited<UID> << interface >> {
+   deleted: boolean
+   deleterID: UID
+}
+interface FullAudited<UID> << interface >>
+class FullAuditedEntity<ID, UID> {
+  + FullAuditedEntity(): 
+  - deletedTime: LocalDateTime
+  - deleted: boolean
+   deleted: boolean
+   deletedTime: LocalDateTime
+   deleterID: UID
+}
+class FullAuditedGeneratedIdEntity {
+  + FullAuditedGeneratedIdEntity(): 
+  - deletedTime: LocalDateTime
+  - deleted: boolean
+   deleted: boolean
+   deletedTime: LocalDateTime
+   deleterID: Long
+}
+class FullAuditedSerialIdEntity {
+  + FullAuditedSerialIdEntity(): 
+  - deletedTime: LocalDateTime
+  - deleted: boolean
+   deleted: boolean
+   deletedTime: LocalDateTime
+   deleterID: Long
+}
+class GeneratedIdEntity {
+  + GeneratedIdEntity(): 
+  + GeneratedIdEntity(String): 
+  - id: String
+  - newEntity: boolean
+  + toString(): String
+  + equals(Object): boolean
+   newEntity: boolean
+   new: boolean
+   id: String?
+}
+interface HasCreatedTime << interface >> {
+   createdTime: LocalDateTime
+}
+interface HasDeletedTime << interface >> {
+   deletedTime: LocalDateTime
+}
+interface HasUpdatedTime << interface >> {
+   updatedTime: LocalDateTime
+}
+interface IEntity<ID> << interface >> {
+   new: boolean
+   id: ID?
+}
+class IdEntity<ID> {
+  + IdEntity(): 
+  + IdEntity(ID): 
+  - id: ID
+  - newEntity: boolean
+  + toString(): String
+  + equals(Object): boolean
+   newEntity: boolean
+   new: boolean
+   id: ID?
+}
+interface ModificationAudited<UID> << interface >> {
+   updaterID: UID
+}
+class SerialIdEntity {
+  + SerialIdEntity(): 
+  + SerialIdEntity(Long): 
+  - id: Long
+  - newEntity: boolean
+  + ensureId(): void
+  + toString(): String
+  + equals(Object): boolean
+   newEntity: boolean
+   id: Long?
+   new: boolean
+}
+interface SoftDeletable << interface >> {
+   deleted: boolean
+}
+
+Audited                           -[#008200,plain]-^  CreationAudited                  
+Audited                           -[#008200,plain]-^  ModificationAudited              
+AuditedEntity                     -[#008200,dashed]-^  Audited                          
+AuditedEntity                     -[#000082,plain]-^  CreationAuditedEntity            
+AuditedGeneratedIdEntity          -[#008200,dashed]-^  Audited                          
+AuditedGeneratedIdEntity          -[#000082,plain]-^  CreationAuditedGeneratedIdEntity 
+AuditedSerialIdEntity             -[#008200,dashed]-^  Audited                          
+AuditedSerialIdEntity             -[#000082,plain]-^  CreationAuditedSerialIdEntity    
+CreationAudited                   -[#008200,plain]-^  HasCreatedTime                   
+CreationAuditedEntity             -[#008200,dashed]-^  CreationAudited                  
+CreationAuditedEntity             -[#000082,plain]-^  IdEntity                         
+CreationAuditedGeneratedIdEntity  -[#008200,dashed]-^  CreationAudited                  
+CreationAuditedGeneratedIdEntity  -[#000082,plain]-^  GeneratedIdEntity                
+CreationAuditedSerialIdEntity     -[#008200,dashed]-^  CreationAudited                  
+CreationAuditedSerialIdEntity     -[#000082,plain]-^  SerialIdEntity                   
+DeletionAudited                   -[#008200,plain]-^  HasDeletedTime                   
+FullAudited                       -[#008200,plain]-^  Audited                          
+FullAudited                       -[#008200,plain]-^  DeletionAudited                  
+FullAuditedEntity                 -[#000082,plain]-^  AuditedEntity                    
+FullAuditedEntity                 -[#008200,dashed]-^  FullAudited                      
+FullAuditedEntity                 -[#008200,dashed]-^  SoftDeletable                    
+FullAuditedGeneratedIdEntity      -[#000082,plain]-^  AuditedGeneratedIdEntity         
+FullAuditedGeneratedIdEntity      -[#008200,dashed]-^  FullAudited                      
+FullAuditedSerialIdEntity         -[#000082,plain]-^  AuditedSerialIdEntity            
+FullAuditedSerialIdEntity         -[#008200,dashed]-^  FullAudited                      
+FullAuditedSerialIdEntity         -[#008200,dashed]-^  SoftDeletable                    
+GeneratedIdEntity                 -[#008200,dashed]-^  IEntity                          
+IdEntity                          -[#008200,dashed]-^  IEntity                          
+ModificationAudited               -[#008200,plain]-^  HasUpdatedTime                   
+SerialIdEntity                    -[#008200,dashed]-^  IEntity                          
+@enduml

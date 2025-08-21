@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class APIListResponseHeader extends APIResponseHeader {
+public class APIListResponseMetadata extends APIResponseMetadata {
 
   @Serial private static final long serialVersionUID = 1L;
 
@@ -17,9 +17,9 @@ public class APIListResponseHeader extends APIResponseHeader {
 
   private long totalRecords = 0L;
 
-  public APIListResponseHeader() {}
+  public APIListResponseMetadata() {}
 
-  public APIListResponseHeader(
+  public APIListResponseMetadata(
       int code, String message, long offset, int limit, long totalRecords) {
     super(code, message);
     this.offset = offset;
@@ -27,7 +27,7 @@ public class APIListResponseHeader extends APIResponseHeader {
     this.totalRecords = totalRecords;
   }
 
-  public APIListResponseHeader(
+  public APIListResponseMetadata(
       ErrorCode status, String message, long offset, int limit, long totalRecords) {
     super(status, message);
     this.offset = offset;

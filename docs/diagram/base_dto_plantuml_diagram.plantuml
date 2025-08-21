@@ -1,0 +1,84 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class AuditedEntityDto<ID, UID> {
+  + AuditedEntityDto(): 
+  - lastUpdate: LocalDateTime
+  - updaterId: UID
+   lastUpdate: LocalDateTime
+   updaterId: UID
+}
+interface CreateInput<T> << interface >> {
+  + mapToEntity(): T
+}
+class CreationAuditedEntityDto<ID, UID> {
+  + CreationAuditedEntityDto(): 
+  - uid: UID
+  - creationTime: LocalDateTime
+   uid: UID
+   creationTime: LocalDateTime
+}
+class Dto {
+  + Dto(): 
+  + toString(): String
+}
+class EntityDto<ID> {
+  + EntityDto(): 
+  - id: ID
+   id: ID
+}
+interface FilterInput << interface >> {
+  + mapToSearchCriteria(): List<SearchCriteria>
+   paging: PagedAndSortedResultRequestDto
+}
+interface HasTotalCount << interface >> {
+   totalElements: long
+}
+class LimitedResultRequestDto {
+  + LimitedResultRequestDto(int): 
+  + LimitedResultRequestDto(): 
+  - limit: int
+   limit: int
+}
+class ListResultDto<T> {
+  + ListResultDto(List<T>): 
+  - elements: List<T>
+   elements: List<T>
+}
+class PagedAndSortedResultRequestDto {
+  + PagedAndSortedResultRequestDto(): 
+  + PagedAndSortedResultRequestDto(String): 
+  + PagedAndSortedResultRequestDto(int, int, String): 
+  - sort: String
+   sort: String
+}
+class PagedResultDto<T> {
+  + PagedResultDto(long, List<T>): 
+  - totalElements: long
+   totalElements: long
+}
+class PagedResultRequestDto {
+  + PagedResultRequestDto(): 
+  + PagedResultRequestDto(int): 
+  + PagedResultRequestDto(int, int): 
+  - offset: int
+   offset: int
+}
+interface UpdateInput<T> << interface >> {
+  + mapToEntity(T): boolean
+}
+
+AuditedEntityDto                -[#000082,plain]-^  CreationAuditedEntityDto       
+CreationAuditedEntityDto        -[#000082,plain]-^  EntityDto                      
+EntityDto                       -[#000082,plain]-^  Dto                            
+LimitedResultRequestDto         -[#000082,plain]-^  Dto                            
+ListResultDto                   -[#000082,plain]-^  Dto                            
+PagedAndSortedResultRequestDto  -[#000082,plain]-^  PagedResultRequestDto          
+PagedResultDto                  -[#595959,dashed]->  Dto                            
+PagedResultDto                  -[#008200,dashed]-^  HasTotalCount                  
+PagedResultDto                  -[#000082,plain]-^  ListResultDto                  
+PagedResultRequestDto           -[#000082,plain]-^  LimitedResultRequestDto        
+@enduml
