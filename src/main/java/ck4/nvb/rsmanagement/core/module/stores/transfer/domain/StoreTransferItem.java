@@ -1,6 +1,5 @@
 package ck4.nvb.rsmanagement.core.module.stores.transfer.domain;
 
-import ck4.nvb.rsmanagement.base.domain.entity.CreationAuditedSerialIdEntity;
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,15 +16,15 @@ import lombok.Setter;
 @Entity
 @Table(name = "store_transfer_item")
 public class StoreTransferItem extends FullAuditedSerialIdEntity {
-    @Column(name = "transfer_id")
-    private Long transferId;
+  @Column(name = "transfer_id")
+  private Long transferId;
 
-    @Column(name = "batch_stock_id")
-    private Long batchStockId;
+  @Column(name = "batch_stock_id")
+  private Long batchStockId;
 
-    @Column(name = "qty_requested")
-    private Integer qtyRequested;
+  @Column(name = "qty_requested")
+  private Integer qtyRequested;
 
-    @Column(name = "qtY_transfered")
-    private Integer qtyTransferred;
+  @Column(name = "qtY_transfered")
+  private Integer qtyTransferred;
 }

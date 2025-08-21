@@ -46,7 +46,7 @@ public class GetController<
       @RequestParam(required = false, name = "sort") String sort,
       @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
       @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
-/*    if (query != null) {
+    /*    if (query != null) {
       List<SearchCriteria> params = SearchCriteriaParser.parse(query);
       if (params.isEmpty()) {
         return getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort));
@@ -81,7 +81,9 @@ public class GetController<
     if (request.getPaging() == null) {
       request.setPaging(new PagedAndSortedResultRequestDto());
     }
-    PagedResultDto<D> page = getService().getPage(request.mapToSearchCriteria(), request.getPaging());
-    return APIResponseBuilder.paged(page, request.getPaging().getOffset(), request.getPaging().getLimit());
+    PagedResultDto<D> page =
+        getService().getPage(request.mapToSearchCriteria(), request.getPaging());
+    return APIResponseBuilder.paged(
+        page, request.getPaging().getOffset(), request.getPaging().getLimit());
   }
 }

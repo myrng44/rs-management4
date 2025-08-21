@@ -16,24 +16,24 @@ import lombok.Setter;
 @Entity
 @Table(name = "sale_return_item")
 public class SaleReturnItem extends FullAuditedSerialIdEntity {
-    @Column(name = "sale_return_id")
-    private Long saleReturnId;
+  @Column(name = "sale_return_id")
+  private Long saleReturnId;
 
-    @Column(name = "product_id")
-    private Long productId;
+  @Column(name = "product_id")
+  private Long productId;
 
-    @Column(name = "original_sale_line_id")
-    private Long originalSaleLineId;
+  @Column(name = "original_sale_line_id")
+  private Long originalSaleLineId;
 
-    @Column(name = "qty_returned")
-    private Integer qtyReturned;
+  @Column(name = "qty_returned")
+  private Integer qtyReturned;
 
-    @Column(name = "unit_price_at_sale")
-    private Integer unitPriceAtSale;
+  @Column(name = "unit_price_at_sale")
+  private Integer unitPriceAtSale;
 
-    @Column(name = "return_unit_price")
-    private Integer returnUnitPrice;
+  @Column(name = "return_unit_price")
+  private Integer returnUnitPrice;
 
-    @Column(name = "condition_note")
-    private String conditionNote;
+  @Column(name = "condition_note")
+  private String conditionNote;
 }

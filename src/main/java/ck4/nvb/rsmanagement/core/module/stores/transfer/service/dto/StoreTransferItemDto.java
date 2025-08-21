@@ -12,17 +12,18 @@ import org.modelmapper.ModelMapper;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StoreTransferItemDto extends EntityDto<Long> implements CreateInput<StoreTransferItemDto> {
-    private Long transferId;
+public class StoreTransferItemDto extends EntityDto<Long>
+    implements CreateInput<StoreTransferItemDto> {
+  private Long transferId;
 
-    private Long batchStockId;
+  private Long batchStockId;
 
-    private Integer qtyRequested;
+  private Integer qtyRequested;
 
-    private Integer qtyTransferred;
+  private Integer qtyTransferred;
 
-    @Override
-    public StoreTransferItemDto mapToEntity() {
-        return new ModelMapper().map(this, StoreTransferItemDto.class);
-    }
+  @Override
+  public StoreTransferItemDto mapToEntity() {
+    return new ModelMapper().map(this, StoreTransferItemDto.class);
+  }
 }

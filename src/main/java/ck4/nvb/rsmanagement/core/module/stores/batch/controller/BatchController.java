@@ -6,13 +6,12 @@ import ck4.nvb.rsmanagement.core.module.stores.batch.service.IBatchService;
 import ck4.nvb.rsmanagement.core.module.stores.batch.service.dto.BatchDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/${rs.api.main.baseUrl}/batch")
+@RequestMapping("/${rs.api.main.baseUrl}/batches")
 public class BatchController
     extends AuditedCrudController<BatchDto, Batch, Long, UserGetDto, Long, BatchDto, BatchDto> {
 

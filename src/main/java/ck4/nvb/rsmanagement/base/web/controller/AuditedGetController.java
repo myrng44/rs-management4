@@ -13,7 +13,6 @@ import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteriaParser;
-
 import java.io.Serializable;
 import java.util.List;
 import lombok.Getter;
@@ -58,7 +57,9 @@ public abstract class AuditedGetController<
       if (params.isEmpty()) {
         page = getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort), user);
       } else {
-        page = getService().getPage(params, new PagedAndSortedResultRequestDto(offset, limit, sort), user);
+        page =
+            getService()
+                .getPage(params, new PagedAndSortedResultRequestDto(offset, limit, sort), user);
       }
     } else {
       page = getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort), user);
@@ -80,8 +81,10 @@ public abstract class AuditedGetController<
   public APIListResponse<List<D>> getList(Authentication auth, FilterInput request) {
     User user = extractUser(auth);
     if (request.getPaging() == null) request.setPaging(new PagedAndSortedResultRequestDto());
-    PagedResultDto<D> page = getService().getPage(request.mapToSearchCriteria(), request.getPaging(), user);
-    return APIResponseBuilder.paged(page, request.getPaging().getOffset(), request.getPaging().getLimit());
+    PagedResultDto<D> page =
+        getService().getPage(request.mapToSearchCriteria(), request.getPaging(), user);
+    return APIResponseBuilder.paged(
+        page, request.getPaging().getOffset(), request.getPaging().getLimit());
   }
 
   @GetMapping("/count")

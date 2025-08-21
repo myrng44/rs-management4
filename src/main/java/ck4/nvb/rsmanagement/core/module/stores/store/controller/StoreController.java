@@ -6,13 +6,12 @@ import ck4.nvb.rsmanagement.core.module.stores.store.service.StoreCrudServiceImp
 import ck4.nvb.rsmanagement.core.module.stores.store.service.dto.StoreDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("${rs.api.main.baseUrl}/store")
+@RequestMapping("${rs.api.main.baseUrl}/stores")
 public class StoreController
     extends AuditedCrudController<StoreDto, Store, Long, UserGetDto, Long, StoreDto, StoreDto> {
 

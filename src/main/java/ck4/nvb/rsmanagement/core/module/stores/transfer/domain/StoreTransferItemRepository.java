@@ -4,5 +4,5 @@ import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository("storeTransferItemRepository")
-public interface StoreTransferItemRepository extends BaseFullAuditedRepository<StoreTransferItem, Long, Long> {
-}
+public interface StoreTransferItemRepository
+    extends BaseFullAuditedRepository<StoreTransferItem, Long, Long> {}

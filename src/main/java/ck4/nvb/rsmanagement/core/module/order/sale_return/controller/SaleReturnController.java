@@ -17,36 +17,42 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/return")
-public class SaleReturnController extends AuditedCrudController<SaleReturnGetDto, SaleReturn, Long, UserGetDto, Long, SaleReturnCreateDto, SaleReturnUpdateDto> {
+public class SaleReturnController
+    extends AuditedCrudController<
+        SaleReturnGetDto,
+        SaleReturn,
+        Long,
+        UserGetDto,
+        Long,
+        SaleReturnCreateDto,
+        SaleReturnUpdateDto> {
 
-    @Autowired
-    private ISaleReturnItemService saleReturnItemService;
+  @Autowired private ISaleReturnItemService saleReturnItemService;
 
-    @Autowired
-    private ModelMapper modelMapper;
+  @Autowired private ModelMapper modelMapper;
 
-    public SaleReturnController(ISaleReturnService service) {
-        super(service);
+  public SaleReturnController(ISaleReturnService service) {
+    super(service);
+  }
+
+  @Override
+  public UserGetDto extractUser(Authentication auth) {
+    if (auth == null || !auth.isAuthenticated()) {
+      return null;
     }
 
-    @Override
-    public UserGetDto extractUser(Authentication auth) {
-        if (auth == null || !auth.isAuthenticated()) {
-            return null;
-        }
-
-        Object principal = auth.getPrincipal();
-        if (principal instanceof UserGetDto) {
-            return (UserGetDto) principal;
-        }
-
-        if (principal instanceof UserRoleDto) {
-            UserRoleDto userRoleDto = (UserRoleDto) principal;
-            UserGetDto userGetDto = new UserGetDto();
-            userGetDto.setId(userRoleDto.getUserId());
-            userGetDto.setUserName(userRoleDto.getUserName());
-            return userGetDto;
-        }
-        return null;
+    Object principal = auth.getPrincipal();
+    if (principal instanceof UserGetDto) {
+      return (UserGetDto) principal;
     }
+
+    if (principal instanceof UserRoleDto) {
+      UserRoleDto userRoleDto = (UserRoleDto) principal;
+      UserGetDto userGetDto = new UserGetDto();
+      userGetDto.setId(userRoleDto.getUserId());
+      userGetDto.setUserName(userRoleDto.getUserName());
+      return userGetDto;
+    }
+    return null;
+  }
 }

@@ -14,23 +14,24 @@ import org.modelmapper.ModelMapper;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaleReturnItemDto extends EntityDto<Long> implements CreateInput<SaleReturnItem>, UpdateInput<SaleReturnItem> {
+public class SaleReturnItemDto extends EntityDto<Long>
+    implements CreateInput<SaleReturnItem>, UpdateInput<SaleReturnItem> {
 
-    private Long saleReturnId;
-    private Long productId;
-    private Long originalSaleLineId;
-    private Integer qtyReturned;
-    private Integer unitPriceAtSale;
-    private Integer returnUnitPrice;
-    private String conditionNote;
+  private Long saleReturnId;
+  private Long productId;
+  private Long originalSaleLineId;
+  private Integer qtyReturned;
+  private Integer unitPriceAtSale;
+  private Integer returnUnitPrice;
+  private String conditionNote;
 
-    @Override
-    public SaleReturnItem mapToEntity() {
-        return new ModelMapper().map(this, SaleReturnItem.class);
-    }
+  @Override
+  public SaleReturnItem mapToEntity() {
+    return new ModelMapper().map(this, SaleReturnItem.class);
+  }
 
-    @Override
-    public boolean mapToEntity(SaleReturnItem entity) {
-        return false;
-    }
+  @Override
+  public boolean mapToEntity(SaleReturnItem entity) {
+    return false;
+  }
 }

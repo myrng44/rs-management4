@@ -6,10 +6,9 @@ import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.base.application.exception.ObjectNotFoundException;
 import ck4.nvb.rsmanagement.base.application.service.CrudService;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
-import java.io.Serializable;
-
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
+import java.io.Serializable;
 import org.springframework.web.bind.annotation.*;
 
 public class CrudController<

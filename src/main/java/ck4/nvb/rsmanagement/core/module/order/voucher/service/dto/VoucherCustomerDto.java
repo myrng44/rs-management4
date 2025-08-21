@@ -14,18 +14,19 @@ import org.modelmapper.ModelMapper;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VoucherCustomerDto extends EntityDto<Long> implements CreateInput<VoucherCustomer>, UpdateInput<VoucherCustomer> {
-    private Long voucherId;
-    private Long customerId;
-    private Boolean issued;
+public class VoucherCustomerDto extends EntityDto<Long>
+    implements CreateInput<VoucherCustomer>, UpdateInput<VoucherCustomer> {
+  private Long voucherId;
+  private Long customerId;
+  private Boolean issued;
 
-    @Override
-    public VoucherCustomer mapToEntity() {
-        return new ModelMapper().map(this, VoucherCustomer.class);
-    }
+  @Override
+  public VoucherCustomer mapToEntity() {
+    return new ModelMapper().map(this, VoucherCustomer.class);
+  }
 
-    @Override
-    public boolean mapToEntity(VoucherCustomer entity) {
-        return false;
-    }
+  @Override
+  public boolean mapToEntity(VoucherCustomer entity) {
+    return false;
+  }
 }

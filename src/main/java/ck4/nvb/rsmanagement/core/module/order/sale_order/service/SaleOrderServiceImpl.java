@@ -21,7 +21,6 @@ import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,14 +38,10 @@ public class SaleOrderServiceImpl
     return (SaleOrderRepository) super.getRepository();
   }
 
-  @Autowired
-  private CustomerRepository customerRepository;
-  @Autowired
-  private VoucherRepository voucherRepository;
-  @Autowired
-  private PaymentMethodRepository paymentMethodRepository;
-  @Autowired
-  private ISaleLineService saleLineService;
+  @Autowired private CustomerRepository customerRepository;
+  @Autowired private VoucherRepository voucherRepository;
+  @Autowired private PaymentMethodRepository paymentMethodRepository;
+  @Autowired private ISaleLineService saleLineService;
 
   @Override
   public SaleOrderGetDto mapToEntityDto(SaleOrder entity) {
@@ -61,7 +56,9 @@ public class SaleOrderServiceImpl
       orderDto.setCustomerName(customer.getName());
     }
 
-    List<SaleLineGetDto> lines = saleLineService.getAll(List.of(new SearchCriteria("saleOrderId", SearchOperator.EQUALS, entity.getId())));
+    List<SaleLineGetDto> lines =
+        saleLineService.getAll(
+            List.of(new SearchCriteria("saleOrderId", SearchOperator.EQUALS, entity.getId())));
     orderDto.setSaleLines(lines);
 
     orderDto.setStoreId(entity.getStoreId());
@@ -87,9 +84,14 @@ public class SaleOrderServiceImpl
       throw new DuplicateIdentifierException("Duplicate identifier " + saleOrder.getId());
     }
     saleOrder = getRepository().save(saleOrder);
-    getLogger().info("Created order id {} by user {}: {}", saleOrder.getId(), saleOrder.getCreatorId(), saleOrder);
+    getLogger()
+        .info(
+            "Created order id {} by user {}: {}",
+            saleOrder.getId(),
+            saleOrder.getCreatorId(),
+            saleOrder);
 
-    for (SaleLineDto saleLineDto: createDto.getLines()) {
+    for (SaleLineDto saleLineDto : createDto.getLines()) {
       saleLineDto.setSaleOrderId(saleOrder.getId());
       saleLineService.create(saleLineDto, user);
     }
@@ -119,6 +121,4 @@ public class SaleOrderServiceImpl
     keys.add("finalPrice");
     return keys;
   }
-
-
 }

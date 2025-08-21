@@ -21,7 +21,7 @@ public class BatchStockDto extends EntityDto<Long>
   private String status;
   private Integer version;
 
-/*  @JsonFormat(
+  /*  @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss",
       timezone = "Asia/Ho_Chi_Minh")

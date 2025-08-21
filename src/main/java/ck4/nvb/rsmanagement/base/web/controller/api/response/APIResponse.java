@@ -4,14 +4,13 @@ import java.io.Serial;
 
 public class APIResponse<T> extends BaseAPIResponse<APIResponseHeader, T> {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
-    public APIResponse() {
-        super();
-    }
+  public APIResponse() {
+    super();
+  }
 
-    public APIResponse(APIResponseHeader header, T body) {
-        super(header, body);
-    }
+  public APIResponse(APIResponseHeader header, T body) {
+    super(header, body);
+  }
 }

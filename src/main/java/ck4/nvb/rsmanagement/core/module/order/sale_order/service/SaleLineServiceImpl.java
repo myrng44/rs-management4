@@ -44,7 +44,7 @@ public class SaleLineServiceImpl
     Product product = productService.getEntity(entity.getProductId());
     // snapshot
     entity.setUnitPrice(
-            product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
+        product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
     dto.setProductId(product.getId());
     dto.setProductName(product.getName());
 
@@ -83,7 +83,7 @@ public class SaleLineServiceImpl
         getRepository().findMostSoldProductsOfInterval(start, end, noProducts));
   }
 
-/*  @Override
+  /*  @Override
   public List<SaleLineGetDto> getDetailByOrderId(String orderId) throws AppException {
     return mapToGetListOutputDto(getRepository().findBySaleOrderId(orderId));
   }*/

@@ -2,9 +2,9 @@ package ck4.nvb.rsmanagement.core.module.order.sale_order.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleLineService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleOrderService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderCreateDto;
-import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleLineService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderGetDto;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderUpdateDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
@@ -22,13 +22,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/orders")
 public class SaleOrderController
-    extends AuditedCrudController<SaleOrderGetDto, SaleOrder, String, UserGetDto, Long, SaleOrderCreateDto, SaleOrderUpdateDto> {
+    extends AuditedCrudController<
+        SaleOrderGetDto,
+        SaleOrder,
+        String,
+        UserGetDto,
+        Long,
+        SaleOrderCreateDto,
+        SaleOrderUpdateDto> {
 
-  @Autowired
-  private ISaleLineService orderDetailCrudService;
+  @Autowired private ISaleLineService orderDetailCrudService;
 
-  @Autowired
-  private ModelMapper modelMapper;
+  @Autowired private ModelMapper modelMapper;
 
   public SaleOrderController(ISaleOrderService service) {
     super(service);

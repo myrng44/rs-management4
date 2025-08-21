@@ -16,12 +16,12 @@ import lombok.Setter;
 @Entity
 @Table(name = "voucher_customer")
 public class VoucherCustomer extends FullAuditedSerialIdEntity {
-    @Column(name = "voucher_id")
-    private Long voucherId;
+  @Column(name = "voucher_id")
+  private Long voucherId;
 
-    @Column(name = "customer_id")
-    private Long customerId;
+  @Column(name = "customer_id")
+  private Long customerId;
 
-    @Column(name = "issued")
-    private Boolean issued;
+  @Column(name = "issued")
+  private Boolean issued;
 }

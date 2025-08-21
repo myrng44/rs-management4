@@ -9,8 +9,6 @@ import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -73,16 +73,18 @@ public abstract class FullAuditedCrudServiceImpl<
   }
 
   public List<SearchCriteria> addDeletedFalse(List<SearchCriteria> filter) {
-    //always create a new mutable list to avoid UnsupportedOperationException
-    List<SearchCriteria> mutableFilter = filter == null ? new ArrayList<>() : new ArrayList<>(filter);
+    // always create a new mutable list to avoid UnsupportedOperationException
+    List<SearchCriteria> mutableFilter =
+        filter == null ? new ArrayList<>() : new ArrayList<>(filter);
 
     boolean hasDeleted =
-            mutableFilter.stream()
-                    .anyMatch(
-                            c -> "deleted".equals(c.getKey()) && SearchOperator.EQUALS.equals(c.getOperator()));
+        mutableFilter.stream()
+            .anyMatch(
+                c -> "deleted".equals(c.getKey()) && SearchOperator.EQUALS.equals(c.getOperator()));
 
     if (!hasDeleted) {
-      mutableFilter.add(new SearchCriteria("deleted", SearchOperator.EQUALS, Boolean.FALSE.toString()));
+      mutableFilter.add(
+          new SearchCriteria("deleted", SearchOperator.EQUALS, Boolean.FALSE.toString()));
     }
 
     return mutableFilter;

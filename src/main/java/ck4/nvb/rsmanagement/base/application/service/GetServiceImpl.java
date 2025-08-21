@@ -131,7 +131,7 @@ public abstract class GetServiceImpl<
           Math.max(0, paging.getOffset()), Math.max(1, paging.getLimit()));
     }
 
-    // Split and trim sort params ("+name,-createdTime" -> ["+name", "-createdTime"])
+    //split and trim sort params ("+name,-createdTime" -> ["+name", "-createdTime"])
     String[] requestSorts =
         Arrays.stream(paging.getSort().split(","))
             .map(String::trim)
