@@ -1,5 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.service;
 
+import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
 import ck4.nvb.rsmanagement.base.application.exception.AppException;
 import ck4.nvb.rsmanagement.base.application.exception.DuplicateIdentifierException;
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
@@ -14,10 +15,13 @@ import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrderReposit
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineDto;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineGetDto;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderCreateDto;
-import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderGetDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderGetFullDto;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.Voucher;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.VoucherRepository;
+import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +30,7 @@ import org.springframework.stereotype.Service;
 
 @Service("orderService")
 public class SaleOrderServiceImpl
-    extends FullAuditedCrudServiceImpl<SaleOrderGetDto, SaleOrder, String, UserGetDto, Long>
+    extends FullAuditedCrudServiceImpl<SaleOrderGetFullDto, SaleOrder, String, UserGetDto, Long>
     implements ISaleOrderService {
 
   protected SaleOrderServiceImpl(SaleOrderRepository repository) {
@@ -42,12 +46,11 @@ public class SaleOrderServiceImpl
   @Autowired private VoucherRepository voucherRepository;
   @Autowired private PaymentMethodRepository paymentMethodRepository;
   @Autowired private ISaleLineService saleLineService;
+  @Autowired private ProductRepository productRepository;
 
   @Override
-  public SaleOrderGetDto mapToEntityDto(SaleOrder entity) {
-    int finalPrice = getRepository().getFinalPriceByOrderId(entity.getId());
-
-    SaleOrderGetDto orderDto = new SaleOrderGetDto();
+  public SaleOrderGetFullDto mapToEntityDto(SaleOrder entity) {
+    SaleOrderGetFullDto orderDto = new SaleOrderGetFullDto();
     orderDto.setId(entity.getId());
 
     if (entity.getCustomerId() != null) {
@@ -72,29 +75,48 @@ public class SaleOrderServiceImpl
     PaymentMethod paymentMethod = paymentMethodRepository.getReferenceById(entity.getPaymentId());
     orderDto.setPaymentMethodName(paymentMethod.getName());
 
-    orderDto.setFinalPrice(finalPrice);
+    orderDto.setFinalPrice(entity.getFinalPrice());
     return orderDto;
   }
 
-  public SaleOrderGetDto create(SaleOrderCreateDto createDto, UserGetDto user) throws AppException {
+  @Override
+  public SaleOrderGetFullDto create(CreateInput<SaleOrder> createDto, UserGetDto user) throws AppException {
+    if (createDto instanceof SaleOrderCreateDto) {
+      return create((SaleOrderCreateDto) createDto, user);
+    }
+    return super.create(createDto, user);
+  }
+
+  public SaleOrderGetFullDto create(SaleOrderCreateDto createDto, UserGetDto user) throws AppException {
     super.checkCreatePermission(createDto, user);
+    int finalPrice = 0;
     SaleOrder saleOrder = createDto.mapToEntity();
+    saleOrder.setCreatorId(user.getId());
+    saleOrder.setCreatedTime(LocalDateTime.now());
+    saleOrder.setNew(true);
+    saleOrder.setUpdaterID(user.getId());
+    saleOrder.setUpdatedTime(saleOrder.getCreatedTime());
     if (saleOrder.getId() != null && exists(saleOrder.getId())) {
       getLogger().error("Duplicate id {}", saleOrder.getId());
       throw new DuplicateIdentifierException("Duplicate identifier " + saleOrder.getId());
     }
+    for (SaleLineDto saleLineDto : createDto.getLines()) {
+      finalPrice += productRepository.findFirstByIdAndDeletedIsFalse(saleLineDto.getProductId()).getUnitPrice() * saleLineDto.getQtyOrdered();
+    }
+    saleOrder.setFinalPrice(finalPrice);
     saleOrder = getRepository().save(saleOrder);
     getLogger()
-        .info(
-            "Created order id {} by user {}: {}",
-            saleOrder.getId(),
-            saleOrder.getCreatorId(),
-            saleOrder);
+            .info(
+                    "Created order id {} by user {}: {}",
+                    saleOrder.getId(),
+                    saleOrder.getCreatorId(),
+                    saleOrder);
 
     for (SaleLineDto saleLineDto : createDto.getLines()) {
       saleLineDto.setSaleOrderId(saleOrder.getId());
       saleLineService.create(saleLineDto, user);
     }
+
     return mapToEntityDto(saleOrder);
   }
 

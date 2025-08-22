@@ -1,6 +1,5 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto;
 
-import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -16,9 +15,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaleOrderUpdateDto extends EntityDto<String> implements UpdateInput<SaleOrder> {
-  @JsonSerialize(using = ToStringSerializer.class)
-  private Long customerId;
+public class SaleOrderUpdateDto extends BaseSaleOrderDto implements UpdateInput<SaleOrder> {
 
   @JsonSerialize(using = ToStringSerializer.class)
   private Long storeId;
@@ -28,10 +25,6 @@ public class SaleOrderUpdateDto extends EntityDto<String> implements UpdateInput
   @JsonSerialize(using = ToStringSerializer.class)
   private Long voucherId;
 
-  private Integer finalPrice;
-
-  private String note;
-
   private Long paymentId;
 
   @Override
@@ -40,8 +33,8 @@ public class SaleOrderUpdateDto extends EntityDto<String> implements UpdateInput
     if (entity == null) {
       return false;
     }
-    if (!customerId.equals(entity.getCustomerId())) {
-      entity.setCustomerId(customerId);
+    if (!getCustomerId().equals(entity.getCustomerId())) {
+      entity.setCustomerId(getCustomerId());
       isModified = true;
     }
     if (!storeId.equals(entity.getStoreId())) {
@@ -52,12 +45,8 @@ public class SaleOrderUpdateDto extends EntityDto<String> implements UpdateInput
       entity.setVoucherId(voucherId);
       isModified = true;
     }
-    if (!finalPrice.equals(entity.getFinalPrice())) {
-      entity.setFinalPrice(finalPrice);
-      isModified = true;
-    }
-    if (!note.equals(entity.getNote())) {
-      entity.setNote(note);
+    if (!getNote().equals(entity.getNote())) {
+      entity.setNote(getNote());
       isModified = true;
     }
     if (!paymentId.equals(entity.getPaymentId())) {

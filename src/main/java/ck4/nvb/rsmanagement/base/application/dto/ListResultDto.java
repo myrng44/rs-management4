@@ -8,9 +8,9 @@ import lombok.Setter;
 @Setter
 public class ListResultDto<T extends Dto> extends Dto {
 
-  private final List<T> elements;
+  private final List<T> records;
 
-  public ListResultDto(List<T> elements) {
-    this.elements = elements;
+  public ListResultDto(List<T> records) {
+    this.records = records;
   }
 }

@@ -1,7 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
-import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -16,9 +15,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaleOrderCreateDto extends EntityDto<String> implements CreateInput<SaleOrder> {
-  @JsonSerialize(using = ToStringSerializer.class)
-  private Long customerId;
+public class SaleOrderCreateDto extends BaseSaleOrderDto implements CreateInput<SaleOrder> {
 
   @JsonSerialize(using = ToStringSerializer.class)
   private Long storeId;
@@ -28,14 +25,17 @@ public class SaleOrderCreateDto extends EntityDto<String> implements CreateInput
   @JsonSerialize(using = ToStringSerializer.class)
   private Long voucherId;
 
-  private Integer finalPrice;
-
-  private String note;
-
   private Long paymentId;
 
   @Override
   public SaleOrder mapToEntity() {
-    return null;
+
+    SaleOrder saleOrder = new SaleOrder();
+    saleOrder.setCustomerId(getCustomerId());
+    saleOrder.setNote(getNote());
+    saleOrder.setStoreId(storeId);
+    saleOrder.setVoucherId(voucherId);
+    saleOrder.setPaymentId(paymentId);
+    return saleOrder;
   }
 }

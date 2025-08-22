@@ -1,12 +1,15 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.service;
 
+import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
 import ck4.nvb.rsmanagement.base.application.exception.AppException;
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
 import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleLine;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleLineRepository;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineDto;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineGetDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
+import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.ProductServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
@@ -22,7 +25,7 @@ public class SaleLineServiceImpl
     extends FullAuditedCrudServiceImpl<SaleLineGetDto, SaleLine, Long, UserGetDto, Long>
     implements ISaleLineService {
 
-  @Autowired private ProductServiceImpl productService;
+  @Autowired ProductServiceImpl productService;
 
   protected SaleLineServiceImpl(SaleLineRepository repository) {
     super(repository, SaleLine.class);
@@ -43,19 +46,33 @@ public class SaleLineServiceImpl
 
     Product product = productService.getEntity(entity.getProductId());
     // snapshot
-    entity.setUnitPrice(
-        product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
+    dto.setUnitPrice(product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
     dto.setProductId(product.getId());
     dto.setProductName(product.getName());
 
     dto.setQtyOrdered(entity.getQtyOrdered());
 
-    dto.setUnitPrice(entity.getUnitPrice());
 
     Long totalPrice = (long) entity.getQtyOrdered() * entity.getUnitPrice();
     dto.setTotalPrice(totalPrice);
 
     return dto;
+  }
+
+/*  @Override
+  protected SaleLineGetDto createEntity(SaleLine entity) {
+    Product product = productService.getEntity(entity.getProductId());
+    entity.setUnitPrice(product.getUnitPrice());
+    return super.createEntity(entity);
+  }*/
+
+  @Override
+  public SaleLineGetDto create(CreateInput<SaleLine> createDto, UserGetDto user) throws AppException {
+    if (createDto instanceof SaleLineDto) {
+      Product product = productService.getEntity(((SaleLineDto) createDto).getProductId());
+      ((SaleLineDto) createDto).setUnitPrice(product.getUnitPrice());
+    }
+    return super.create(createDto, user);
   }
 
   @Override
@@ -82,9 +99,4 @@ public class SaleLineServiceImpl
     return productService.mapToGetListOutputDto(
         getRepository().findMostSoldProductsOfInterval(start, end, noProducts));
   }
-
-  /*  @Override
-  public List<SaleLineGetDto> getDetailByOrderId(String orderId) throws AppException {
-    return mapToGetListOutputDto(getRepository().findBySaleOrderId(orderId));
-  }*/
 }

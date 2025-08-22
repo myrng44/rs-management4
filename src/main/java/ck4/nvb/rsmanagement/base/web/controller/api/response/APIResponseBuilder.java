@@ -36,9 +36,9 @@ public final class APIResponseBuilder {
   public static <T extends Dto> APIListResponse<List<T>> paged(
       PagedResultDto<T> page, int offset, int limit) {
     APIListResponseMetadata header =
-        new APIListResponseMetadata(ErrorCode.OK, "OK", offset, limit, page.getTotalElements());
+        new APIListResponseMetadata(ErrorCode.OK, "OK", offset, limit, page.getTotalRecords());
     setCommonHeaderFields(header);
-    return new APIListResponse<>(header, page.getElements());
+    return new APIListResponse<>(header, page.getRecords());
   }
 
   // success (list)

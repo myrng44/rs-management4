@@ -122,12 +122,12 @@ public abstract class CreationAuditedGetServiceImpl<
     preCheckGetListPermission(filter, user);
 
     PagedResultDto<D> page = getPage(filter, paging);
-    if (page.getElements() == null || page.getElements().isEmpty()) {
+    if (page.getRecords() == null || page.getRecords().isEmpty()) {
       return page;
     }
 
     // post-check get permission
-    postCheckGetListPermission(page.getElements(), user);
+    postCheckGetListPermission(page.getRecords(), user);
 
     return page;
   }

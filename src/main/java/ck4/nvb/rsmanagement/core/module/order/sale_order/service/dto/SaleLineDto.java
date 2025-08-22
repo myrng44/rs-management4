@@ -20,6 +20,7 @@ public class SaleLineDto extends EntityDto<Long>
   private Integer qtyOrdered;
   private Integer qtyAllocated;
   private Integer qtyPicked;
+  private Integer unitPrice;
 
   @Override
   public SaleLine mapToEntity() {

@@ -1,11 +1,13 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleLineService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleOrderService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderCreateDto;
-import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderGetDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderGetFullDto;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderUpdateDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
@@ -14,16 +16,13 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/orders")
 public class SaleOrderController
     extends AuditedCrudController<
-        SaleOrderGetDto,
+        SaleOrderGetFullDto,
         SaleOrder,
         String,
         UserGetDto,
@@ -66,5 +65,15 @@ public class SaleOrderController
     UserGetDto user = extractUser(auth);
 
     return orderDetailCrudService.getMostSoldProductsLastDay(days, noProducts);
+  }
+
+  @PostMapping
+  @Override
+  public APIResponse<SaleOrderGetFullDto> create(Authentication auth, SaleOrderCreateDto entity) {
+    UserGetDto user = extractUser(auth);
+
+    SaleOrderGetFullDto output = getService().create(entity, user);
+
+    return APIResponseBuilder.success(output, "create order success.");
   }
 }
