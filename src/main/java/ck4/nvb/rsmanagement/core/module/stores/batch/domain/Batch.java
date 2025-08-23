@@ -30,7 +30,7 @@ public class Batch extends FullAuditedSerialIdEntity {
   @Column(name = "supplier_id")
   private Long supplierId;
 
-  @Column(name = "imported_price")
+  @Column(name = "import_price")
   private Integer importedPrice;
 
   @Column(name = "manufacture_date")

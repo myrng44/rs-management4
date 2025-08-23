@@ -5,6 +5,8 @@ import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.stores.transfer.domain.StoreTransfer;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,12 +20,18 @@ import org.modelmapper.ModelMapper;
 public class StoreTransferDto extends EntityDto<Long> implements CreateInput<StoreTransfer>, UpdateInput<StoreTransfer> {
   private Long fromStoreId;
   private Long toStoreId;
+  List<StoreTransferItemDto> items;
   private LocalDateTime transferDate;
   private String status;
 
   @Override
   public StoreTransfer mapToEntity() {
-    return new ModelMapper().map(this, StoreTransfer.class);
+    StoreTransfer storeTransfer = new StoreTransfer();
+    storeTransfer.setFromStoreId(fromStoreId);
+    storeTransfer.setToStoreId(toStoreId);
+    storeTransfer.setTransferDate(transferDate);
+    storeTransfer.setStatus(status);
+    return storeTransfer;
   }
 
   @Override

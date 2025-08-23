@@ -2,6 +2,8 @@ package ck4.nvb.rsmanagement.core.module.stores.transfer.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
+import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
+import ck4.nvb.rsmanagement.core.module.stores.transfer.domain.StoreTransferItem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +15,7 @@ import org.modelmapper.ModelMapper;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StoreTransferItemDto extends EntityDto<Long>
-    implements CreateInput<StoreTransferItemDto> {
+    implements CreateInput<StoreTransferItem>, UpdateInput<StoreTransferItem> {
   private Long transferId;
 
   private Long batchStockId;
@@ -23,7 +25,12 @@ public class StoreTransferItemDto extends EntityDto<Long>
   private Integer qtyTransferred;
 
   @Override
-  public StoreTransferItemDto mapToEntity() {
-    return new ModelMapper().map(this, StoreTransferItemDto.class);
+  public StoreTransferItem mapToEntity() {
+    return new ModelMapper().map(this, StoreTransferItem.class);
+  }
+
+  @Override
+  public boolean mapToEntity(StoreTransferItem entity) {
+    return false;
   }
 }

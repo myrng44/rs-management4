@@ -4,8 +4,8 @@ import ck4.nvb.rsmanagement.base.application.exception.AppException;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import ck4.nvb.rsmanagement.core.web.security.service.dto.TokenResponseDto;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.*;
@@ -15,20 +15,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenGenerator {
 
-  @Value("${rs.security.jwt.expiration}")
-  private long jwtExpiration;
+  @Value("${rs.security.jwt.expirationMillis}")
+  private long jwtExpirationMillis;
+
+  private static final String CLAIM_ROLE_ID = "roleId";
+  private static final String CLAIM_STORE_ID = "storeId";
 
   public TokenResponseDto generateToken(UserRoleDto userRoleDto, PrivateKey privateKey) {
 
     Map<String, Object> claims = new HashMap<>();
-    claims.put("userId", String.valueOf(userRoleDto.getUserId()));
-    claims.put("roleId", String.valueOf(userRoleDto.getRoleId()));
-    claims.put("storeId", String.valueOf(userRoleDto.getStoreId()));
-    claims.put("username", userRoleDto.getUserName()); // add username for validation
+    claims.put(CLAIM_ROLE_ID, userRoleDto.getRoleId());
+    claims.put(CLAIM_STORE_ID, userRoleDto.getStoreId());
 
     TokenResponseDto response = new TokenResponseDto();
     response.setIssuedAt(System.currentTimeMillis());
-    response.setExpiresIn(jwtExpiration);
+    response.setExpiresIn(jwtExpirationMillis);
     response.setExpiresAt(response.getIssuedAt() + response.getExpiresIn() * 1000);
     response.setTokenType("Bearer");
 
@@ -36,27 +37,38 @@ public class JwtTokenGenerator {
         Jwts.builder()
             .claims(claims)
             .id(createJTI())
-            .subject(userRoleDto.getUserId().toString())
+            .subject(String.valueOf(userRoleDto.getUserId()))
             .issuedAt(new Date(response.getIssuedAt()))
             .expiration(new Date(response.getExpiresAt()))
-            .signWith(privateKey, SignatureAlgorithm.RS256)
+            .signWith(privateKey)
             .compact();
     response.setAccessToken(accessToken);
 
     return response;
   }
 
+  private Claims parseClaims(String token, PublicKey publicKey) throws JwtException {
+    try {
+      return Jwts.parser()
+              .verifyWith(publicKey)
+              .build()
+              .parseSignedClaims(token)
+              .getPayload();
+    } catch (JwtException e) {
+      throw e;
+    }
+  }
+
   public UserRoleDto getUserDetailsFromToken(String token, PublicKey publicKey)
       throws AppException {
     try {
-      Claims claims =
-          Jwts.parser().setSigningKey(publicKey).build().parseClaimsJws(token).getPayload();
+      Claims claims = parseClaims(token, publicKey);
 
       UserRoleDto userRoleDto = new UserRoleDto();
-      userRoleDto.setUserId(Long.valueOf(claims.get("userId", String.class)));
-      userRoleDto.setRoleId(Long.valueOf(claims.get("roleId", String.class)));
-      userRoleDto.setStoreId(Long.valueOf(claims.get("storeId", String.class)));
-      userRoleDto.setUserName(claims.get("username", String.class)); // Add username
+      userRoleDto.setUserId(Long.valueOf(claims.getSubject()));
+      userRoleDto.setRoleId(claims.get(CLAIM_ROLE_ID, Long.class));
+      userRoleDto.setStoreId(claims.get(CLAIM_STORE_ID, Long.class));
+      //userRoleDto.setUserName(claims.get("username", String.class)); //add username
 
       return userRoleDto;
     } catch (Exception e) {
@@ -74,8 +86,8 @@ public class JwtTokenGenerator {
    */
   public Boolean validateToken(String token, UserRoleDto userDetails, PublicKey publicKey) {
     try {
-      String username = getUsernameFromToken(token, publicKey);
-      return (username.equals(userDetails.getUserName()) && !isTokenExpired(token, publicKey));
+      Claims claims = parseClaims(token, publicKey);
+      return claims != null && claims.getExpiration().before(new Date());
     } catch (Exception e) {
       return false;
     }
@@ -90,7 +102,7 @@ public class JwtTokenGenerator {
    */
   public String getUsernameFromToken(String token, PublicKey publicKey) {
     try {
-      Claims claims = getClaimsFromToken(token, publicKey);
+      Claims claims = parseClaims(token, publicKey);
       if (claims != null) {
         // Try to get username from claims first, fallback to subject
         String username = claims.get("username", String.class);
@@ -115,37 +127,24 @@ public class JwtTokenGenerator {
    */
   public Long getUserIdFromToken(String token, PublicKey publicKey) {
     try {
-      Claims claims = getClaimsFromToken(token, publicKey);
-      if (claims != null) {
-        String userId = claims.get("userId", String.class);
-        return userId != null ? Long.valueOf(userId) : null;
-      }
-      return null;
+      Claims claims = parseClaims(token, publicKey);
+      return claims != null ? Long.valueOf(claims.getSubject()) : null;
     } catch (Exception e) {
       return null;
     }
   }
 
+/*
   public boolean isTokenExpired(String token, PublicKey publicKey) {
     try {
-      Claims claims = getClaimsFromToken(token, publicKey);
+      Claims claims = parseClaims(token, publicKey);
 
       return claims.getExpiration().before(new Date());
     } catch (Exception e) {
       return true;
     }
   }
-
-  private Claims getClaimsFromToken(String token, PublicKey publicKey) {
-    Claims claims;
-    try {
-      claims = Jwts.parser().setSigningKey(publicKey).build().parseClaimsJws(token).getPayload();
-    } catch (Exception e) {
-      // logger.error("Error parsing token: {}", e.getMessage());
-      claims = null;
-    }
-    return claims;
-  }
+*/
 
   private static String createJTI() {
     return new String(Base64.getEncoder().encode(UUID.randomUUID().toString().getBytes()));

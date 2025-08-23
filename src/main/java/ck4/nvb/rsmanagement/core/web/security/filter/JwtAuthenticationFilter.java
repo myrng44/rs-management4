@@ -42,8 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (userRole != null && userRole.getUserName() != null) {
           // validate token against user details
-          Boolean isValid =
-              jwtTokenGenerator.validateToken(token, userRole, rsaKeyProperties.getPublicKey());
+          Boolean isValid = jwtTokenGenerator.validateToken(token, userRole, rsaKeyProperties.getPublicKey());
 
           if (Boolean.TRUE.equals(isValid)) {
             // create authentication with authorities

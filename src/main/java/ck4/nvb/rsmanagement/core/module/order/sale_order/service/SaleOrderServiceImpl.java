@@ -12,12 +12,13 @@ import ck4.nvb.rsmanagement.core.module.order.paymentmethod.domain.PaymentMethod
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.domain.PaymentMethodRepository;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrderRepository;
-import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineDto;
-import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineGetDto;
-import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderCreateDto;
-import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleOrderGetFullDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.*;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.Voucher;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.VoucherRepository;
+import ck4.nvb.rsmanagement.core.module.stores.batch.domain.Batch;
+import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchRepository;
+import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
+import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStockRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 
@@ -27,8 +28,10 @@ import java.util.Map;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("orderService")
+@Transactional
 public class SaleOrderServiceImpl
     extends FullAuditedCrudServiceImpl<SaleOrderGetFullDto, SaleOrder, String, UserGetDto, Long>
     implements ISaleOrderService {
@@ -46,7 +49,10 @@ public class SaleOrderServiceImpl
   @Autowired private VoucherRepository voucherRepository;
   @Autowired private PaymentMethodRepository paymentMethodRepository;
   @Autowired private ISaleLineService saleLineService;
+  @Autowired private ISaleAllocationService saleAllocationService;
   @Autowired private ProductRepository productRepository;
+  @Autowired private BatchStockRepository batchStockRepository;
+  @Autowired private BatchRepository batchRepository;
 
   @Override
   public SaleOrderGetFullDto mapToEntityDto(SaleOrder entity) {
@@ -89,6 +95,10 @@ public class SaleOrderServiceImpl
 
   public SaleOrderGetFullDto create(SaleOrderCreateDto createDto, UserGetDto user) throws AppException {
     super.checkCreatePermission(createDto, user);
+
+    //check inventory availability first
+    validateInventoryAvailability(createDto);
+
     int finalPrice = 0;
     SaleOrder saleOrder = createDto.mapToEntity();
     saleOrder.setCreatorId(user.getId());
@@ -103,6 +113,16 @@ public class SaleOrderServiceImpl
     for (SaleLineDto saleLineDto : createDto.getLines()) {
       finalPrice += productRepository.findFirstByIdAndDeletedIsFalse(saleLineDto.getProductId()).getUnitPrice() * saleLineDto.getQtyOrdered();
     }
+    if (createDto.getVoucherId() != null) {
+      Voucher voucher = voucherRepository.findFirstByIdAndDeletedIsFalse(createDto.getVoucherId());
+      Integer discount = 0;
+      if (voucher.getDiscountPer() > 0) {
+        discount = (finalPrice * voucher.getDiscountPer()) / 100;
+      } else if (voucher.getDiscountVal() != null) {
+        discount = voucher.getDiscountVal();
+      }
+      finalPrice -= discount;
+    }
     saleOrder.setFinalPrice(finalPrice);
     saleOrder = getRepository().save(saleOrder);
     getLogger()
@@ -114,10 +134,100 @@ public class SaleOrderServiceImpl
 
     for (SaleLineDto saleLineDto : createDto.getLines()) {
       saleLineDto.setSaleOrderId(saleOrder.getId());
-      saleLineService.create(saleLineDto, user);
+      SaleLineGetDto createdLine = saleLineService.create(saleLineDto, user);
+
+      //allocate inventory or this line
+      allocateInventoryForSaleLine(createdLine.getId(), saleLineDto.getProductId(), saleLineDto.getQtyOrdered(), createDto.getStoreId(), user);
     }
 
     return mapToEntityDto(saleOrder);
+  }
+
+  /**
+   * validate if there's enough inventory available for all products in the order
+   */
+  private void validateInventoryAvailability(SaleOrderCreateDto createDto) throws AppException {
+    for (SaleLineDto lineDto : createDto.getLines()) {
+      Long availableQty = getTotalAvailableQuantity(lineDto.getProductId(), createDto.getStoreId());
+      if (availableQty < lineDto.getQtyOrdered()) {
+        throw new AppException(String.format(
+                "Insufficient inventory for product ID %d. Required: %d, Available: %d",
+                lineDto.getProductId(), lineDto.getQtyOrdered(), availableQty));
+      }
+    }
+  }
+
+  /**
+   * get total available quantity for a product in a specific store
+   */
+  private Long getTotalAvailableQuantity(Long productId, Long storeId) {
+    return batchStockRepository.getTotalAvailableQuantityByProductAndStore(productId, storeId);
+  }
+
+  /**
+   * allocate inventory for a sale line using FIFO strategy
+   */
+  private void allocateInventoryForSaleLine(Long saleLineId, Long productId, Integer qtyNeeded,
+                                            Long storeId, UserGetDto user) throws AppException {
+    // get available batch stocks ordered by expiry date (FIFO)
+    List<BatchStock> availableBatchStocks = batchStockRepository
+            .findAvailableBatchStocksByProductAndStore(productId, storeId);
+
+    int remainingQtyToAllocate = qtyNeeded;
+
+    for (BatchStock batchStock : availableBatchStocks) {
+      if (remainingQtyToAllocate <= 0) break;
+
+      int qtyToAllocateFromThisBatch = Math.min(remainingQtyToAllocate, batchStock.getQtyAvailable());
+
+      if (qtyToAllocateFromThisBatch > 0) {
+        // get batch info for cost snapshot
+        Batch batch = batchRepository.findFirstByIdAndDeletedIsFalse(batchStock.getBatchId());
+
+        // create allocation record
+        SaleAllocationDto allocationDto = new SaleAllocationDto();
+        allocationDto.setSaleLineId(saleLineId);
+        allocationDto.setBatchStockId(batchStock.getId());
+        allocationDto.setQtyAllocated(qtyToAllocateFromThisBatch);
+        allocationDto.setQtyPicked(0); // initially 0, will be updated when picking
+        allocationDto.setUnitCostSnap(batch.getImportedPrice()); // snapshot of cost at allocation time
+
+        saleAllocationService.create(allocationDto, user);
+
+        // update batch stock quantities
+        // note: The database trigger will handle updating batch_stock table
+        // ,but want to do it explicitly in service layer for better control
+        updateBatchStockAllocation(batchStock, qtyToAllocateFromThisBatch);
+
+        remainingQtyToAllocate -= qtyToAllocateFromThisBatch;
+
+        getLogger().info("Allocated {} units from batch stock {} for sale line {}",
+                qtyToAllocateFromThisBatch, batchStock.getId(), saleLineId);
+      }
+    }
+
+    if (remainingQtyToAllocate > 0) {
+      throw new AppException(String.format(
+              "Unable to fully allocate inventory for product %d. Missing %d units",
+              productId, remainingQtyToAllocate));
+    }
+  }
+
+  /**
+   * update batch stock allocation quantities
+   * note: this might be handled by database trigger, but keeping for explicit control
+   */
+  private void updateBatchStockAllocation(BatchStock batchStock, int allocatedQty) {
+    batchStock.setQtyAvailable(batchStock.getQtyAvailable() - allocatedQty);
+    batchStock.setQtyReversed(batchStock.getQtyReversed() + allocatedQty);
+
+    // update status if needed
+    if (batchStock.getQtyAvailable() == 0) {
+      batchStock.setStatus("RESERVED");
+    }
+
+    batchStock.setVersion(batchStock.getVersion() + 1); // optimistic locking
+    batchStockRepository.save(batchStock);
   }
 
   @Override
