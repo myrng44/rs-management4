@@ -1,23 +1,26 @@
 package ck4.nvb.rsmanagement.base.domain.entity.interfaces;
 
-import org.springframework.data.domain.Persistable;
-
 import java.io.Serializable;
 
-public interface IEntity<ID extends Comparable<ID> & Serializable> extends Persistable<ID>, Serializable {
+import lombok.experimental.SuperBuilder;
+import org.springframework.data.domain.Persistable;
 
-    /**
-     * @return id - The unique Identifier for the object
-     */
-    ID getId();
 
-    /**
-     * @param id - The unique Identifier for the object
-     */
-    void setId(ID id);
+public interface IEntity<ID extends Comparable<ID> & Serializable>
+    extends Persistable<ID>, Serializable {
 
-    /**
-     * @param newEntity
-     */
-    void setNew(boolean newEntity);
+  /**
+   * @return id - The unique Identifier for the object
+   */
+  ID getId();
+
+  /**
+   * @param id - The unique Identifier for the object
+   */
+  void setId(ID id);
+
+  /**
+   * @param newEntity
+   */
+  void setNew(boolean newEntity);
 }

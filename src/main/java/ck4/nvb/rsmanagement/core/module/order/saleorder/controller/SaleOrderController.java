@@ -22,13 +22,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/orders")
 public class SaleOrderController
-        extends AuditedCrudController<SaleOrderGetDto, SaleOrder, String, UserGetDto, Long, SaleOrderCreateDto, SaleOrderUpdateDto> {
+    extends AuditedCrudController<
+        SaleOrderGetDto,
+        SaleOrder,
+        String,
+        UserGetDto,
+        Long,
+        SaleOrderCreateDto,
+        SaleOrderUpdateDto> {
 
-  @Autowired
-  private ISaleLineService orderDetailCrudService;
+  @Autowired private ISaleLineService orderDetailCrudService;
 
-  @Autowired
-  private ModelMapper modelMapper;
+  @Autowired private ModelMapper modelMapper;
 
   public SaleOrderController(ISaleOrderService service) {
     super(service);
@@ -57,7 +62,7 @@ public class SaleOrderController
 
   @GetMapping("/most")
   public List<ProductGetDto> getMostSoldProductsLastDay(
-          Authentication auth, @RequestParam int days, @RequestParam int noProducts) {
+      Authentication auth, @RequestParam int days, @RequestParam int noProducts) {
     UserGetDto user = extractUser(auth);
 
     return orderDetailCrudService.getMostSoldProductsLastDay(days, noProducts);

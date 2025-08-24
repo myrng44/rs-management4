@@ -1,11 +1,9 @@
 package ck4.nvb.rsmanagement.core.module.stores.inventoryadjustment.controller;
 
-import ck4.nvb.rsmanagement.base.application.dto.PagedResultDto;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.core.module.stores.inventoryadjustment.domain.InventoryAdjustment;
 import ck4.nvb.rsmanagement.core.module.stores.inventoryadjustment.service.InventoryAdjustmentServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.inventoryadjustment.service.dto.InventoryAdjustmentDto;
-import ck4.nvb.rsmanagement.core.module.stores.inventoryadjustment.service.dto.InventoryAdjustmentFilterInputDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import org.modelmapper.ModelMapper;
@@ -47,9 +45,9 @@ public class InventoryAdjustmentController
     return null;
   }
 
-//  @PostMapping("/filtered")
-//  public PagedResultDto<InventoryAdjustmentDto> getList(
-//      Authentication auth, @RequestBody InventoryAdjustmentFilterInputDto request) {
-//    return super.getList(auth, request);
-//  }
+  //  @PostMapping("/filtered")
+  //  public PagedResultDto<InventoryAdjustmentDto> getList(
+  //      Authentication auth, @RequestBody InventoryAdjustmentFilterInputDto request) {
+  //    return super.getList(auth, request);
+  //  }
 }

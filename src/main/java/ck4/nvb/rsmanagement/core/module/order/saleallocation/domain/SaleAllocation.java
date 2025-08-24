@@ -16,18 +16,18 @@ import lombok.Setter;
 @Entity
 @Table(name = "sale_allocation")
 public class SaleAllocation extends FullAuditedSerialIdEntity {
-    @Column(name = "sale_line_id")
-    private Long saleLineId;
+  @Column(name = "sale_line_id")
+  private Long saleLineId;
 
-    @Column(name = "batch_stock_id")
-    private Long batchStockId;
+  @Column(name = "batch_stock_id")
+  private Long batchStockId;
 
-    @Column(name = "qty_allocated")
-    private Integer qtyAllocated;
+  @Column(name = "qty_allocated")
+  private Integer qtyAllocated;
 
-    @Column(name = "qty_picked")
-    private Integer qtyPicked;
+  @Column(name = "qty_picked")
+  private Integer qtyPicked;
 
-    @Column(name = "unit_cost_snap")
-    private Integer unitCostSnap;
+  @Column(name = "unit_cost_snap")
+  private Integer unitCostSnap;
 }

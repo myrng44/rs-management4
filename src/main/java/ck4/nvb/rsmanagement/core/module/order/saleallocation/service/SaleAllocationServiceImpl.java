@@ -10,22 +10,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("saleAllocationService")
-public class SaleAllocationServiceImpl extends FullAuditedCrudServiceImpl<SaleAllocationDto, SaleAllocation, Long, UserGetDto, Long> implements ISaleAllocationService {
+public class SaleAllocationServiceImpl
+    extends FullAuditedCrudServiceImpl<SaleAllocationDto, SaleAllocation, Long, UserGetDto, Long>
+    implements ISaleAllocationService {
 
-    protected SaleAllocationServiceImpl(SaleAllocationRepository repository) {
-        super(repository, SaleAllocation.class);
-    }
+  protected SaleAllocationServiceImpl(SaleAllocationRepository repository) {
+    super(repository, SaleAllocation.class);
+  }
 
-    @Autowired
-    private ModelMapper modelMapper;
+  @Autowired private ModelMapper modelMapper;
 
-    @Override
-    public SaleAllocationRepository getRepository() {
-        return (SaleAllocationRepository) super.getRepository();
-    }
+  @Override
+  public SaleAllocationRepository getRepository() {
+    return (SaleAllocationRepository) super.getRepository();
+  }
 
-    @Override
-    public SaleAllocationDto mapToEntityDto(SaleAllocation entity) {
-        return modelMapper.map(entity, SaleAllocationDto.class);
-    }
+  @Override
+  public SaleAllocationDto mapToEntityDto(SaleAllocation entity) {
+    return modelMapper.map(entity, SaleAllocationDto.class);
+  }
 }

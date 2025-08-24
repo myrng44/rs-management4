@@ -10,22 +10,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("saleReturnItemService")
-public class SaleReturnItemServiceImpl extends FullAuditedCrudServiceImpl<SaleReturnItemDto, SaleReturnItem, Long, UserGetDto, Long> implements ISaleReturnItemService {
+public class SaleReturnItemServiceImpl
+    extends FullAuditedCrudServiceImpl<SaleReturnItemDto, SaleReturnItem, Long, UserGetDto, Long>
+    implements ISaleReturnItemService {
 
-    @Autowired
-    private ModelMapper modelMapper;
+  @Autowired private ModelMapper modelMapper;
 
-    protected SaleReturnItemServiceImpl(SaleReturnItemRepository repository) {
-        super(repository, SaleReturnItem.class);
-    }
+  protected SaleReturnItemServiceImpl(SaleReturnItemRepository repository) {
+    super(repository, SaleReturnItem.class);
+  }
 
-    @Override
-    public SaleReturnItemRepository getRepository() {
-        return (SaleReturnItemRepository) super.getRepository();
-    }
+  @Override
+  public SaleReturnItemRepository getRepository() {
+    return (SaleReturnItemRepository) super.getRepository();
+  }
 
-    @Override
-    public SaleReturnItemDto mapToEntityDto(SaleReturnItem entity) {
-        return modelMapper.map(entity, SaleReturnItemDto.class);
-    }
+  @Override
+  public SaleReturnItemDto mapToEntityDto(SaleReturnItem entity) {
+    return modelMapper.map(entity, SaleReturnItemDto.class);
+  }
 }

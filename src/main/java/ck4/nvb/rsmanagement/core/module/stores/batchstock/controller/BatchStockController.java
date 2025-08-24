@@ -6,7 +6,6 @@ import ck4.nvb.rsmanagement.core.module.stores.batchstock.service.BatchStockServ
 import ck4.nvb.rsmanagement.core.module.stores.batchstock.service.dto.BatchStockDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/import-log")
 public class BatchStockController
-        extends AuditedCrudController<
+    extends AuditedCrudController<
         BatchStockDto, BatchStock, Long, UserGetDto, Long, BatchStockDto, BatchStockDto> {
 
   public BatchStockController(BatchStockServiceImpl importLogService) {

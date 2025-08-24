@@ -6,7 +6,6 @@ import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.PaymentMetho
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.dto.PaymentMethodDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/payment-method")
 public class PaymentMethodController
-        extends AuditedCrudController<
+    extends AuditedCrudController<
         PaymentMethodDto,
         PaymentMethod,
         Long,

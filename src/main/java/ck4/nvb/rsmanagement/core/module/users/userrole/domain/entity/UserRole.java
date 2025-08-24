@@ -1,16 +1,18 @@
 package ck4.nvb.rsmanagement.core.module.users.userrole.domain.entity;
 
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import ck4.nvb.rsmanagement.core.module.users.role.domain.entity.Role;
+import ck4.nvb.rsmanagement.core.module.users.user.domain.User;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "user_role")
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserRole extends FullAuditedSerialIdEntity {
 
   @Column(name = "user_id")
@@ -21,4 +23,12 @@ public class UserRole extends FullAuditedSerialIdEntity {
 
   @Column(name = "store_id")
   private Long storeId;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", insertable = false, updatable = false)
+  User user;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "role_id", insertable = false, updatable = false)
+  Role role;
 }

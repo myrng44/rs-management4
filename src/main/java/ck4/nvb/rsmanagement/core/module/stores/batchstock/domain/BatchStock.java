@@ -36,5 +36,4 @@ public class BatchStock extends FullAuditedSerialIdEntity {
 
   @Column(name = "version")
   private Integer version;
-
 }

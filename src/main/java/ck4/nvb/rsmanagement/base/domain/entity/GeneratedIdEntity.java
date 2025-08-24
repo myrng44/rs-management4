@@ -7,55 +7,56 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 @MappedSuperclass
 public abstract class GeneratedIdEntity implements IEntity<String> {
-    //Fields
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+  // Fields
+  @Id
+  @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private String id;
 
-    public GeneratedIdEntity(String id) {
-        setId(id);
+  public GeneratedIdEntity(String id) {
+    setId(id);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-
-        if (!(obj instanceof GeneratedIdEntity)) {
-            return false;
-        }
-
-        if (this == obj) {
-            return true;
-        }
-
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-
-        return this.getId() != null && this.getId().equals(((GeneratedIdEntity) obj).getId());
+    if (!(obj instanceof GeneratedIdEntity)) {
+      return false;
     }
 
-    @Transient
-    private boolean newEntity = false;
-
-    @Override
-    public void setNew(boolean newEntity) {
-        this.newEntity = newEntity;
+    if (this == obj) {
+      return true;
     }
 
-    @Override
-    public boolean isNew() {
-        return newEntity;
+    if (getClass() != obj.getClass()) {
+      return false;
     }
 
-    @Override
-    public String toString() {
-        return super.getClass().getSimpleName() + " " + JacksonParser.getInstance().toJson(this);
-    }
+    return this.getId() != null && this.getId().equals(((GeneratedIdEntity) obj).getId());
+  }
+
+  @Transient private boolean newEntity = false;
+
+  @Override
+  public void setNew(boolean newEntity) {
+    this.newEntity = newEntity;
+  }
+
+  @Override
+  public boolean isNew() {
+    return newEntity;
+  }
+
+  @Override
+  public String toString() {
+    return super.getClass().getSimpleName() + " " + JacksonParser.getInstance().toJson(this);
+  }
 }

@@ -11,12 +11,12 @@ import lombok.Setter;
 @Setter
 @MappedSuperclass
 public class CreationAuditedGeneratedIdEntity extends GeneratedIdEntity
-        implements CreationAudited<Long> {
+    implements CreationAudited<Long> {
 
-    // Fields
-    @Column(name = "created_at")
-    private LocalDateTime createdTime;
+  // Fields
+  @Column(name = "created_at")
+  private LocalDateTime createdTime;
 
-    @Column(name = "created_by")
-    private Long creatorId;
+  @Column(name = "created_by")
+  private Long creatorId;
 }

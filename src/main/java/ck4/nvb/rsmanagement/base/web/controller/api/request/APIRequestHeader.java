@@ -2,13 +2,12 @@ package ck4.nvb.rsmanagement.base.web.controller.api.request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 @Getter
 @Setter
@@ -16,19 +15,18 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class APIRequestHeader implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
-    private String requestId;
+  private String requestId;
 
-    private String requestTime;
+  private String requestTime;
 
-    @Override
-    public String toString() {
-        try {
-            return new ObjectMapper().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            return super.toString();
-        }
+  @Override
+  public String toString() {
+    try {
+      return new ObjectMapper().writeValueAsString(this);
+    } catch (JsonProcessingException e) {
+      return super.toString();
     }
+  }
 }

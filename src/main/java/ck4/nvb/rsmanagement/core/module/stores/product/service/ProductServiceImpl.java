@@ -5,10 +5,12 @@ import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
-import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import org.springframework.stereotype.Service;
 
 @Service("productService")

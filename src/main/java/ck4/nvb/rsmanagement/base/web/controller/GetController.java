@@ -8,7 +8,7 @@ import ck4.nvb.rsmanagement.base.application.exception.ObjectNotFoundException;
 import ck4.nvb.rsmanagement.base.application.service.GetService;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponses;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteriaParser;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 public class GetController<
-        D extends EntityDto<ID>, T extends IEntity<ID>, ID extends Comparable<ID> & Serializable> {
+    D extends EntityDto<ID>, T extends IEntity<ID>, ID extends Comparable<ID> & Serializable> {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -42,19 +42,10 @@ public class GetController<
 
   @GetMapping
   public ResponseEntity<APIListResponse<List<D>>> getList(
-          @RequestParam(required = false, name = "query") List<String> query,
-          @RequestParam(required = false, name = "sort") String sort,
-          @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
-          @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
-/*    if (query != null) {
-      List<SearchCriteria> params = SearchCriteriaParser.parse(query);
-      if (params.isEmpty()) {
-        return getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort));
-      }
-
-      return getService().getPage(params, new PagedAndSortedResultRequestDto(offset, limit, sort));
-    }
-    return getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort));*/
+      @RequestParam(required = false, name = "query") List<String> query,
+      @RequestParam(required = false, name = "sort") String sort,
+      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
+      @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
     PagedAndSortedResultRequestDto paging = new PagedAndSortedResultRequestDto(offset, limit, sort);
     PagedResultDto<D> page;
     if (query != null) {
@@ -69,7 +60,7 @@ public class GetController<
   }
 
   @GetMapping("/{id}")
-  public APIResponse<D> getById(@PathVariable ID id) {
+  public APIResponses<D> getById(@PathVariable ID id) {
     D output = getService().get(id);
     if (output == null) {
       throw new ObjectNotFoundException("Object not found. Invalid ID: " + id);
@@ -81,7 +72,9 @@ public class GetController<
     if (request.getPaging() == null) {
       request.setPaging(new PagedAndSortedResultRequestDto());
     }
-    PagedResultDto<D> page = getService().getPage(request.mapToSearchCriteria(), request.getPaging());
-    return APIResponseBuilder.paged(page, request.getPaging().getOffset(), request.getPaging().getLimit());
+    PagedResultDto<D> page =
+        getService().getPage(request.mapToSearchCriteria(), request.getPaging());
+    return APIResponseBuilder.paged(
+        page, request.getPaging().getOffset(), request.getPaging().getLimit());
   }
 }

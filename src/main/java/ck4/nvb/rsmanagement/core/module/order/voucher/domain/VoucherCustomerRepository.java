@@ -4,5 +4,5 @@ import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository("voucherCustomerRepository")
-public interface VoucherCustomerRepository extends BaseFullAuditedRepository<VoucherCustomer, Long, Long> {
-}
+public interface VoucherCustomerRepository
+    extends BaseFullAuditedRepository<VoucherCustomer, Long, Long> {}

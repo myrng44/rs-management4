@@ -7,7 +7,6 @@ import ck4.nvb.rsmanagement.core.module.order.saleline.service.dto.SaleLineDto;
 import ck4.nvb.rsmanagement.core.module.order.saleline.service.dto.SaleLineGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
-import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -47,7 +46,7 @@ public class SaleLineController
     return null;
   }
 
-/*  @GetMapping("/summary/{orderId}")
+  /*  @GetMapping("/summary/{orderId}")
   public List<SaleLineGetDto> getOrderDetails(
       @PathVariable String orderId, Authentication auth) {
     UserGetDto user = extractUser(auth);

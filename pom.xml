@@ -29,7 +29,6 @@
     <properties>
         <java.version>21</java.version>
         <querydsl.version>5.0.0</querydsl.version>
-
     </properties>
     <dependencies>
         <dependency>

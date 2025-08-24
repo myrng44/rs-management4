@@ -11,11 +11,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SaleReturnItemGetDto extends EntityDto<Long> {
-    private Long saleReturnId;
-    private String productName;
-    private Long originalSaleLineId;
-    private Integer qtyReturned;
-    private Integer unitPriceAtSale;
-    private Integer returnUnitPrice;
-    private String conditionNote;
+  private Long saleReturnId;
+  private String productName;
+  private Long originalSaleLineId;
+  private Integer qtyReturned;
+  private Integer unitPriceAtSale;
+  private Integer returnUnitPrice;
+  private String conditionNote;
 }

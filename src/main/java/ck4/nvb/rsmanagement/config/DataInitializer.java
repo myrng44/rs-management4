@@ -1,0 +1,121 @@
+package ck4.nvb.rsmanagement.config;
+
+
+import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.Permission;
+import ck4.nvb.rsmanagement.core.module.users.permission.domain.repository.PermissionRepository;
+import ck4.nvb.rsmanagement.core.module.users.role.domain.entity.Role;
+import ck4.nvb.rsmanagement.core.module.users.role.domain.repository.RoleRepository;
+import ck4.nvb.rsmanagement.core.module.users.rolepermission.domain.entity.RolePermission;
+import ck4.nvb.rsmanagement.core.module.users.rolepermission.domain.repository.RolePermissionRepository;
+import ck4.nvb.rsmanagement.core.module.users.user.domain.User;
+import ck4.nvb.rsmanagement.core.module.users.user.domain.UserRepository;
+import ck4.nvb.rsmanagement.core.module.users.userrole.domain.entity.UserRole;
+import ck4.nvb.rsmanagement.core.module.users.userrole.domain.repository.UserRoleRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class DataInitializer implements CommandLineRunner {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final RolePermissionRepository rolePermissionRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public void run(String... args) throws Exception {
+        if (userRepository.count() == 0) {
+            // Create permissions
+            Permission userRead = createPermission("USER_READ", "Read user information");
+            Permission userWrite = createPermission("USER_WRITE", "Create and update users");
+            Permission userDelete = createPermission("USER_DELETE", "Delete users");
+            Permission roleRead = createPermission("ROLE_READ", "Read roles");
+            Permission roleWrite = createPermission("ROLE_WRITE", "Create and update roles");
+            Permission adminAccess = createPermission("ADMIN_ACCESS", "Full admin access");
+
+            // Create roles
+            Role adminRole = createRole("ADMIN", "System Administrator");
+            Role managerRole = createRole("MANAGER", "Store Manager");
+            Role employeeRole = createRole("EMPLOYEE", "Store Employee");
+
+            // Assign permissions to roles
+            assignPermissionsToRole(adminRole, Arrays.asList(userRead, userWrite, userDelete, roleRead, roleWrite, adminAccess));
+            assignPermissionsToRole(managerRole, Arrays.asList(userRead, userWrite, roleRead, roleWrite));
+            assignPermissionsToRole(employeeRole, Arrays.asList(userRead, roleRead));
+
+            // Create users
+            User admin = createUser("admin", "password123", "System Admin", "admin@circlek.com", "0123456789", 1L);
+            User manager = createUser("manager1", "password123", "Store Manager", "manager1@circlek.com", "0123456788", 1L);
+            User employee = createUser("employee1", "password123", "Store Employee", "employee1@circlek.com", "0123456787", 1L);
+
+            // Assign roles to users
+            assignRoleToUser(admin, adminRole);
+            assignRoleToUser(manager, managerRole);
+            assignRoleToUser(employee, employeeRole);
+
+            log.info("Sample data initialized successfully!");
+        }
+    }
+
+    private Permission createPermission(String code, String description) {
+        Permission permission = Permission.builder()
+                .code(code)
+                .description(description)
+                .build();
+        return permissionRepository.save(permission);
+    }
+
+    private Role createRole(String name, String description) {
+        Role role = Role.builder()
+                .name(name)
+                .description(description)
+                .createdTime(LocalDateTime.now())
+                .creatorId(1L)
+                .deleted(false)
+                .build();
+        return roleRepository.save(role);
+    }
+
+    private User createUser(String userName, String password, String fullName, String email, String phone, Long storeId) {
+        User user = User.builder()
+                .username(userName)
+                .password(passwordEncoder.encode(password))
+                .name(fullName)
+                .email(email)
+                .phone(phone)
+                .storeId(storeId)
+                .createdTime(LocalDateTime.now())
+                .creatorId(1L)
+                .build();
+        return userRepository.save(user);
+    }
+
+    private void assignPermissionsToRole(Role role, java.util.List<Permission> permissions) {
+        permissions.forEach(permission -> {
+            RolePermission rolePermission = RolePermission.builder()
+                    .roleId(role.getId())
+                    .permissionId(permission.getId())
+                    .build();
+            rolePermissionRepository.save(rolePermission);
+        });
+    }
+
+    private void assignRoleToUser(User user, Role role) {
+        UserRole userRole = UserRole.builder()
+                .userId(user.getId())
+                .roleId(role.getId())
+                .user(user)
+                .role(role)
+                .build();
+        userRoleRepository.save(userRole);
+    }
+}

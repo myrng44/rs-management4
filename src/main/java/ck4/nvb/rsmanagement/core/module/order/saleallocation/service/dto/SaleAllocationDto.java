@@ -14,20 +14,21 @@ import org.modelmapper.ModelMapper;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaleAllocationDto extends EntityDto<Long> implements CreateInput<SaleAllocation>, UpdateInput<SaleAllocation> {
-    private Long saleLineId;
-    private Long batchStockId;
-    private Integer qtyAllocated;
-    private Integer qtyPicked;
-    private Integer unitCostSnap;
+public class SaleAllocationDto extends EntityDto<Long>
+    implements CreateInput<SaleAllocation>, UpdateInput<SaleAllocation> {
+  private Long saleLineId;
+  private Long batchStockId;
+  private Integer qtyAllocated;
+  private Integer qtyPicked;
+  private Integer unitCostSnap;
 
-    @Override
-    public SaleAllocation mapToEntity() {
-        return new ModelMapper().map(this, SaleAllocation.class);
-    }
+  @Override
+  public SaleAllocation mapToEntity() {
+    return new ModelMapper().map(this, SaleAllocation.class);
+  }
 
-    @Override
-    public boolean mapToEntity(SaleAllocation entity) {
-        return false;
-    }
+  @Override
+  public boolean mapToEntity(SaleAllocation entity) {
+    return false;
+  }
 }

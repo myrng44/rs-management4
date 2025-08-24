@@ -4,13 +4,13 @@ import java.time.LocalDateTime;
 
 public interface HasDeletedTime {
 
-    /**
-     * @return Date - the date the object was deleted
-     */
-    LocalDateTime getDeletedTime();
+  /**
+   * @return Date - the date the object was deleted
+   */
+  LocalDateTime getDeletedTime();
 
-    /**
-     * @param deletedTime - the date the object was deleted
-     */
-    void setDeletedTime(LocalDateTime deletedTime);
+  /**
+   * @param deletedTime - the date the object was deleted
+   */
+  void setDeletedTime(LocalDateTime deletedTime);
 }

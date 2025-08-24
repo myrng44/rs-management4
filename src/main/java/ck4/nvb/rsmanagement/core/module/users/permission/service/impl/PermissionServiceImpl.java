@@ -6,9 +6,11 @@ import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.Permissio
 import ck4.nvb.rsmanagement.core.module.users.permission.domain.repository.PermissionRepository;
 import ck4.nvb.rsmanagement.core.module.users.permission.service.PermissionService;
 import ck4.nvb.rsmanagement.core.module.users.permission.service.dto.PermissionDto;
-import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+
 import java.util.List;
 import java.util.Map;
+
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 

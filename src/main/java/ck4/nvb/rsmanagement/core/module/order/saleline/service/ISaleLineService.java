@@ -6,6 +6,7 @@ import ck4.nvb.rsmanagement.core.module.order.saleline.domain.SaleLine;
 import ck4.nvb.rsmanagement.core.module.order.saleline.service.dto.SaleLineGetDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+
 import java.util.List;
 
 public interface ISaleLineService
@@ -19,11 +20,13 @@ public interface ISaleLineService
    */
   List<ProductGetDto> getMostSoldProductsLastDay(int days, int noProducts) throws AppException;
 
-/*  *//**
+  /*  */
+  /**
    * Get all order detail by orderId
    *
    * @param orderId identifier of an order
    * @return list of orderDetailDto
-   *//*
+   */
+  /*
   List<SaleLineGetDto> getDetailByOrderId(String orderId) throws AppException;*/
 }

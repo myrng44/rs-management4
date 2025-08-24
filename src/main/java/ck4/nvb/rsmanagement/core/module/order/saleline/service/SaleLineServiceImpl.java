@@ -9,11 +9,13 @@ import ck4.nvb.rsmanagement.core.module.order.saleline.service.dto.SaleLineGetDt
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.ProductServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
-import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +46,7 @@ public class SaleLineServiceImpl
     Product product = productService.getEntity(entity.getProductId());
     // snapshot
     entity.setUnitPrice(
-            product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
+        product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
     dto.setProductId(product.getId());
     dto.setProductName(product.getName());
 
@@ -83,7 +85,7 @@ public class SaleLineServiceImpl
         getRepository().findMostSoldProductsOfInterval(start, end, noProducts));
   }
 
-/*  @Override
+  /*  @Override
   public List<SaleLineGetDto> getDetailByOrderId(String orderId) throws AppException {
     return mapToGetListOutputDto(getRepository().findBySaleOrderId(orderId));
   }*/

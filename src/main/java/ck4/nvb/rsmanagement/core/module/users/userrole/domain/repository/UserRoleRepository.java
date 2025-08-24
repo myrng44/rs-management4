@@ -5,6 +5,7 @@ import ck4.nvb.rsmanagement.core.module.users.role.service.dto.UserRoleProjectio
 import ck4.nvb.rsmanagement.core.module.users.userrole.domain.entity.UserRole;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository("userRoleRepository")
@@ -12,6 +13,13 @@ public interface UserRoleRepository extends BaseFullAuditedRepository<UserRole, 
   List<UserRole> findByUserId(Long userId);
 
   List<UserRole> findByStoreId(Long storeId);
+
+  List<UserRole> findByRoleId(Long roleId);
+  void deleteByUserId(Long userId);
+  void deleteByUserIdAndRoleId(Long userId, Long roleId);
+
+  @Query("SELECT ur FROM UserRole ur LEFT JOIN FETCH ur.role r LEFT JOIN FETCH r.rolePermissions rp LEFT JOIN FETCH rp.permission p WHERE ur.userId = :userId")
+  List<UserRole> findByUserIdWithPermissions(@Param("userId") Long userId);
 
   void deleteByUserIdAndRoleIdAndStoreId(Long userId, Long roleId, Long storeId);
 

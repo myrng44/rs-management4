@@ -14,19 +14,20 @@ import org.modelmapper.ModelMapper;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VoucherRedemptionDto extends EntityDto<Long> implements CreateInput<VoucherRedemption>, UpdateInput<VoucherRedemption> {
-    private Long voucherId;
-    private Long customerId;
-    private String saleOrderId;
-    private Integer appliedValue;
+public class VoucherRedemptionDto extends EntityDto<Long>
+    implements CreateInput<VoucherRedemption>, UpdateInput<VoucherRedemption> {
+  private Long voucherId;
+  private Long customerId;
+  private String saleOrderId;
+  private Integer appliedValue;
 
-    @Override
-    public VoucherRedemption mapToEntity() {
-        return new ModelMapper().map(this, VoucherRedemption.class);
-    }
+  @Override
+  public VoucherRedemption mapToEntity() {
+    return new ModelMapper().map(this, VoucherRedemption.class);
+  }
 
-    @Override
-    public boolean mapToEntity(VoucherRedemption entity) {
-        return false;
-    }
+  @Override
+  public boolean mapToEntity(VoucherRedemption entity) {
+    return false;
+  }
 }

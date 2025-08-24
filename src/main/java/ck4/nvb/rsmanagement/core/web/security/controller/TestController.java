@@ -61,24 +61,4 @@ public class TestController {
 
     return ResponseEntity.ok(response);
   }
-
-  /** store-specific endpoint - requires STORE_ACCESS permission */
-  /*    @GetMapping("/store/{storeId}")
-  @PreAuthorize("hasAuthority('STORE_ACCESS') and #storeId == authentication.principal.storeId")
-  public ResponseEntity<Map<String, Object>> storeEndpoint(@PathVariable Long storeId) {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      UserRoleDto userRole = (UserRoleDto) authentication.getPrincipal();
-
-      Map<String, Object> response = new HashMap<>();
-      response.put("message", "This is a store-specific endpoint");
-      response.put("user", userRole.getUserName());
-      response.put("requestedStoreId", storeId);
-      response.put("userStoreId", userRole.getStoreId());
-      response.put("timestamp", System.currentTimeMillis());
-
-      log.info("User {} accessed store {} endpoint", userRole.getUserName(), storeId);
-
-      return ResponseEntity.ok(response);
-  }*/
-
 }

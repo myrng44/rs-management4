@@ -5,10 +5,12 @@ import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.stores.inventoryadjustment.domain.InventoryAdjustment;
 import ck4.nvb.rsmanagement.core.module.stores.inventoryadjustment.domain.InventoryAdjustmentRepository;
 import ck4.nvb.rsmanagement.core.module.stores.inventoryadjustment.service.dto.InventoryAdjustmentDto;
-import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 

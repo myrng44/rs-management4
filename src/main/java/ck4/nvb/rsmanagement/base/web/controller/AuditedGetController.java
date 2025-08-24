@@ -9,11 +9,10 @@ import ck4.nvb.rsmanagement.base.application.service.CreationAuditedCrudService;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.CreationAudited;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponses;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteriaParser;
-
 import java.io.Serializable;
 import java.util.List;
 import lombok.Getter;
@@ -27,11 +26,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Getter
 public abstract class AuditedGetController<
-        D extends EntityDto<ID>,
-        T extends IEntity<ID> & CreationAudited<UID>,
-        ID extends Comparable<ID> & Serializable,
-        User extends EntityDto<UID>,
-        UID extends Comparable<UID> & Serializable> {
+    D extends EntityDto<ID>,
+    T extends IEntity<ID> & CreationAudited<UID>,
+    ID extends Comparable<ID> & Serializable,
+    User extends EntityDto<UID>,
+    UID extends Comparable<UID> & Serializable> {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -45,11 +44,11 @@ public abstract class AuditedGetController<
 
   @GetMapping
   public APIListResponse<List<D>> getList(
-          Authentication auth,
-          @RequestParam(required = false, name = "query") List<String> query,
-          @RequestParam(required = false, name = "sort") String sort,
-          @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
-          @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
+      Authentication auth,
+      @RequestParam(required = false, name = "query") List<String> query,
+      @RequestParam(required = false, name = "sort") String sort,
+      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
+      @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
     User user = extractUser(auth);
 
     PagedResultDto<D> page;
@@ -58,7 +57,9 @@ public abstract class AuditedGetController<
       if (params.isEmpty()) {
         page = getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort), user);
       } else {
-        page = getService().getPage(params, new PagedAndSortedResultRequestDto(offset, limit, sort), user);
+        page =
+            getService()
+                .getPage(params, new PagedAndSortedResultRequestDto(offset, limit, sort), user);
       }
     } else {
       page = getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort), user);
@@ -68,7 +69,7 @@ public abstract class AuditedGetController<
   }
 
   @GetMapping("/{id}")
-  public APIResponse<D> getById(Authentication auth, @PathVariable ID id) {
+  public APIResponses<D> getById(Authentication auth, @PathVariable ID id) {
     User user = extractUser(auth);
 
     D output = getService().get(id, user);
@@ -80,13 +81,15 @@ public abstract class AuditedGetController<
   public APIListResponse<List<D>> getList(Authentication auth, FilterInput request) {
     User user = extractUser(auth);
     if (request.getPaging() == null) request.setPaging(new PagedAndSortedResultRequestDto());
-    PagedResultDto<D> page = getService().getPage(request.mapToSearchCriteria(), request.getPaging(), user);
-    return APIResponseBuilder.paged(page, request.getPaging().getOffset(), request.getPaging().getLimit());
+    PagedResultDto<D> page =
+        getService().getPage(request.mapToSearchCriteria(), request.getPaging(), user);
+    return APIResponseBuilder.paged(
+        page, request.getPaging().getOffset(), request.getPaging().getLimit());
   }
 
   @GetMapping("/count")
   public ResponseEntity<Long> count(
-          @RequestParam(required = false, name = "query") List<String> query) {
+      @RequestParam(required = false, name = "query") List<String> query) {
     if (query != null) {
       List<SearchCriteria> params = SearchCriteriaParser.parse(query);
       return ResponseEntity.ok(getService().count(params));

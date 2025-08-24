@@ -26,8 +26,8 @@ public abstract class FullAuditedCrudServiceImpl<
         ID extends Comparable<ID> & Serializable,
         U extends EntityDto<UID>,
         UID extends Comparable<UID> & Serializable>
-        extends AuditedCrudServiceImpl<D, T, ID, U, UID>
-        implements FullAuditedCrudService<D, T, ID, U, UID> {
+    extends AuditedCrudServiceImpl<D, T, ID, U, UID>
+    implements FullAuditedCrudService<D, T, ID, U, UID> {
 
   protected FullAuditedCrudServiceImpl(BaseRepository<T, ID> repository, Class<T> type) {
     super(repository, type);
@@ -73,16 +73,18 @@ public abstract class FullAuditedCrudServiceImpl<
   }
 
   public List<SearchCriteria> addDeletedFalse(List<SearchCriteria> filter) {
-    //always create a new mutable list to avoid UnsupportedOperationException
-    List<SearchCriteria> mutableFilter = filter == null ? new ArrayList<>() : new ArrayList<>(filter);
+    // always create a new mutable list to avoid UnsupportedOperationException
+    List<SearchCriteria> mutableFilter =
+        filter == null ? new ArrayList<>() : new ArrayList<>(filter);
 
     boolean hasDeleted =
-            mutableFilter.stream()
-                    .anyMatch(
-                            c -> "deleted".equals(c.getKey()) && SearchOperator.EQUALS.equals(c.getOperator()));
+        mutableFilter.stream()
+            .anyMatch(
+                c -> "deleted".equals(c.getKey()) && SearchOperator.EQUALS.equals(c.getOperator()));
 
     if (!hasDeleted) {
-      mutableFilter.add(new SearchCriteria("deleted", SearchOperator.EQUALS, Boolean.FALSE.toString()));
+      mutableFilter.add(
+          new SearchCriteria("deleted", SearchOperator.EQUALS, Boolean.FALSE.toString()));
     }
 
     return mutableFilter;
@@ -115,14 +117,14 @@ public abstract class FullAuditedCrudServiceImpl<
 
   @Override
   public PagedResultDto<D> getPage(PagedAndSortedResultRequestDto paging, U user)
-          throws AppException {
+      throws AppException {
     return super.getPage(addDeletedFalse(null), paging, user);
   }
 
   @Override
   public PagedResultDto<D> getPage(
-          List<SearchCriteria> filter, PagedAndSortedResultRequestDto paging, U user)
-          throws AppException {
+      List<SearchCriteria> filter, PagedAndSortedResultRequestDto paging, U user)
+      throws AppException {
     return super.getPage(addDeletedFalse(filter), paging, user);
   }
 
@@ -133,7 +135,7 @@ public abstract class FullAuditedCrudServiceImpl<
 
   @Override
   public PagedResultDto<D> getPage(
-          List<SearchCriteria> filter, PagedAndSortedResultRequestDto paging) throws AppException {
+      List<SearchCriteria> filter, PagedAndSortedResultRequestDto paging) throws AppException {
     return super.getPage(addDeletedFalse(filter), paging);
   }
 }
