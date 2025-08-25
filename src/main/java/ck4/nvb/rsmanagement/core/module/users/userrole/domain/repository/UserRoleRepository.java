@@ -4,6 +4,8 @@ import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
 import ck4.nvb.rsmanagement.core.module.users.role.service.dto.UserRoleProjection;
 import ck4.nvb.rsmanagement.core.module.users.userrole.domain.entity.UserRole;
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -11,9 +13,20 @@ import org.springframework.stereotype.Repository;
 public interface UserRoleRepository extends BaseFullAuditedRepository<UserRole, Long, Long> {
   List<UserRole> findByUserId(Long userId);
 
-  List<UserRole> findByStoreId(Long storeId);
+  List<UserRole> findByUserIdAndStoreId(Long userId, Long storeId);
+
+  @Query(value = """
+    SELECT usr.id
+    FROM user_role usr
+    WHERE usr.store_id=:storeId AND usr.user_id=:userId
+""", nativeQuery = true)
+  Set<Long> findRoleIdsByUserIdAndStoreId(Long userId, Long storeId);
+
+  Set<Long> findStoreIdsByUserId(Long userId);
 
   void deleteByUserIdAndRoleIdAndStoreId(Long userId, Long roleId, Long storeId);
+
+  List<UserRole> findByUserIdAndRoleId(Long userId, Long roleId);
 
   @Query(
       value =

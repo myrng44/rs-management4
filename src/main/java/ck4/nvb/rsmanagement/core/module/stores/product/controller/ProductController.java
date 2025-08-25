@@ -1,13 +1,16 @@
 package ck4.nvb.rsmanagement.core.module.stores.product.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.IProductService;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductCreateDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductUpdateDto;
+import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/products")
@@ -56,5 +61,12 @@ public class ProductController
   public ResponseEntity<Integer> remainQuantity(Authentication auth, @RequestParam long productId) {
     UserGetDto user = extractUser(auth);
     return ResponseEntity.ok(getProductService().getRemainQuantity(productId, user.getStoreId()));
+  }
+
+  @RequiredPermission(PermissionCode.VIEW_PRODUCT)
+  @GetMapping
+  @Override
+  public APIListResponse<List<ProductGetDto>> getList(Authentication auth, List<String> query, String sort, int offset, int limit) {
+    return super.getList(auth, query, sort, offset, limit);
   }
 }

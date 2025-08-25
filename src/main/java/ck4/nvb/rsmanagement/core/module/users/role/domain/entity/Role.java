@@ -1,9 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.users.role.domain.entity;
 
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,8 +11,9 @@ import lombok.Setter;
 @Table(name = "role")
 public class Role extends FullAuditedSerialIdEntity {
 
-  @Column(name = "name", nullable = false)
-  private String name;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "name", nullable = false, unique = true)
+  private RoleName name;
 
   @Column(name = "desc")
   private String desc;

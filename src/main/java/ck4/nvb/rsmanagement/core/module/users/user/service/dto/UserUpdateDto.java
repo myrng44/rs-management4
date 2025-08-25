@@ -32,10 +32,6 @@ public class UserUpdateDto extends BaseUserDto implements UpdateInput<User> {
       entity.setPhone(phone);
       isModified = true;
     }
-    if ((long) storeId != entity.getStoreId()) {
-      entity.setStoreId(storeId);
-      isModified = true;
-    }
     if (enabled != entity.isDeleted()) {
       entity.setDeleted(enabled);
       isModified = true;

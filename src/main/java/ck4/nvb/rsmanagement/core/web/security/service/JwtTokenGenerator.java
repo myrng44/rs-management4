@@ -68,83 +68,12 @@ public class JwtTokenGenerator {
       userRoleDto.setUserId(Long.valueOf(claims.getSubject()));
       userRoleDto.setRoleId(claims.get(CLAIM_ROLE_ID, Long.class));
       userRoleDto.setStoreId(claims.get(CLAIM_STORE_ID, Long.class));
-      //userRoleDto.setUserName(claims.get("username", String.class)); //add username
 
       return userRoleDto;
     } catch (Exception e) {
       throw new AppException("Invalid token: " + e.getMessage());
     }
   }
-
-  /**
-   * Validate token against user details
-   *
-   * @param token JWT token
-   * @param userDetails User role details
-   * @param publicKey Public key for verification
-   * @return true if token is valid for the user
-   */
-  public Boolean validateToken(String token, UserRoleDto userDetails, PublicKey publicKey) {
-    try {
-      Claims claims = parseClaims(token, publicKey);
-      return claims != null && claims.getExpiration().before(new Date());
-    } catch (Exception e) {
-      return false;
-    }
-  }
-
-  /**
-   * Extract username from token
-   *
-   * @param token JWT token
-   * @param publicKey Public key for verification
-   * @return Username from token
-   */
-  public String getUsernameFromToken(String token, PublicKey publicKey) {
-    try {
-      Claims claims = parseClaims(token, publicKey);
-      if (claims != null) {
-        // Try to get username from claims first, fallback to subject
-        String username = claims.get("username", String.class);
-        if (username != null) {
-          return username;
-        }
-        // If username not in claims, use subject (userId) and get username from service
-        return claims.getSubject();
-      }
-      return null;
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
-  /**
-   * Extract user ID from token
-   *
-   * @param token JWT token
-   * @param publicKey Public key for verification
-   * @return User ID from token
-   */
-  public Long getUserIdFromToken(String token, PublicKey publicKey) {
-    try {
-      Claims claims = parseClaims(token, publicKey);
-      return claims != null ? Long.valueOf(claims.getSubject()) : null;
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
-/*
-  public boolean isTokenExpired(String token, PublicKey publicKey) {
-    try {
-      Claims claims = parseClaims(token, publicKey);
-
-      return claims.getExpiration().before(new Date());
-    } catch (Exception e) {
-      return true;
-    }
-  }
-*/
 
   private static String createJTI() {
     return new String(Base64.getEncoder().encode(UUID.randomUUID().toString().getBytes()));

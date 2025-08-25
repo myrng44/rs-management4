@@ -1,9 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.users.permission.domain.entity;
 
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,9 +11,10 @@ import lombok.Setter;
 @Table(name = "permission")
 public class Permission extends FullAuditedSerialIdEntity {
 
-  @Column(name = "code")
-  private String code;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "code", nullable = false, unique = true)
+  private PermissionCode code;
 
-  @Column(name = "desc")
+  @Column(name = "\"desc\"")
   private String desc;
 }

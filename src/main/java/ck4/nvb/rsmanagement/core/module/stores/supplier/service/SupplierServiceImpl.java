@@ -35,7 +35,7 @@ public class SupplierServiceImpl
   public Map<String, List<SearchOperator>> getSearchableKeys() {
     Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
     keys.put("name", List.of(SearchOperator.EQUALS, SearchOperator.CONTAINS));
-    keys.put("address", List.of(SearchOperator.CONTAINS));
+    keys.put("location_id", List.of(SearchOperator.CONTAINS, SearchOperator.EQUALS));
     keys.put("contact", List.of(SearchOperator.CONTAINS));
     return keys;
   }
@@ -44,7 +44,7 @@ public class SupplierServiceImpl
   public Set<String> getSortableKeys() {
     Set<String> keys = super.getSortableKeys();
     keys.add("name");
-    keys.add("address");
+    keys.add("location_id");
     keys.add("contact");
     return keys;
   }

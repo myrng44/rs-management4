@@ -1,5 +1,7 @@
 package ck4.nvb.rsmanagement.core.web.security.filter;
 
+import ck4.nvb.rsmanagement.base.application.exception.AppException;
+import ck4.nvb.rsmanagement.core.module.users.user.service.impl.UserGetServiceWithRoleImpl;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import ck4.nvb.rsmanagement.core.web.security.service.JwtTokenGenerator;
 import ck4.nvb.rsmanagement.core.web.security.service.rsa.RSAKeyProperties;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtTokenGenerator jwtTokenGenerator;
   private final RSAKeyProperties rsaKeyProperties;
+  @Autowired
+  private UserGetServiceWithRoleImpl userGetServiceWithRole;
 
   @Override
   protected void doFilterInternal(
@@ -36,38 +41,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       String token = extractTokenFromRequest(request);
 
       if (StringUtils.hasText(token)) {
-        // validate token and extract user details
-        UserRoleDto userRole =
-            jwtTokenGenerator.getUserDetailsFromToken(token, rsaKeyProperties.getPublicKey());
-
-        if (userRole != null && userRole.getUserName() != null) {
-          // validate token against user details
-          Boolean isValid = jwtTokenGenerator.validateToken(token, userRole, rsaKeyProperties.getPublicKey());
-
-          if (Boolean.TRUE.equals(isValid)) {
-            // create authentication with authorities
-            List<SimpleGrantedAuthority> authorities =
-                userRole.getPermissions() != null
-                    ? userRole.getPermissions().stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList())
-                    : List.of(new SimpleGrantedAuthority("ORDER_VIEW"));
-
-            UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userRole, null, authorities);
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            log.debug(
-                "Authenticated user: {} with authorities: {}", userRole.getUserName(), authorities);
-          } else {
-            log.warn("Invalid token for user: {}", userRole.getUserName());
-          }
-        }
+        authenticateUser(token);
       }
     } catch (Exception e) {
-      log.error("Error processing JWT token: {}", e.getMessage());
-      // Don't throw exception, just continue with unauthenticated request
+      log.error("Authentication error: {}", e.getMessage());
+      SecurityContextHolder.clearContext();
+      // Không throw exception, continue with unauthenticated request
     }
 
     filterChain.doFilter(request, response);
@@ -77,9 +56,70 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     String bearerToken = request.getHeader("Authorization");
 
     if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-      return bearerToken.substring(7);
+      return bearerToken.substring(7).trim();
     }
 
     return null;
+  }
+
+  private void authenticateUser(String token) throws AppException {
+    // Lấy basic info từ token
+    UserRoleDto tokenUserRole = jwtTokenGenerator.getUserDetailsFromToken(
+            token, rsaKeyProperties.getPublicKey());
+
+    if (tokenUserRole.getUserId() == null) {
+      throw new AppException("Invalid token");
+    }
+
+    // Get complete user info with permissions from database
+    UserRoleDto fullUserRole = getUserRoleFromDatabase(tokenUserRole);
+
+    // Create Spring Security authentication with permissions
+    List<SimpleGrantedAuthority> authorities = fullUserRole.getPermissions()
+            .stream()
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toList());
+
+    // Always ensure user has basic role
+    if (authorities.isEmpty()) {
+      authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    UsernamePasswordAuthenticationToken authentication =
+            new UsernamePasswordAuthenticationToken(fullUserRole, null, authorities);
+
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+    log.debug("User {} authenticated with {} permissions at store {}",
+            fullUserRole.getUserName(), authorities.size(), fullUserRole.getStoreId());
+  }
+
+  private UserRoleDto getUserRoleFromDatabase(UserRoleDto tokenUserRole) throws AppException {
+    try {
+      // if token have storeId, lấy role cho specific store
+      if (tokenUserRole.getStoreId() != null) {
+        return userGetServiceWithRole.getUserSession(
+                tokenUserRole.getUserId(), tokenUserRole.getStoreId()).getUserRoles();
+      } else {
+        // Otherwise lại lấy primary role
+        return userGetServiceWithRole.get(tokenUserRole.getUserId());
+      }
+    } catch (AppException e) {
+      log.warn("Failed to get user role from database: {}", e.getMessage());
+      throw new AppException("User authentication failed: " + e.getMessage());
+    }
+  }
+
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    String path = request.getRequestURI();
+
+    // Skip filter cho public endpoints
+    return path.contains("/auth/login") ||
+            path.contains("/auth/register") ||
+            path.contains("/auth/refresh") ||
+            path.contains("/public/") ||
+            path.contains("/health") ||
+            path.contains("/actuator/");
   }
 }

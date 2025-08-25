@@ -1,8 +1,11 @@
 package ck4.nvb.rsmanagement.core.web.security.controller;
 
+import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import java.util.HashMap;
 import java.util.Map;
+
+import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,7 +49,6 @@ public class TestController {
 
   /** admin only endpoint - requires USER_WRITE permission */
   @GetMapping("/admin")
-  @PreAuthorize("hasAuthority('SYSTEM_CONFIG')")
   public ResponseEntity<Map<String, Object>> adminEndpoint() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     UserRoleDto userRole = (UserRoleDto) authentication.getPrincipal();
@@ -61,24 +63,4 @@ public class TestController {
 
     return ResponseEntity.ok(response);
   }
-
-  /** store-specific endpoint - requires STORE_ACCESS permission */
-  /*    @GetMapping("/store/{storeId}")
-  @PreAuthorize("hasAuthority('STORE_ACCESS') and #storeId == authentication.principal.storeId")
-  public ResponseEntity<Map<String, Object>> storeEndpoint(@PathVariable Long storeId) {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      UserRoleDto userRole = (UserRoleDto) authentication.getPrincipal();
-
-      Map<String, Object> response = new HashMap<>();
-      response.put("message", "This is a store-specific endpoint");
-      response.put("user", userRole.getUserName());
-      response.put("requestedStoreId", storeId);
-      response.put("userStoreId", userRole.getStoreId());
-      response.put("timestamp", System.currentTimeMillis());
-
-      log.info("User {} accessed store {} endpoint", userRole.getUserName(), storeId);
-
-      return ResponseEntity.ok(response);
-  }*/
-
 }

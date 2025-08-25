@@ -1,9 +1,11 @@
 package ck4.nvb.rsmanagement.core.module.users.user.service;
 
 import ck4.nvb.rsmanagement.base.application.exception.AppException;
+import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import ck4.nvb.rsmanagement.core.web.security.service.dto.UserSessionDto;
 import java.util.List;
+import java.util.Set;
 
 public interface UserGetServiceWithRole {
 
@@ -25,4 +27,12 @@ public interface UserGetServiceWithRole {
 
   /** Get user session with all roles and current context */
   UserSessionDto getUserSession(Long userId, Long storeId) throws AppException;
+
+  public Set<Long> getUserAccessibleStores(Long userId) throws AppException;
+
+  public boolean hasAccessToStore(Long userId, Long storeId) throws AppException;
+
+  public boolean hasPermissionAtStore(Long userId, Long storeId, PermissionCode permission)
+          throws AppException;
+
 }

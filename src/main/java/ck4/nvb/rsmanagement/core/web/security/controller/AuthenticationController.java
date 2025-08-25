@@ -46,7 +46,6 @@ public class AuthenticationController {
   }
 
   @PostMapping("/register")
-  // @PreAuthorize("hasAuthority('USER_MANAGEMENT')")
   public ResponseEntity<BaseUserDto> register(@Valid @RequestBody UserCreateDto request) {
     try {
       BaseUserDto user = getBaseUserDto();

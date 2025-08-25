@@ -5,5 +5,5 @@ import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.Permissio
 import ck4.nvb.rsmanagement.core.module.users.permission.service.dto.PermissionDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 
-public interface PermissionService
+public interface IPermissionService
     extends FullAuditedCrudService<PermissionDto, Permission, Long, UserGetDto, Long> {}

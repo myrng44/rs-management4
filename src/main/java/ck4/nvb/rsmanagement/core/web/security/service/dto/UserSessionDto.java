@@ -28,7 +28,7 @@ public class UserSessionDto extends Dto {
   private String currentRoleName;
 
   // all user roles across stores
-  private List<UserRoleDto> userRoles;
+  private UserRoleDto userRoles;
 
   // current permissions (from current role)
   private List<String> currentPermissions;
