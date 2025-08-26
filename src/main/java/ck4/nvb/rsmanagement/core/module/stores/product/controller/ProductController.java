@@ -2,6 +2,7 @@ package ck4.nvb.rsmanagement.core.module.stores.product.controller;
 
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.IProductService;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductCreateDto;
@@ -15,10 +16,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -68,5 +66,12 @@ public class ProductController
   @Override
   public APIListResponse<List<ProductGetDto>> getList(Authentication auth, List<String> query, String sort, int offset, int limit) {
     return super.getList(auth, query, sort, offset, limit);
+  }
+
+  @PostMapping
+  @RequiredPermission(PermissionCode.CREATE_PRODUCT)
+  @Override
+  public APIResponse<ProductGetDto> create(Authentication auth, ProductCreateDto entity) {
+    return super.create(auth, entity);
   }
 }

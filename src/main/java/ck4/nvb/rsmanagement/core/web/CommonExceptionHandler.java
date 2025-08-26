@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -28,10 +29,10 @@ public class CommonExceptionHandler {
 
   @ExceptionHandler(ObjectNotFoundException.class)
   public ResponseEntity<APIResponse<Object>> handleNotFound(ObjectNotFoundException ex) {
-    APIResponseMetadata header = new APIResponseMetadata(ErrorCode.NOT_FOUND, ex.getMessage());
-    header.setTimestamp(LocalDateTime.now());
-    header.setTraceId(traceId());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new APIResponse<>(header, null));
+    APIResponseMetadata metadata = new APIResponseMetadata(ErrorCode.NOT_FOUND, ex.getMessage());
+    metadata.setTimestamp(LocalDateTime.now());
+    metadata.setTraceId(traceId());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new APIResponse<>(metadata, null));
   }
 
   @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
@@ -52,21 +53,27 @@ public class CommonExceptionHandler {
     }
 
     ValidationErrorResponse val = new ValidationErrorResponse(fieldErrors);
-    APIResponseMetadata header = new APIResponseMetadata(ErrorCode.BAD_REQUEST, "Validation failed");
-    header.setTimestamp(LocalDateTime.now());
-    header.setTraceId(traceId());
-    return ResponseEntity.badRequest().body(new APIResponse<>(header, val));
+    APIResponseMetadata metadata = new APIResponseMetadata(ErrorCode.BAD_REQUEST, "Validation failed");
+    metadata.setTimestamp(LocalDateTime.now());
+    metadata.setTraceId(traceId());
+    return ResponseEntity.badRequest().body(new APIResponse<>(metadata, val));
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<APIResponse<Object>> handleAccessDenied(AccessDeniedException e) {
+    APIResponseMetadata metadata = new APIResponseMetadata(ErrorCode.FORBIDDEN, e.getMessage());
+    log.warn("Access denied: {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(new APIResponse<>(metadata, null));
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<APIResponse<Object>> handleGeneric(Exception ex) {
-    // log full stack with traceId
-    // logger.error("Unhandled", ex);
-    APIResponseMetadata header =
+    APIResponseMetadata metadata =
         new APIResponseMetadata(ErrorCode.INTERNAL_SERVER_ERROR, "Internal server error");
-    header.setTimestamp(LocalDateTime.now());
-    header.setTraceId(traceId());
+    metadata.setTimestamp(LocalDateTime.now());
+    metadata.setTraceId(traceId());
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(new APIResponse<>(header, null));
+        .body(new APIResponse<>(metadata, null));
   }
 }

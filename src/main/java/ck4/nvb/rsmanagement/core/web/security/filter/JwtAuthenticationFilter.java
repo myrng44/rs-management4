@@ -99,7 +99,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       // if token have storeId, lấy role cho specific store
       if (tokenUserRole.getStoreId() != null) {
         return userGetServiceWithRole.getUserSession(
-                tokenUserRole.getUserId(), tokenUserRole.getStoreId()).getUserRoles();
+                tokenUserRole.getUserId(), tokenUserRole.getStoreId());
       } else {
         // Otherwise lại lấy primary role
         return userGetServiceWithRole.get(tokenUserRole.getUserId());
@@ -115,11 +115,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     String path = request.getRequestURI();
 
     // Skip filter cho public endpoints
-    return path.contains("/auth/login") ||
-            path.contains("/auth/register") ||
-            path.contains("/auth/refresh") ||
-            path.contains("/public/") ||
-            path.contains("/health") ||
-            path.contains("/actuator/");
+    return path.equals("/public/rest/v1/auth/login")
+            || path.equals("/public/rest/v1/auth/register")
+            || path.equals("/public/rest/v1/auth/refresh")
+            || path.startsWith("/actuator/")
+            || path.equals("/health");
   }
 }

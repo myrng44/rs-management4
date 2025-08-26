@@ -3195,7 +3195,7 @@ class UserGetDto {
 }
 interface UserGetServiceWithRole << interface >> {
   + getAllUserRoles(Long): List<UserRoleDto>
-  + getUserSession(Long, Long): UserSessionDto
+  + getUserSession(Long, Long): UserRoleDto
   + getByUsername(String): UserRoleDto
   + getByUsernameAndPasswordAndStore(String, String, Long): UserRoleDto
   + getByUsernameAndPassword(String, String): UserRoleDto
@@ -3212,7 +3212,7 @@ class UserGetServiceWithRoleImpl {
   - getPrimaryUserRole(User): UserRoleDto
   + getAllUserRoles(Long): List<UserRoleDto>
   + getByUsernameAndPasswordAndStore(String, String, Long): UserRoleDto
-  + getUserSession(Long, Long): UserSessionDto
+  + getUserSession(Long, Long): UserRoleDto
   - buildUserRoleDto(UserRole, User): UserRoleDto
 }
 interface UserRepository << interface >> {

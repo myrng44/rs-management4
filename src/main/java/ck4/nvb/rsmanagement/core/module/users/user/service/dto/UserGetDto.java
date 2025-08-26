@@ -21,8 +21,6 @@ public class UserGetDto extends BaseUserDto {
 
   private Long storeId;
 
-  private boolean enabled;
-
   public UserGetDto(Long id) {
     setId(id);
   }

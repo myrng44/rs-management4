@@ -69,6 +69,8 @@ public class JwtTokenGenerator {
       userRoleDto.setRoleId(claims.get(CLAIM_ROLE_ID, Long.class));
       userRoleDto.setStoreId(claims.get(CLAIM_STORE_ID, Long.class));
 
+
+
       return userRoleDto;
     } catch (Exception e) {
       throw new AppException("Invalid token: " + e.getMessage());

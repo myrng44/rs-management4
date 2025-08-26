@@ -14,7 +14,6 @@ import ck4.nvb.rsmanagement.core.module.users.user.service.UserGetServiceWithRol
 import ck4.nvb.rsmanagement.core.module.users.userrole.domain.entity.UserRole;
 import ck4.nvb.rsmanagement.core.module.users.userrole.domain.repository.UserRoleRepository;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
-import ck4.nvb.rsmanagement.core.web.security.service.dto.UserSessionDto;
 import ck4.nvb.rsmanagement.core.web.util.CommonPasswordEncoder;
 import java.util.List;
 import java.util.Set;
@@ -85,7 +84,7 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
 
   @Override
   @Transactional(readOnly = true)
-  public UserSessionDto getUserSession(Long userId, Long storeId) throws AppException {
+  public UserRoleDto getUserSession(Long userId, Long storeId) throws AppException {
     User user =
         userRepository.findById(userId).orElseThrow(() -> new AppException("User not found"));
 
@@ -95,10 +94,7 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
             .filter(role -> role.getStoreId().equals(storeId))
             .findFirst()
             .orElseThrow(() -> new AppException("User has no role for this store"));
-
-    UserSessionDto session = new UserSessionDto(currentRole);
-    session.setUserRoles(currentRole);
-    return session;
+    return currentRole;
   }
 
   private User authenticateUser(String username, String password) throws AppException {
