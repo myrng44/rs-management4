@@ -42,8 +42,8 @@ public class UserRoleServiceImpl
     return keys;
   }
 
-  public UserRoleDto getFullInfoByUserIdAndRoleId(long userId, long roleId) {
-    UserRoleProjection projection = getRepository().findInfoByUserIdAndRoleId(userId, roleId);
+  public UserRoleDto getFullInfoByUserIdAndRoleId(long userId, long roleId, long storeId) {
+    UserRoleProjection projection = getRepository().findInfoByUserIdAndRoleId(userId, roleId, storeId);
     UserRoleDto response = new UserRoleDto();
     response.setUserId(projection.getUserId());
     response.setRoleId(projection.getRoleId());

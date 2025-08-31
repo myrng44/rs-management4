@@ -29,8 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtTokenGenerator jwtTokenGenerator;
   private final RSAKeyProperties rsaKeyProperties;
-  @Autowired
-  private UserGetServiceWithRoleImpl userGetServiceWithRole;
+  @Autowired private UserGetServiceWithRoleImpl userGetServiceWithRole;
 
   @Override
   protected void doFilterInternal(
@@ -64,8 +63,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private void authenticateUser(String token) throws AppException {
     // Lấy basic info từ token
-    UserRoleDto tokenUserRole = jwtTokenGenerator.getUserDetailsFromToken(
-            token, rsaKeyProperties.getPublicKey());
+    UserRoleDto tokenUserRole =
+        jwtTokenGenerator.getUserDetailsFromToken(token, rsaKeyProperties.getPublicKey());
 
     if (tokenUserRole.getUserId() == null) {
       throw new AppException("Invalid token");
@@ -75,8 +74,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     UserRoleDto fullUserRole = getUserRoleFromDatabase(tokenUserRole);
 
     // Create Spring Security authentication with permissions
-    List<SimpleGrantedAuthority> authorities = fullUserRole.getPermissions()
-            .stream()
+    List<SimpleGrantedAuthority> authorities =
+        fullUserRole.getPermissions().stream()
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
 
@@ -86,12 +85,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(fullUserRole, null, authorities);
+        new UsernamePasswordAuthenticationToken(fullUserRole, null, authorities);
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    log.debug("User {} authenticated with {} permissions at store {}",
-            fullUserRole.getUserName(), authorities.size(), fullUserRole.getStoreId());
+    log.debug(
+        "User {} authenticated with {} permissions at store {}",
+        fullUserRole.getUserName(),
+        authorities.size(),
+        fullUserRole.getStoreId());
   }
 
   private UserRoleDto getUserRoleFromDatabase(UserRoleDto tokenUserRole) throws AppException {
@@ -99,7 +101,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       // if token have storeId, lấy role cho specific store
       if (tokenUserRole.getStoreId() != null) {
         return userGetServiceWithRole.getUserSession(
-                tokenUserRole.getUserId(), tokenUserRole.getStoreId());
+            tokenUserRole.getUserId(), tokenUserRole.getStoreId());
       } else {
         // Otherwise lại lấy primary role
         return userGetServiceWithRole.get(tokenUserRole.getUserId());
@@ -116,9 +118,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // Skip filter cho public endpoints
     return path.equals("/public/rest/v1/auth/login")
-            || path.equals("/public/rest/v1/auth/register")
-            || path.equals("/public/rest/v1/auth/refresh")
-            || path.startsWith("/actuator/")
-            || path.equals("/health");
+        || path.equals("/public/rest/v1/auth/register")
+        || path.equals("/public/rest/v1/auth/refresh")
+        || path.startsWith("/actuator/")
+        || path.equals("/health");
   }
 }

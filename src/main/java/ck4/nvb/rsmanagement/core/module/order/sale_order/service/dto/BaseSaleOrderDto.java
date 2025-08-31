@@ -13,7 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BaseSaleOrderDto extends EntityDto<String> {
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long customerId;
-    private String note;
+  @JsonSerialize(using = ToStringSerializer.class)
+  private Long customerId;
+
+  private String note;
 }

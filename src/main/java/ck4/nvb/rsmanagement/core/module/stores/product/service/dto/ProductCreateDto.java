@@ -1,6 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.stores.product.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
+import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProductCreateDto extends BaseProductDto implements CreateInput<Product> {
+public class ProductCreateDto extends EntityDto<Long> implements CreateInput<Product> {
 
   private String sku;
   private String name;

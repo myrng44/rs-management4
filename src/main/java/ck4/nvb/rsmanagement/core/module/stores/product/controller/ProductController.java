@@ -1,6 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.stores.product.controller;
 
-import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.base.application.dto.FilterInput;
+import ck4.nvb.rsmanagement.base.web.controller.api.method.AuditedAPICrudMethod;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
@@ -12,19 +13,18 @@ import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.Permissio
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
+import java.util.List;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/products")
 @Getter
 public class ProductController
-    extends AuditedCrudController<
+    extends AuditedAPICrudMethod<
         ProductGetDto, Product, Long, UserGetDto, Long, ProductCreateDto, ProductUpdateDto> {
 
   @Autowired private IProductService productService;
@@ -61,17 +61,50 @@ public class ProductController
     return ResponseEntity.ok(getProductService().getRemainQuantity(productId, user.getStoreId()));
   }
 
-  @RequiredPermission(PermissionCode.VIEW_PRODUCT)
-  @GetMapping
   @Override
-  public APIListResponse<List<ProductGetDto>> getList(Authentication auth, List<String> query, String sort, int offset, int limit) {
+  @PostMapping
+  @RequiredPermission(PermissionCode.CREATE_PRODUCT)
+  public APIResponse<ProductGetDto> create(
+      Authentication auth, @RequestBody ProductCreateDto entity) {
+    return super.create(auth, entity);
+  }
+
+  @Override
+  @PutMapping("/{productId}")
+  @RequiredPermission(PermissionCode.UPDATE_PRODUCT)
+  public APIResponse<ProductGetDto> update(
+      Authentication auth, @PathVariable Long productId, @RequestBody ProductUpdateDto entity) {
+    return super.update(auth, productId, entity);
+  }
+
+  @Override
+  @DeleteMapping("/{productId}")
+  @RequiredPermission(PermissionCode.DELETE_PRODUCT)
+  public APIResponse<Void> delete(Authentication auth, @PathVariable Long productId) {
+    return super.delete(auth, productId);
+  }
+
+  @Override
+  @GetMapping
+  @RequiredPermission(PermissionCode.VIEW_PRODUCT)
+  public APIListResponse<List<ProductGetDto>> getList(
+      Authentication auth,
+      @RequestParam(required = false, name = "query") List<String> query,
+      @RequestParam(required = false, name = "sort") String sort,
+      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
+      @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
     return super.getList(auth, query, sort, offset, limit);
   }
 
-  @PostMapping
-  @RequiredPermission(PermissionCode.CREATE_PRODUCT)
   @Override
-  public APIResponse<ProductGetDto> create(Authentication auth, ProductCreateDto entity) {
-    return super.create(auth, entity);
+  @GetMapping("/{productId}")
+  @RequiredPermission(PermissionCode.VIEW_PRODUCT)
+  public APIResponse<ProductGetDto> getById(Authentication auth, @PathVariable Long productId) {
+    return super.getById(auth, productId);
+  }
+
+  @Override
+  public APIListResponse<List<ProductGetDto>> getList(Authentication auth, FilterInput request) {
+    return super.getList(auth, request);
   }
 }

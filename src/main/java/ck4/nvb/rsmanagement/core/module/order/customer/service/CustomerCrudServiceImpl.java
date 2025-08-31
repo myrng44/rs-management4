@@ -6,6 +6,8 @@ import ck4.nvb.rsmanagement.core.module.order.customer.domain.Customer;
 import ck4.nvb.rsmanagement.core.module.order.customer.domain.CustomerRepository;
 import ck4.nvb.rsmanagement.core.module.order.customer.service.dto.CustomerDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service("customerService")
 public class CustomerCrudServiceImpl
-    extends FullAuditedCrudServiceImpl<CustomerDto, Customer, Long, UserGetDto, Long> {
+    extends FullAuditedCrudServiceImpl<CustomerDto, Customer, Long, UserGetDto, Long> implements ICustomerService {
 
   protected CustomerCrudServiceImpl(CustomerRepository repository) {
     super(repository, Customer.class);
@@ -55,5 +57,10 @@ public class CustomerCrudServiceImpl
     keys.add("gender");
     keys.add("point");
     return keys;
+  }
+
+  @Override
+  public int getNumberOfNewCustomersOfInterval(LocalDateTime start, LocalDateTime end) {
+    return getRepository().countCustomerByDeletedIsFalseBetweenInterval(start, end);
   }
 }

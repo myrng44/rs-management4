@@ -135,7 +135,7 @@ public class AuthenticationController {
     UserRoleDto userRole = (UserRoleDto) authentication.getPrincipal();
 
     UserRoleDto response =
-        userRoleService.getFullInfoByUserIdAndRoleId(userRole.getUserId(), userRole.getRoleId());
+        userRoleService.getFullInfoByUserIdAndRoleId(userRole.getUserId(), userRole.getRoleId(), userRole.getStoreId());
 
     return ResponseEntity.ok(response);
   }

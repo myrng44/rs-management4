@@ -17,8 +17,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SaleOrderCreateDto extends BaseSaleOrderDto implements CreateInput<SaleOrder> {
 
-  @JsonSerialize(using = ToStringSerializer.class)
-  private Long storeId;
+/*  @JsonSerialize(using = ToStringSerializer.class)
+  private Long storeId;*/
 
   @NotEmpty private List<SaleLineDto> lines;
 
@@ -33,7 +33,6 @@ public class SaleOrderCreateDto extends BaseSaleOrderDto implements CreateInput<
     SaleOrder saleOrder = new SaleOrder();
     saleOrder.setCustomerId(getCustomerId());
     saleOrder.setNote(getNote());
-    saleOrder.setStoreId(storeId);
     saleOrder.setVoucherId(voucherId);
     saleOrder.setPaymentId(paymentId);
     return saleOrder;

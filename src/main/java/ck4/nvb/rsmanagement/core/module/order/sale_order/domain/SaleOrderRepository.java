@@ -8,7 +8,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository("orderRepository")
 public interface SaleOrderRepository extends BaseFullAuditedRepository<SaleOrder, String, Long> {
+
   int countOrdersByCreatedTimeBetween(LocalDateTime from, LocalDateTime to);
+
+  int countSaleOrdersByCreatedTimeBetweenAndStoreId(LocalDateTime from, LocalDateTime to, Long storeId);
 
   @Query(
       value =
@@ -19,6 +22,17 @@ public interface SaleOrderRepository extends BaseFullAuditedRepository<SaleOrder
 """,
       nativeQuery = true)
   long sumTotalFinalPriceBetween(LocalDateTime from, LocalDateTime to);
+
+  @Query(
+          value =
+                  """
+            SELECT SUM(so.final_price) AS revenue
+            FROM sale_order so
+            WHERE so.deleted=false
+                AND so.order_id=:orderId
+        """,
+          nativeQuery = true)
+  long sumTotalFinalPriceOfAStoreBetween(LocalDateTime from, LocalDateTime to, Long storeId);
 
   @Query(
       value =

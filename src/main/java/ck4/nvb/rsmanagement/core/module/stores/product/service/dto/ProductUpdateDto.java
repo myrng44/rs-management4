@@ -1,5 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.stores.product.service.dto;
 
+import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProductUpdateDto extends BaseProductDto implements UpdateInput<Product> {
+public class ProductUpdateDto extends EntityDto<Long> implements UpdateInput<Product> {
 
   private String sku;
   private String name;

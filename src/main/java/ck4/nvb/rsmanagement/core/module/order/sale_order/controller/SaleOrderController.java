@@ -1,6 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.controller;
 
-import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.base.application.dto.FilterInput;
+import ck4.nvb.rsmanagement.base.web.controller.api.method.AuditedAPICrudMethod;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
@@ -11,9 +12,13 @@ import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleOrderServi
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.OrderFulfillmentService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.*;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
+import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
+import ck4.nvb.rsmanagement.core.module.users.role.domain.entity.RoleName;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import java.util.List;
+
+import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -22,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/orders")
 public class SaleOrderController
-    extends AuditedCrudController<
+    extends AuditedAPICrudMethod<
         SaleOrderGetFullDto,
         SaleOrder,
         String,
@@ -55,22 +60,41 @@ public class SaleOrderController
       UserGetDto userGetDto = new UserGetDto();
       userGetDto.setId(userRoleDto.getUserId());
       userGetDto.setUserName(userRoleDto.getUserName());
+      userGetDto.setStoreId(userRoleDto.getStoreId());
+      userGetDto.setRoleName(userRoleDto.getRoleName());
       return userGetDto;
     }
     return null;
   }
 
-  @GetMapping("/most")
-  public List<ProductGetDto> getMostSoldProductsLastDay(
+  @GetMapping("/most-products")
+  @RequiredPermission(PermissionCode.VIEW_STORE_REPORT)
+  public List<ProductGetDto.WithSales> getMostSoldProductsLastDay(
       Authentication auth, @RequestParam int days, @RequestParam int noProducts) {
     UserGetDto user = extractUser(auth);
 
-    return saleLineService.getMostSoldProductsLastDay(days, noProducts);
+    if (user.getRoleName().equals(RoleName.SYSADMIN.getName()) ||
+    user.getRoleName().equals(RoleName.ADMIN.getName())) {
+      return saleLineService.getMostSoldProductsLastDay(days, noProducts);
+    } else {
+      return saleLineService.getMostSoldProductsLastDayOfAStore(days, noProducts, user.getStoreId());
+    }
+  }
+
+  @GetMapping("/{storeId}/most-products")
+  public List<ProductGetDto.WithSales> getMostSoldProductsLastDay(
+          Authentication auth, @PathVariable Long storeId, @RequestParam int days, @RequestParam int noProducts
+  ) {
+    UserGetDto user = extractUser(auth);
+
+    return saleLineService.getMostSoldProductsLastDayOfAStore(days, noProducts, storeId);
   }
 
   @PostMapping
+  @RequiredPermission(PermissionCode.CREATE_ORDER)
   @Override
-  public APIResponse<SaleOrderGetFullDto> create(Authentication auth, SaleOrderCreateDto entity) {
+  public APIResponse<SaleOrderGetFullDto> create(
+      Authentication auth, @RequestBody SaleOrderCreateDto entity) {
     UserGetDto user = extractUser(auth);
 
     SaleOrderGetFullDto output = getService().create(entity, user);
@@ -78,19 +102,56 @@ public class SaleOrderController
     return APIResponseBuilder.success(output, "create order success.");
   }
 
+  @PutMapping("/{orderId}")
+  @RequiredPermission(PermissionCode.UPDATE_ORDER)
+  @Override
+  public APIResponse<SaleOrderGetFullDto> update(
+      Authentication auth, @PathVariable String orderId, @RequestBody SaleOrderUpdateDto entity) {
+    return super.update(auth, orderId, entity);
+  }
+
+  @DeleteMapping("/{orderId}")
+  @RequiredPermission(PermissionCode.UPDATE_ORDER)
+  @Override
+  public APIResponse<Void> delete(Authentication auth, @PathVariable String orderId) {
+    return super.delete(auth, orderId);
+  }
+
+  @GetMapping
+  @RequiredPermission(PermissionCode.VIEW_ORDER)
+  @Override
+  public APIListResponse<List<SaleOrderGetFullDto>> getList(
+      Authentication auth,
+      @RequestParam(required = false, name = "query") List<String> query,
+      @RequestParam(required = false, name = "sort") String sort,
+      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
+      @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
+    return super.getList(auth, query, sort, offset, limit);
+  }
+
+  @GetMapping("/{orderId}")
+  @RequiredPermission(PermissionCode.VIEW_ORDER)
+  @Override
+  public APIResponse<SaleOrderGetFullDto> getById(
+      Authentication auth, @PathVariable String orderId) {
+    return super.getById(auth, orderId);
+  }
+
+  @Override
+  public APIListResponse<List<SaleOrderGetFullDto>> getList(
+      Authentication auth, FilterInput request) {
+    return super.getList(auth, request);
+  }
+
   // ===== FULFILLMENT ENDPOINTS =====
 
-  /**
-   * Get fulfillment status of an order
-   * GET /orders/{orderId}/fulfillment/status
-   */
+  /** Get fulfillment status of an order GET /orders/{orderId}/fulfillment/status */
   @GetMapping("/{orderId}/fulfillment/status")
   public APIResponse<OrderFulfillmentStatusDto> getFulfillmentStatus(
-          Authentication auth,
-          @PathVariable String orderId) {
+      Authentication auth, @PathVariable String orderId) {
 
     OrderFulfillmentService.OrderFulfillmentStatus status =
-            fulfillmentService.getOrderFulfillmentStatus(orderId);
+        fulfillmentService.getOrderFulfillmentStatus(orderId);
 
     OrderFulfillmentStatusDto statusDto = new OrderFulfillmentStatusDto();
     statusDto.setOrderId(orderId);
@@ -100,27 +161,18 @@ public class SaleOrderController
     return APIResponseBuilder.ok(statusDto);
   }
 
-  /**
-   * Get detailed allocation information for an order
-   * GET /orders/{orderId}/allocations
-   */
+  /** Get detailed allocation information for an order GET /orders/{orderId}/allocations */
   @GetMapping("/{orderId}/allocations")
   public APIListResponse<List<SaleAllocationDto>> getOrderAllocations(
-          Authentication auth,
-          @PathVariable String orderId) {
+      Authentication auth, @PathVariable String orderId) {
 
     List<SaleAllocationDto> allocations = fulfillmentService.getOrderAllocationDetails(orderId);
     return APIResponseBuilder.successList(allocations, 0, 10, allocations.size(), "allocations");
   }
 
-  /**
-   * Pick all items for an order
-   * POST /orders/{orderId}/fulfillment/pick
-   */
+  /** Pick all items for an order POST /orders/{orderId}/fulfillment/pick */
   @PostMapping("/{orderId}/fulfillment/pick")
-  public APIResponse<String> pickOrderItems(
-          Authentication auth,
-          @PathVariable String orderId) {
+  public APIResponse<String> pickOrderItems(Authentication auth, @PathVariable String orderId) {
 
     UserGetDto user = extractUser(auth);
 
@@ -128,8 +180,10 @@ public class SaleOrderController
     try {
       // This is a simplified approach - pick all lines at once
       // In reality, you might want to pick line by line
-      List<SaleLineGetDto> saleLines = saleLineService.getAll(
-              List.of(new ck4.nvb.rsmanagement.base.web.utils.SearchCriteria(
+      List<SaleLineGetDto> saleLines =
+          saleLineService.getAll(
+              List.of(
+                  new ck4.nvb.rsmanagement.base.web.utils.SearchCriteria(
                       "saleOrderId",
                       ck4.nvb.rsmanagement.base.web.utils.SearchOperator.EQUALS,
                       orderId)));
@@ -138,107 +192,108 @@ public class SaleOrderController
         fulfillmentService.pickItemsForSaleLine(saleLine.getId(), user);
       }
 
-      return APIResponseBuilder.success("Order items picked successfully",
-              "All items for order " + orderId + " have been picked.");
+      return APIResponseBuilder.success(
+          "Order items picked successfully",
+          "All items for order " + orderId + " have been picked.");
 
     } catch (Exception e) {
-      return APIResponseBuilder.error(ErrorCode.INTERNAL_SERVER_ERROR,"Failed to pick order items: " + e.getMessage());
+      return APIResponseBuilder.error(
+          ErrorCode.INTERNAL_SERVER_ERROR, "Failed to pick order items: " + e.getMessage());
     }
   }
 
-  /**
-   * Pick specific quantity from a sale line
-   * POST /orders/lines/{saleLineId}/pick
-   */
+  /** Pick specific quantity from a sale line POST /orders/lines/{saleLineId}/pick */
   @PostMapping("/lines/{saleLineId}/pick")
   public APIResponse<String> pickSaleLineItems(
-          Authentication auth,
-          @PathVariable Long saleLineId,
-          @RequestBody PickItemsRequestDto request) {
+      Authentication auth,
+      @PathVariable Long saleLineId,
+      @RequestBody PickItemsRequestDto request) {
 
     UserGetDto user = extractUser(auth);
 
     try {
       if (request.getQtyToPick() != null) {
-        // Partial pick - this would require more complex logic to determine which allocation to pick from
-        return APIResponseBuilder.error(ErrorCode.INTERNAL_SERVER_ERROR,"Partial picking not yet implemented. Use full pick instead.");
+        // Partial pick - this would require more complex logic to determine which allocation to
+        // pick from
+        return APIResponseBuilder.error(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            "Partial picking not yet implemented. Use full pick instead.");
       } else {
         // Full pick
         fulfillmentService.pickItemsForSaleLine(saleLineId, user);
-        return APIResponseBuilder.success("Sale line items picked successfully",
-                "All items for sale line " + saleLineId + " have been picked.");
+        return APIResponseBuilder.success(
+            "Sale line items picked successfully",
+            "All items for sale line " + saleLineId + " have been picked.");
       }
     } catch (Exception e) {
-      return APIResponseBuilder.error(ErrorCode.INTERNAL_SERVER_ERROR,"Failed to pick sale line items: " + e.getMessage());
+      return APIResponseBuilder.error(
+          ErrorCode.INTERNAL_SERVER_ERROR, "Failed to pick sale line items: " + e.getMessage());
     }
   }
 
-  /**
-   * Complete order fulfillment (finalize and ship)
-   * POST /orders/{orderId}/fulfillment/complete
-   */
+  /** Complete order fulfillment (finalize and ship) POST /orders/{orderId}/fulfillment/complete */
   @PostMapping("/{orderId}/fulfillment/complete")
   public APIResponse<String> completeOrderFulfillment(
-          Authentication auth,
-          @PathVariable String orderId) {
+      Authentication auth, @PathVariable String orderId) {
 
     UserGetDto user = extractUser(auth);
 
     try {
       // Check if order is ready to be completed
       if (!fulfillmentService.canFulfillOrder(orderId)) {
-        return APIResponseBuilder.error(ErrorCode.INTERNAL_SERVER_ERROR,"Order cannot be completed. Some items are not yet picked.");
+        return APIResponseBuilder.error(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            "Order cannot be completed. Some items are not yet picked.");
       }
 
       fulfillmentService.completeOrderFulfillment(orderId, user);
-      return APIResponseBuilder.success("Order fulfillment completed",
-              "Order " + orderId + " has been completed and inventory updated.");
+      return APIResponseBuilder.success(
+          "Order fulfillment completed",
+          "Order " + orderId + " has been completed and inventory updated.");
 
     } catch (Exception e) {
-      return APIResponseBuilder.error(ErrorCode.INTERNAL_SERVER_ERROR,"Failed to complete order fulfillment: " + e.getMessage());
+      return APIResponseBuilder.error(
+          ErrorCode.INTERNAL_SERVER_ERROR,
+          "Failed to complete order fulfillment: " + e.getMessage());
     }
   }
 
-  /**
-   * Cancel an order (release allocated inventory)
-   * POST /orders/{orderId}/fulfillment/cancel
-   */
+  /** Cancel an order (release allocated inventory) POST /orders/{orderId}/fulfillment/cancel */
   @PostMapping("/{orderId}/fulfillment/cancel")
-  public APIResponse<String> cancelOrder(
-          Authentication auth,
-          @PathVariable String orderId) {
+  public APIResponse<String> cancelOrder(Authentication auth, @PathVariable String orderId) {
 
     UserGetDto user = extractUser(auth);
 
     try {
       fulfillmentService.cancelOrder(orderId, user);
-      return APIResponseBuilder.success("Order cancelled successfully",
-              "Order " + orderId + " has been cancelled and inventory released.");
+      return APIResponseBuilder.success(
+          "Order cancelled successfully",
+          "Order " + orderId + " has been cancelled and inventory released.");
 
     } catch (Exception e) {
-      return APIResponseBuilder.error(ErrorCode.INTERNAL_SERVER_ERROR,"Failed to cancel order: " + e.getMessage());
+      return APIResponseBuilder.error(
+          ErrorCode.INTERNAL_SERVER_ERROR, "Failed to cancel order: " + e.getMessage());
     }
   }
 
-  /**
-   * Partial pick from specific allocation
-   * POST /allocations/{allocationId}/pick
-   */
+  /** Partial pick from specific allocation POST /allocations/{allocationId}/pick */
   @PostMapping("/allocations/{allocationId}/pick")
   public APIResponse<String> partialPickFromAllocation(
-          Authentication auth,
-          @PathVariable Long allocationId,
-          @RequestBody PartialPickRequestDto request) {
+      Authentication auth,
+      @PathVariable Long allocationId,
+      @RequestBody PartialPickRequestDto request) {
 
     UserGetDto user = extractUser(auth);
 
     try {
       fulfillmentService.partialPick(allocationId, request.getQtyToPick(), user);
-      return APIResponseBuilder.success("Partial pick completed",
-              "Picked " + request.getQtyToPick() + " items from allocation " + allocationId);
+      return APIResponseBuilder.success(
+          "Partial pick completed",
+          "Picked " + request.getQtyToPick() + " items from allocation " + allocationId);
 
     } catch (Exception e) {
-      return APIResponseBuilder.error(ErrorCode.INTERNAL_SERVER_ERROR,"Failed to partial pick: " + e.getMessage());
+      return APIResponseBuilder.error(
+          ErrorCode.INTERNAL_SERVER_ERROR, "Failed to partial pick: " + e.getMessage());
     }
   }
 }

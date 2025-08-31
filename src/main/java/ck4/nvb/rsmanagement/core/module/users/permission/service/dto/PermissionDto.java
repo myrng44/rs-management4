@@ -10,7 +10,8 @@ import org.modelmapper.ModelMapper;
 
 @Getter
 @Setter
-public class PermissionDto extends EntityDto<Long> implements CreateInput<Permission>, UpdateInput<Permission> {
+public class PermissionDto extends EntityDto<Long>
+    implements CreateInput<Permission>, UpdateInput<Permission> {
   private String code;
   private String desc;
 

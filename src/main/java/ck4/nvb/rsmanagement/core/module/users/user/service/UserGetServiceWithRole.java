@@ -32,6 +32,5 @@ public interface UserGetServiceWithRole {
   public boolean hasAccessToStore(Long userId, Long storeId) throws AppException;
 
   public boolean hasPermissionAtStore(Long userId, Long storeId, PermissionCode permission)
-          throws AppException;
-
+      throws AppException;
 }

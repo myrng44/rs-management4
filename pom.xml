@@ -127,6 +127,18 @@
             <version>5.1.0</version>
         </dependency>
 
+        <!-- ==============================ELASTIC SEARCH================================= -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/co.elastic.clients/elasticsearch-java -->
+        <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-java</artifactId>
+            <version>9.0.0</version>
+        </dependency>
+
         <!-- ===============================FLYWAY (database's version control)================================= -->
         <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
         <dependency>

@@ -5,7 +5,6 @@ import ck4.nvb.rsmanagement.core.module.users.role.service.dto.UserRoleProjectio
 import ck4.nvb.rsmanagement.core.module.users.userrole.domain.entity.UserRole;
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -15,11 +14,14 @@ public interface UserRoleRepository extends BaseFullAuditedRepository<UserRole, 
 
   List<UserRole> findByUserIdAndStoreId(Long userId, Long storeId);
 
-  @Query(value = """
+  @Query(
+      value =
+          """
     SELECT usr.id
     FROM user_role usr
     WHERE usr.store_id=:storeId AND usr.user_id=:userId
-""", nativeQuery = true)
+""",
+      nativeQuery = true)
   Set<Long> findRoleIdsByUserIdAndStoreId(Long userId, Long storeId);
 
   Set<Long> findStoreIdsByUserId(Long userId);
@@ -46,9 +48,9 @@ public interface UserRoleRepository extends BaseFullAuditedRepository<UserRole, 
     JOIN role r ON ur.role_id = r.id
     LEFT JOIN role_permission rp ON r.id = rp.role_id
     LEFT JOIN permission p ON rp.permission_id = p.id
-    WHERE ur.user_id = :userId AND ur.role_id = :roleId
+    WHERE ur.user_id = :userId AND ur.role_id = :roleId AND ur.store_id = :storeId
     GROUP BY ur.user_id, ur.role_id, ur.store_id, u.username, u.full_name, u.email, u.phone, r.name
     """,
       nativeQuery = true)
-  UserRoleProjection findInfoByUserIdAndRoleId(Long userId, Long roleId);
+  UserRoleProjection findInfoByUserIdAndRoleId(Long userId, Long roleId, Long storeId);
 }

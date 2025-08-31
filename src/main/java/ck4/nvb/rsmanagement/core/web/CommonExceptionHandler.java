@@ -53,7 +53,8 @@ public class CommonExceptionHandler {
     }
 
     ValidationErrorResponse val = new ValidationErrorResponse(fieldErrors);
-    APIResponseMetadata metadata = new APIResponseMetadata(ErrorCode.BAD_REQUEST, "Validation failed");
+    APIResponseMetadata metadata =
+        new APIResponseMetadata(ErrorCode.BAD_REQUEST, "Validation failed");
     metadata.setTimestamp(LocalDateTime.now());
     metadata.setTraceId(traceId());
     return ResponseEntity.badRequest().body(new APIResponse<>(metadata, val));
@@ -63,8 +64,7 @@ public class CommonExceptionHandler {
   public ResponseEntity<APIResponse<Object>> handleAccessDenied(AccessDeniedException e) {
     APIResponseMetadata metadata = new APIResponseMetadata(ErrorCode.FORBIDDEN, e.getMessage());
     log.warn("Access denied: {}", e.getMessage());
-    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            .body(new APIResponse<>(metadata, null));
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new APIResponse<>(metadata, null));
   }
 
   @ExceptionHandler(Exception.class)

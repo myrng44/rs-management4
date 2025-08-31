@@ -21,6 +21,8 @@ public class UserGetDto extends BaseUserDto {
 
   private Long storeId;
 
+  private String roleName;
+
   public UserGetDto(Long id) {
     setId(id);
   }

@@ -14,63 +14,65 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("storeTransferService")
-public class StoreTransferServiceImpl extends FullAuditedCrudServiceImpl<StoreTransferDto, StoreTransfer, Long, UserGetDto, Long> implements IStoreTransferService {
+public class StoreTransferServiceImpl
+    extends FullAuditedCrudServiceImpl<StoreTransferDto, StoreTransfer, Long, UserGetDto, Long>
+    implements IStoreTransferService {
 
-    protected StoreTransferServiceImpl(StoreTransferRepository storeTransferRepository) {
-        super(storeTransferRepository, StoreTransfer.class);
+  protected StoreTransferServiceImpl(StoreTransferRepository storeTransferRepository) {
+    super(storeTransferRepository, StoreTransfer.class);
+  }
+
+  @Autowired private IStoreTransferItemService storeTransferItemService;
+
+  @Autowired private ModelMapper modelMapper;
+
+  @Override
+  public StoreTransferRepository getRepository() {
+    return (StoreTransferRepository) super.getRepository();
+  }
+
+  @Override
+  public StoreTransferDto mapToEntityDto(StoreTransfer entity) {
+    return modelMapper.map(entity, StoreTransferDto.class);
+  }
+
+  @Override
+  public StoreTransfer mapToEntity(CreateInput<StoreTransfer> createDto, UserGetDto user) {
+    StoreTransfer storeTransfer = super.mapToEntity(createDto, user);
+    StoreTransfer entity = createDto.mapToEntity();
+    storeTransfer.setFromStoreId(entity.getFromStoreId());
+    storeTransfer.setToStoreId(entity.getToStoreId());
+    storeTransfer.setTransferDate(entity.getTransferDate());
+    storeTransfer.setStatus(entity.getStatus());
+    return storeTransfer;
+  }
+
+  @Override
+  public StoreTransferDto create(CreateInput<StoreTransfer> createDto, UserGetDto user)
+      throws AppException {
+    if (createDto instanceof StoreTransferDto) {
+      return create((StoreTransferDto) createDto, user);
+    }
+    return super.create(createDto, user);
+  }
+
+  private StoreTransferDto create(StoreTransferDto createDto, UserGetDto user) {
+    super.checkCreatePermission(createDto, user);
+
+    StoreTransfer storeTransfer = mapToEntity(createDto, user);
+
+    if (storeTransfer.getId() != null && exists(storeTransfer.getId())) {
+      getLogger().error("Duplicate id {}", storeTransfer.getId());
+      throw new DuplicateIdentifierException("Duplicate identifier " + storeTransfer.getId());
     }
 
-    @Autowired private IStoreTransferItemService storeTransferItemService;
+    storeTransfer = getRepository().save(storeTransfer);
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @Override
-    public StoreTransferRepository getRepository() {
-        return (StoreTransferRepository) super.getRepository();
+    for (StoreTransferItemDto storeTransferItemDto : createDto.getItems()) {
+      storeTransferItemDto.setTransferId(storeTransfer.getId());
+      storeTransferItemService.create(storeTransferItemDto, user);
     }
 
-    @Override
-    public StoreTransferDto mapToEntityDto(StoreTransfer entity) {
-        return modelMapper.map(entity, StoreTransferDto.class);
-    }
-
-    @Override
-    public StoreTransfer mapToEntity(CreateInput<StoreTransfer> createDto, UserGetDto user) {
-        StoreTransfer storeTransfer = super.mapToEntity(createDto, user);
-        StoreTransfer entity = createDto.mapToEntity();
-        storeTransfer.setFromStoreId(entity.getFromStoreId());
-        storeTransfer.setToStoreId(entity.getToStoreId());
-        storeTransfer.setTransferDate(entity.getTransferDate());
-        storeTransfer.setStatus(entity.getStatus());
-        return storeTransfer;
-    }
-
-    @Override
-    public StoreTransferDto create(CreateInput<StoreTransfer> createDto, UserGetDto user) throws AppException {
-        if (createDto instanceof StoreTransferDto) {
-            return create((StoreTransferDto) createDto, user);
-        }
-        return super.create(createDto, user);
-    }
-
-    private StoreTransferDto create(StoreTransferDto createDto, UserGetDto user) {
-        super.checkCreatePermission(createDto, user);
-
-        StoreTransfer storeTransfer = mapToEntity(createDto, user);
-
-        if (storeTransfer.getId() != null && exists(storeTransfer.getId())) {
-            getLogger().error("Duplicate id {}", storeTransfer.getId());
-            throw new DuplicateIdentifierException("Duplicate identifier " + storeTransfer.getId());
-        }
-
-        storeTransfer = getRepository().save(storeTransfer);
-
-        for (StoreTransferItemDto storeTransferItemDto : createDto.getItems()) {
-            storeTransferItemDto.setTransferId(storeTransfer.getId());
-            storeTransferItemService.create(storeTransferItemDto, user);
-        }
-
-        return mapToEntityDto(storeTransfer);
-    }
+    return mapToEntityDto(storeTransfer);
+  }
 }

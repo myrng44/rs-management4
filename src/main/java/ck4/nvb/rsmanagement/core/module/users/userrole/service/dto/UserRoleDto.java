@@ -1,10 +1,8 @@
 package ck4.nvb.rsmanagement.core.module.users.userrole.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
-import java.util.List;
-
-import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.Permission;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

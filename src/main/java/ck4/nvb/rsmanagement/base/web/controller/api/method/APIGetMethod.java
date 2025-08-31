@@ -1,4 +1,4 @@
-package ck4.nvb.rsmanagement.base.web.controller;
+package ck4.nvb.rsmanagement.base.web.controller.api.method;
 
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.base.application.dto.FilterInput;
@@ -14,47 +14,25 @@ import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteriaParser;
 import java.io.Serializable;
 import java.util.List;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
-public class GetController<
+@Getter
+public class APIGetMethod<
     D extends EntityDto<ID>, T extends IEntity<ID>, ID extends Comparable<ID> & Serializable> {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  public Logger getLogger() {
-    return logger;
-  }
-
   private final GetService<D, T, ID> service;
 
-  protected GetController(GetService<D, T, ID> service) {
+  protected APIGetMethod(GetService<D, T, ID> service) {
     this.service = service;
   }
 
-  public GetService<D, T, ID> getService() {
-    return service;
-  }
-
-  @GetMapping
   public ResponseEntity<APIListResponse<List<D>>> getList(
-      @RequestParam(required = false, name = "query") List<String> query,
-      @RequestParam(required = false, name = "sort") String sort,
-      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
-      @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
-    /*    if (query != null) {
-      List<SearchCriteria> params = SearchCriteriaParser.parse(query);
-      if (params.isEmpty()) {
-        return getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort));
-      }
-
-      return getService().getPage(params, new PagedAndSortedResultRequestDto(offset, limit, sort));
-    }
-    return getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort));*/
+      List<String> query, String sort, int offset, int limit) {
     PagedAndSortedResultRequestDto paging = new PagedAndSortedResultRequestDto(offset, limit, sort);
     PagedResultDto<D> page;
     if (query != null) {
@@ -68,8 +46,7 @@ public class GetController<
     return ResponseEntity.ok(resp);
   }
 
-  @GetMapping("/{id}")
-  public APIResponse<D> getById(@PathVariable ID id) {
+  public APIResponse<D> getById(ID id) {
     D output = getService().get(id);
     if (output == null) {
       throw new ObjectNotFoundException("Object not found. Invalid ID: " + id);

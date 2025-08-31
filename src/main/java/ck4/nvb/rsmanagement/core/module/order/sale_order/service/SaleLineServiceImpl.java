@@ -9,7 +9,6 @@ import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleLineReposito
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineDto;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineGetDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
-import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.ProductServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
@@ -46,12 +45,12 @@ public class SaleLineServiceImpl
 
     Product product = productService.getEntity(entity.getProductId());
     // snapshot
-    dto.setUnitPrice(product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
+    dto.setUnitPrice(
+        product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
     dto.setProductId(product.getId());
     dto.setProductName(product.getName());
 
     dto.setQtyOrdered(entity.getQtyOrdered());
-
 
     Long totalPrice = (long) entity.getQtyOrdered() * entity.getUnitPrice();
     dto.setTotalPrice(totalPrice);
@@ -59,15 +58,9 @@ public class SaleLineServiceImpl
     return dto;
   }
 
-/*  @Override
-  protected SaleLineGetDto createEntity(SaleLine entity) {
-    Product product = productService.getEntity(entity.getProductId());
-    entity.setUnitPrice(product.getUnitPrice());
-    return super.createEntity(entity);
-  }*/
-
   @Override
-  public SaleLineGetDto create(CreateInput<SaleLine> createDto, UserGetDto user) throws AppException {
+  public SaleLineGetDto create(CreateInput<SaleLine> createDto, UserGetDto user)
+      throws AppException {
     if (createDto instanceof SaleLineDto) {
       Product product = productService.getEntity(((SaleLineDto) createDto).getProductId());
       ((SaleLineDto) createDto).setUnitPrice(product.getUnitPrice());
@@ -91,12 +84,38 @@ public class SaleLineServiceImpl
   }
 
   @Override
-  public List<ProductGetDto> getMostSoldProductsLastDay(int days, int noProducts)
+  public List<ProductGetDto.WithSales> getMostSoldProductsLastDay(int days, int noProducts)
       throws AppException {
     LocalDateTime end = LocalDateTime.now();
     LocalDateTime start = end.minusDays(days);
 
-    return productService.mapToGetListOutputDto(
-        getRepository().findMostSoldProductsOfInterval(start, end, noProducts));
+    List<Map<String, Object>> results = getRepository().findMostSoldProductsOfIntervalWithQty(start, end, noProducts);
+
+
+    return getWithSales(results);
+  }
+
+  private List<ProductGetDto.WithSales> getWithSales(List<Map<String, Object>> results) {
+    return results.stream()
+            .map(row -> new ProductGetDto.WithSales(
+                    ((Number) row.get("id")).longValue(),
+                    (String) row.get("sku"),
+                    (String) row.get("name"),
+                    (String) row.get("desc"),
+                    ((Number) row.get("unitPrice")).intValue(),
+                    row.get("categoryId") != null ? ((Number) row.get("categoryId")).longValue() : null,
+                    ((Number) row.get("totalQuantitySold")).longValue()
+            ))
+            .toList();
+  }
+
+  @Override
+  public List<ProductGetDto.WithSales> getMostSoldProductsLastDayOfAStore(int days, int noProducts, Long storeId) {
+    LocalDateTime end = LocalDateTime.now();
+    LocalDateTime start = end.minusDays(days);
+
+    List<Map<String, Object>> results = getRepository().findMostSoldProductsOfIntervalWithQtyOfAStore(start, end, noProducts, storeId);
+
+    return getWithSales(results);
   }
 }

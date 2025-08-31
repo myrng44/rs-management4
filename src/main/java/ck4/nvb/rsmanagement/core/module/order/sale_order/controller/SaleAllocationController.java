@@ -1,6 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.controller;
 
-import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.base.web.controller.api.method.AuditedAPICrudMethod;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleAllocation;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleAllocationService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleAllocationDto;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/sale-allocation")
 public class SaleAllocationController
-    extends AuditedCrudController<
+    extends AuditedAPICrudMethod<
         SaleAllocationDto,
         SaleAllocation,
         Long,

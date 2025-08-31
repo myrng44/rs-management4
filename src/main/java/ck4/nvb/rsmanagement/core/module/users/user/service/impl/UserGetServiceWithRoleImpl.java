@@ -113,29 +113,23 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
     return user;
   }
 
-  /**
-   * Lấy tất cả stores mà user có quyền truy cập
-   */
+  /** Lấy tất cả stores mà user có quyền truy cập */
   @Transactional(readOnly = true)
   public Set<Long> getUserAccessibleStores(Long userId) throws AppException {
     User user = findUserById(userId);
     return userRoleRepository.findStoreIdsByUserId(userId);
   }
 
-  /**
-   * Kiểm tra xem user có quyền truy cập store không
-   */
+  /** Kiểm tra xem user có quyền truy cập store không */
   @Transactional(readOnly = true)
   public boolean hasAccessToStore(Long userId, Long storeId) throws AppException {
     return getUserAccessibleStores(userId).contains(storeId);
   }
 
-  /**
-   * Kiểm tra xem user có permission cụ thể ở store không
-   */
+  /** Kiểm tra xem user có permission cụ thể ở store không */
   @Transactional(readOnly = true)
   public boolean hasPermissionAtStore(Long userId, Long storeId, PermissionCode permission)
-          throws AppException {
+      throws AppException {
     try {
       UserRoleDto userRole = getUserRoleForStore(findUserById(userId), storeId);
       return userRole.getPermissions().contains(permission.getCode());
@@ -167,16 +161,18 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
   }
 
   private UserRoleDto findUserRoleForStore(List<UserRoleDto> roles, Long storeId)
-          throws AppException {
+      throws AppException {
     return roles.stream()
-            .filter(role -> role.getStoreId().equals(storeId))
-            .findFirst()
-            .orElseThrow(() -> new AppException("User has no role for store ID: " + storeId));
+        .filter(role -> role.getStoreId().equals(storeId))
+        .findFirst()
+        .orElseThrow(() -> new AppException("User has no role for store ID: " + storeId));
   }
 
   private UserRoleDto buildUserRoleDto(UserRole userRole, User user) throws AppException {
     // Lấy thông tin role
-    Role role = roleRepository.findById(userRole.getRoleId())
+    Role role =
+        roleRepository
+            .findById(userRole.getRoleId())
             .orElseThrow(() -> new AppException("Role not found with ID: " + userRole.getRoleId()));
 
     // Lấy permissions cho role
@@ -199,10 +195,7 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
 
     // permissions
     userRoleDto.setPermissions(
-            permissions.stream()
-                    .map(PermissionCode::getCode)
-                    .collect(Collectors.toList())
-    );
+        permissions.stream().map(PermissionCode::getCode).collect(Collectors.toList()));
 
     return userRoleDto;
   }
@@ -216,30 +209,33 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
   }
 
   private User findUserById(Long userId) throws AppException {
-    return userRepository.findById(userId)
-            .orElseThrow(() -> new AppException("User not found with ID: " + userId));
+    return userRepository
+        .findById(userId)
+        .orElseThrow(() -> new AppException("User not found with ID: " + userId));
   }
 
   private User findUserByUsername(String username) throws AppException {
-    return userRepository.findByUsername(username)
-            .orElseThrow(() -> new AppException("User not found with username: " + username));
+    return userRepository
+        .findByUsername(username)
+        .orElseThrow(() -> new AppException("User not found with username: " + username));
   }
 
   private List<PermissionCode> getPermissionsForRole(Long roleId) throws AppException {
     List<RolePermission> rolePermissions = rolePermissionRepository.findByRoleId(roleId);
 
     return rolePermissions.stream()
-            .map(rp -> {
+        .map(
+            rp -> {
               try {
-                Permission permission = permissionRepository.findById(rp.getPermissionId())
-                        .orElse(null);
+                Permission permission =
+                    permissionRepository.findById(rp.getPermissionId()).orElse(null);
                 return permission != null ? permission.getCode() : null;
               } catch (Exception e) {
                 log.warn("Error fetching permission with ID: {}", rp.getPermissionId(), e);
                 return null;
               }
             })
-            .filter(code -> code != null)
-            .collect(Collectors.toList());
+        .filter(code -> code != null)
+        .collect(Collectors.toList());
   }
 }

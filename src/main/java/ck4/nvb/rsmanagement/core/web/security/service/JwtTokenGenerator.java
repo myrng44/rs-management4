@@ -49,11 +49,7 @@ public class JwtTokenGenerator {
 
   private Claims parseClaims(String token, PublicKey publicKey) throws JwtException {
     try {
-      return Jwts.parser()
-              .verifyWith(publicKey)
-              .build()
-              .parseSignedClaims(token)
-              .getPayload();
+      return Jwts.parser().verifyWith(publicKey).build().parseSignedClaims(token).getPayload();
     } catch (JwtException e) {
       throw e;
     }
@@ -68,8 +64,6 @@ public class JwtTokenGenerator {
       userRoleDto.setUserId(Long.valueOf(claims.getSubject()));
       userRoleDto.setRoleId(claims.get(CLAIM_ROLE_ID, Long.class));
       userRoleDto.setStoreId(claims.get(CLAIM_STORE_ID, Long.class));
-
-
 
       return userRoleDto;
     } catch (Exception e) {

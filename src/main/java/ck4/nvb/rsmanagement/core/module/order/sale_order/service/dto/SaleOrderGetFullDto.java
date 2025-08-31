@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DTO detail cho SaleOrder - chứa toàn bộ thông tin của 1 order , bao gồm cả chi tiết các sale line.
+ * DTO detail cho SaleOrder - chứa toàn bộ thông tin của 1 order , bao gồm cả chi tiết các sale
+ * line.
  */
 @Getter
 @Setter

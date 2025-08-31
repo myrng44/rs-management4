@@ -5,6 +5,8 @@ import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStockRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockDto;
+import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockGetDto;
+import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.InventorySummaryDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import java.util.List;
 import java.util.Map;
@@ -59,5 +61,9 @@ public class BatchStockServiceImpl
     keys.add("startDate");
     keys.add("deliveryDate");
     return keys;
+  }
+
+  public List<BatchStockGetDto> getAllBatchByProduct(Long productId, Long storeId) {
+    return getRepository().findAvailableBatchInfoByProductAndStore(productId, storeId);
   }
 }

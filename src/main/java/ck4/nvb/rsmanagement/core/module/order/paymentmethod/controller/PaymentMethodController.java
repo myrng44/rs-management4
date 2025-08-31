@@ -1,20 +1,29 @@
 package ck4.nvb.rsmanagement.core.module.order.paymentmethod.controller;
 
-import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.base.application.dto.FilterInput;
+import ck4.nvb.rsmanagement.base.web.controller.api.method.AuditedAPICrudMethod;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.domain.PaymentMethod;
-import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.PaymentMethodCrudServiceImpl;
+import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.IPaymentService;
+import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.PaymentMethodServiceImpl;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.dto.PaymentMethodDto;
+import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.dto.PaymentMethodGetDto;
+import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+import java.util.List;
+
+import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/payment-method")
 public class PaymentMethodController
-    extends AuditedCrudController<
+    extends AuditedAPICrudMethod<
         PaymentMethodDto,
         PaymentMethod,
         Long,
@@ -23,10 +32,11 @@ public class PaymentMethodController
         PaymentMethodDto,
         PaymentMethodDto> {
 
-  @Autowired
-  public PaymentMethodController(PaymentMethodCrudServiceImpl service) {
+  public PaymentMethodController(IPaymentService service) {
     super(service);
   }
+
+  @Autowired private IPaymentService service;
 
   @Override
   public UserGetDto extractUser(Authentication auth) {
@@ -44,8 +54,64 @@ public class PaymentMethodController
       UserGetDto userGetDto = new UserGetDto();
       userGetDto.setId(userRoleDto.getUserId());
       userGetDto.setUserName(userRoleDto.getUserName());
+      userGetDto.setStoreId(userRoleDto.getStoreId());
+      userGetDto.setRoleName(userRoleDto.getRoleName());
       return userGetDto;
     }
     return null;
+  }
+
+  @PostMapping
+  @Override
+  public APIResponse<PaymentMethodDto> create(
+      Authentication auth, @RequestBody PaymentMethodDto entity) {
+    return super.create(auth, entity);
+  }
+
+  @PutMapping("/{paymentMethodId}")
+  @Override
+  public APIResponse<PaymentMethodDto> update(
+      Authentication auth,
+      @PathVariable Long paymentMethodId,
+      @RequestBody PaymentMethodDto entity) {
+    return super.update(auth, paymentMethodId, entity);
+  }
+
+  @DeleteMapping("/{paymentMethodId}")
+  @Override
+  public APIResponse<Void> delete(Authentication auth, @PathVariable Long paymentMethodId) {
+    return super.delete(auth, paymentMethodId);
+  }
+
+  @GetMapping
+  @Override
+  public APIListResponse<List<PaymentMethodDto>> getList(
+      Authentication auth,
+      @RequestParam(required = false, name = "query") List<String> query,
+      @RequestParam(required = false, name = "sort") String sort,
+      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
+      @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
+    return super.getList(auth, query, sort, offset, limit);
+  }
+
+  @GetMapping("/{paymentMethodId}")
+  @Override
+  public APIResponse<PaymentMethodDto> getById(
+      Authentication auth, @PathVariable Long paymentMethodId) {
+    return super.getById(auth, paymentMethodId);
+  }
+
+  @Override
+  public APIListResponse<List<PaymentMethodDto>> getList(Authentication auth, FilterInput request) {
+    return super.getList(auth, request);
+  }
+
+  @GetMapping("/usage")
+  public APIListResponse<List<PaymentMethodGetDto.WithUsageStats>> getUsageStats(Authentication auth, @RequestParam int days) {
+    UserGetDto user = extractUser(auth);
+
+    List<PaymentMethodGetDto.WithUsageStats> output = service.getUsageStatsOfInterval(days);
+
+    return APIResponseBuilder.successList(output, 0, output.size(), output.size(), "get usage stats successfully");
   }
 }

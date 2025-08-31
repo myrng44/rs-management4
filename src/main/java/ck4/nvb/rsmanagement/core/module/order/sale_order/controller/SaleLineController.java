@@ -1,6 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.controller;
 
-import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.base.web.controller.api.method.AuditedAPICrudMethod;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleLine;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleLineService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineDto;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/orders/details")
 public class SaleLineController
-    extends AuditedCrudController<
+    extends AuditedAPICrudMethod<
         SaleLineGetDto, SaleLine, Long, UserGetDto, Long, SaleLineDto, SaleLineDto> {
 
   @Autowired private ModelMapper modelMapper;

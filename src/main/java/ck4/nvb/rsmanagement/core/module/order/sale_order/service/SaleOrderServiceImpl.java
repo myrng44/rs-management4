@@ -22,6 +22,7 @@ import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStockRepo
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Service("orderService")
 @Transactional
@@ -86,21 +88,24 @@ public class SaleOrderServiceImpl
   }
 
   @Override
-  public SaleOrderGetFullDto create(CreateInput<SaleOrder> createDto, UserGetDto user) throws AppException {
+  public SaleOrderGetFullDto create(CreateInput<SaleOrder> createDto, UserGetDto user)
+      throws AppException {
     if (createDto instanceof SaleOrderCreateDto) {
       return create((SaleOrderCreateDto) createDto, user);
     }
     return super.create(createDto, user);
   }
 
-  public SaleOrderGetFullDto create(SaleOrderCreateDto createDto, UserGetDto user) throws AppException {
+  public SaleOrderGetFullDto create(SaleOrderCreateDto createDto, UserGetDto user)
+      throws AppException {
     super.checkCreatePermission(createDto, user);
 
-    //check inventory availability first
-    validateInventoryAvailability(createDto);
+    // check inventory availability first
+    validateInventoryAvailability(createDto, user);
 
     int finalPrice = 0;
     SaleOrder saleOrder = createDto.mapToEntity();
+    saleOrder.setStoreId(user.getStoreId());
     saleOrder.setCreatorId(user.getId());
     saleOrder.setCreatedTime(LocalDateTime.now());
     saleOrder.setNew(true);
@@ -111,7 +116,11 @@ public class SaleOrderServiceImpl
       throw new DuplicateIdentifierException("Duplicate identifier " + saleOrder.getId());
     }
     for (SaleLineDto saleLineDto : createDto.getLines()) {
-      finalPrice += productRepository.findFirstByIdAndDeletedIsFalse(saleLineDto.getProductId()).getUnitPrice() * saleLineDto.getQtyOrdered();
+      finalPrice +=
+          productRepository
+                  .findFirstByIdAndDeletedIsFalse(saleLineDto.getProductId())
+                  .getUnitPrice()
+              * saleLineDto.getQtyOrdered();
     }
     if (createDto.getVoucherId() != null) {
       Voucher voucher = voucherRepository.findFirstByIdAndDeletedIsFalse(createDto.getVoucherId());
@@ -126,59 +135,60 @@ public class SaleOrderServiceImpl
     saleOrder.setFinalPrice(finalPrice);
     saleOrder = getRepository().save(saleOrder);
     getLogger()
-            .info(
-                    "Created order id {} by user {}: {}",
-                    saleOrder.getId(),
-                    saleOrder.getCreatorId(),
-                    saleOrder);
+        .info(
+            "Created order id {} by user {}: {}",
+            saleOrder.getId(),
+            saleOrder.getCreatorId(),
+            saleOrder);
 
     for (SaleLineDto saleLineDto : createDto.getLines()) {
       saleLineDto.setSaleOrderId(saleOrder.getId());
       SaleLineGetDto createdLine = saleLineService.create(saleLineDto, user);
 
-      //allocate inventory or this line
-      allocateInventoryForSaleLine(createdLine.getId(), saleLineDto.getProductId(), saleLineDto.getQtyOrdered(), createDto.getStoreId(), user);
+      // allocate inventory or this line
+      allocateInventoryForSaleLine(
+          createdLine.getId(),
+          saleLineDto.getProductId(),
+          saleLineDto.getQtyOrdered(),
+          user);
     }
 
     return mapToEntityDto(saleOrder);
   }
 
-  /**
-   * validate if there's enough inventory available for all products in the order
-   */
-  private void validateInventoryAvailability(SaleOrderCreateDto createDto) throws AppException {
+  /** validate if there's enough inventory available for all products in the order */
+  private void validateInventoryAvailability(SaleOrderCreateDto createDto, UserGetDto user) throws AppException {
     for (SaleLineDto lineDto : createDto.getLines()) {
-      Long availableQty = getTotalAvailableQuantity(lineDto.getProductId(), createDto.getStoreId());
+      Long availableQty = getTotalAvailableQuantity(lineDto.getProductId(), user);
       if (availableQty < lineDto.getQtyOrdered()) {
-        throw new AppException(String.format(
+        throw new AppException(
+            String.format(
                 "Insufficient inventory for product ID %d. Required: %d, Available: %d",
                 lineDto.getProductId(), lineDto.getQtyOrdered(), availableQty));
       }
     }
   }
 
-  /**
-   * get total available quantity for a product in a specific store
-   */
-  private Long getTotalAvailableQuantity(Long productId, Long storeId) {
-    return batchStockRepository.getTotalAvailableQuantityByProductAndStore(productId, storeId);
+  /** get total available quantity for a product in a specific store */
+  private Long getTotalAvailableQuantity(Long productId, UserGetDto user) throws AppException {
+    return batchStockRepository.getTotalAvailableQuantityByProductAndStore(productId, user.getStoreId());
   }
 
-  /**
-   * allocate inventory for a sale line using FIFO strategy
-   */
-  private void allocateInventoryForSaleLine(Long saleLineId, Long productId, Integer qtyNeeded,
-                                            Long storeId, UserGetDto user) throws AppException {
+  /** allocate inventory for a sale line using FIFO strategy */
+  private void allocateInventoryForSaleLine(
+      Long saleLineId, Long productId, Integer qtyNeeded, UserGetDto user)
+      throws AppException {
     // get available batch stocks ordered by expiry date (FIFO)
-    List<BatchStock> availableBatchStocks = batchStockRepository
-            .findAvailableBatchStocksByProductAndStore(productId, storeId);
+    List<BatchStock> availableBatchStocks =
+        batchStockRepository.findAvailableBatchStocksByProductAndStore(productId, user.getStoreId());
 
     int remainingQtyToAllocate = qtyNeeded;
 
     for (BatchStock batchStock : availableBatchStocks) {
       if (remainingQtyToAllocate <= 0) break;
 
-      int qtyToAllocateFromThisBatch = Math.min(remainingQtyToAllocate, batchStock.getQtyAvailable());
+      int qtyToAllocateFromThisBatch =
+          Math.min(remainingQtyToAllocate, batchStock.getQtyAvailable());
 
       if (qtyToAllocateFromThisBatch > 0) {
         // get batch info for cost snapshot
@@ -190,7 +200,8 @@ public class SaleOrderServiceImpl
         allocationDto.setBatchStockId(batchStock.getId());
         allocationDto.setQtyAllocated(qtyToAllocateFromThisBatch);
         allocationDto.setQtyPicked(0); // initially 0, will be updated when picking
-        allocationDto.setUnitCostSnap(batch.getImportedPrice()); // snapshot of cost at allocation time
+        allocationDto.setUnitCostSnap(
+            batch.getImportedPrice()); // snapshot of cost at allocation time
 
         saleAllocationService.create(allocationDto, user);
 
@@ -201,21 +212,26 @@ public class SaleOrderServiceImpl
 
         remainingQtyToAllocate -= qtyToAllocateFromThisBatch;
 
-        getLogger().info("Allocated {} units from batch stock {} for sale line {}",
-                qtyToAllocateFromThisBatch, batchStock.getId(), saleLineId);
+        getLogger()
+            .info(
+                "Allocated {} units from batch stock {} for sale line {}",
+                qtyToAllocateFromThisBatch,
+                batchStock.getId(),
+                saleLineId);
       }
     }
 
     if (remainingQtyToAllocate > 0) {
-      throw new AppException(String.format(
+      throw new AppException(
+          String.format(
               "Unable to fully allocate inventory for product %d. Missing %d units",
               productId, remainingQtyToAllocate));
     }
   }
 
   /**
-   * update batch stock allocation quantities
-   * note: this might be handled by database trigger, but keeping for explicit control
+   * update batch stock allocation quantities note: this might be handled by database trigger, but
+   * keeping for explicit control
    */
   private void updateBatchStockAllocation(BatchStock batchStock, int allocatedQty) {
     batchStock.setQtyAvailable(batchStock.getQtyAvailable() - allocatedQty);
@@ -252,5 +268,44 @@ public class SaleOrderServiceImpl
     Set<String> keys = super.getSortableKeys();
     keys.add("finalPrice");
     return keys;
+  }
+
+  /** STATS METHODS */
+
+  public Long getAllStoreRevenueBetween(LocalDateTime from, LocalDateTime to) throws AppException {
+    return getRepository().sumTotalFinalPriceBetween(from, to);
+  }
+
+  public Long getAStoreRevenueBetween(LocalDateTime from, LocalDateTime to, Long storeId) throws AppException {
+    return getRepository().sumTotalFinalPriceOfAStoreBetween(
+            from,
+            to,
+            storeId
+    );
+  }
+
+  public int getAllStoreNumberOfOrderBetWeen(LocalDateTime from, LocalDateTime to) throws AppException {
+    return getRepository().countOrdersByCreatedTimeBetween(from, to);
+  }
+
+  public int getAStoreNumberOfOrderBetween(LocalDateTime from, LocalDateTime to, Long storeId) throws AppException {
+    return getRepository().countSaleOrdersByCreatedTimeBetweenAndStoreId(
+            from,
+            to,
+            storeId
+    );
+  }
+
+  public Long getAverageValuePerOrderBetWeen(LocalDateTime from, LocalDateTime to) throws AppException {
+    long revenue = getRepository().sumTotalFinalPriceBetween(from, to);
+    int noOrders = getRepository().countOrdersByCreatedTimeBetween(from, to);
+
+    return revenue / noOrders;
+  }
+
+  public Long getAverageValuePerOrderOfAStoreBetween(LocalDateTime from, LocalDateTime to, Long storeId) {
+    long revenue = getRepository().sumTotalFinalPriceOfAStoreBetween(from, to, storeId);
+    int noOrders = getRepository().countSaleOrdersByCreatedTimeBetweenAndStoreId(from, to, storeId);
+    return revenue / noOrders;
   }
 }

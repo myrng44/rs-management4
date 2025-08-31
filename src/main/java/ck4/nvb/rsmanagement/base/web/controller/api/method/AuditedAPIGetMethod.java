@@ -1,4 +1,4 @@
-package ck4.nvb.rsmanagement.base.web.controller;
+package ck4.nvb.rsmanagement.base.web.controller.api.method;
 
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.base.application.dto.FilterInput;
@@ -20,12 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Getter
-public abstract class AuditedGetController<
+public abstract class AuditedAPIGetMethod<
     D extends EntityDto<ID>,
     T extends IEntity<ID> & CreationAudited<UID>,
     ID extends Comparable<ID> & Serializable,
@@ -36,19 +33,14 @@ public abstract class AuditedGetController<
 
   private final CreationAuditedCrudService<D, T, ID, User, UID> service;
 
-  protected AuditedGetController(CreationAuditedCrudService<D, T, ID, User, UID> service) {
+  protected AuditedAPIGetMethod(CreationAuditedCrudService<D, T, ID, User, UID> service) {
     this.service = service;
   }
 
   public abstract User extractUser(Authentication auth);
 
-  @GetMapping
   public APIListResponse<List<D>> getList(
-      Authentication auth,
-      @RequestParam(required = false, name = "query") List<String> query,
-      @RequestParam(required = false, name = "sort") String sort,
-      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
-      @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
+      Authentication auth, List<String> query, String sort, int offset, int limit) {
     User user = extractUser(auth);
 
     PagedResultDto<D> page;
@@ -68,8 +60,7 @@ public abstract class AuditedGetController<
     return APIResponseBuilder.paged(page, offset, limit);
   }
 
-  @GetMapping("/{id}")
-  public APIResponse<D> getById(Authentication auth, @PathVariable ID id) {
+  public APIResponse<D> getById(Authentication auth, ID id) {
     User user = extractUser(auth);
 
     D output = getService().get(id, user);
@@ -87,9 +78,7 @@ public abstract class AuditedGetController<
         page, request.getPaging().getOffset(), request.getPaging().getLimit());
   }
 
-  @GetMapping("/count")
-  public ResponseEntity<Long> count(
-      @RequestParam(required = false, name = "query") List<String> query) {
+  public ResponseEntity<Long> count(List<String> query) {
     if (query != null) {
       List<SearchCriteria> params = SearchCriteriaParser.parse(query);
       return ResponseEntity.ok(getService().count(params));

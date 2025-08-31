@@ -4,7 +4,6 @@ import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.FullAudited;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -15,5 +14,5 @@ public interface FullAuditedCrudService<
         U extends EntityDto<UID>,
         UID extends Comparable<UID> & Serializable>
     extends AuditedCrudService<D, T, ID, U, UID> {
-    List<SearchCriteria> addDeletedFalse(List<SearchCriteria> criteria);
+  List<SearchCriteria> addDeletedFalse(List<SearchCriteria> criteria);
 }

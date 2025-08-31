@@ -1,14 +1,10 @@
 package ck4.nvb.rsmanagement.core.web.security.controller;
 
-import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import java.util.HashMap;
 import java.util.Map;
-
-import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;

@@ -9,7 +9,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class EntityDto<ID extends Comparable<ID> & Serializable> extends Dto implements IEntityDto<ID> {
+public abstract class EntityDto<ID extends Comparable<ID> & Serializable> extends Dto
+    implements IEntityDto<ID> {
 
   @Serial private static final long serialVersionUID = 1L;
 
