@@ -5,4 +5,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository("voucherCustomerRepository")
 public interface VoucherCustomerRepository
-    extends BaseFullAuditedRepository<VoucherCustomer, Long, Long> {}
+    extends BaseFullAuditedRepository<VoucherCustomer, Long, Long> {
+    boolean existsByVoucherIdAndCustomerIdAndIssuedTrue(Long voucherId, Long customerId);
+
+}

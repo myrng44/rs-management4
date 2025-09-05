@@ -1,10 +1,7 @@
 package ck4.nvb.rsmanagement.base.domain.entity.interfaces;
 
 import java.io.Serializable;
-
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.domain.Persistable;
-
 
 public interface IEntity<ID extends Comparable<ID> & Serializable>
     extends Persistable<ID>, Serializable {

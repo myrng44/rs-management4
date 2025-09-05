@@ -4,10 +4,8 @@ import ck4.nvb.rsmanagement.base.domain.entity.interfaces.Audited;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
-
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.modelmapper.internal.bytebuddy.implementation.bind.annotation.Super;
 
 @Getter
 @Setter

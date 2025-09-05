@@ -46,10 +46,6 @@ public class ProductUpdateDto extends BaseProductDto implements UpdateInput<Prod
       entity.setCategoryId(categoryId);
       isModified = true;
     }
-    if (entity.getCategoryId() == null || (long) supplierId != entity.getSupplierId()) {
-      entity.setSupplierId(supplierId);
-      isModified = true;
-    }
     return isModified;
   }
 }

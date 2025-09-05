@@ -7,9 +7,8 @@ import ck4.nvb.rsmanagement.base.application.dto.PagedResultDto;
 import ck4.nvb.rsmanagement.base.application.exception.ObjectNotFoundException;
 import ck4.nvb.rsmanagement.base.application.service.GetService;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponses;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.PageResponse;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteriaParser;
 import java.io.Serializable;
@@ -41,13 +40,15 @@ public class GetController<
   }
 
   @GetMapping
-  public ResponseEntity<APIListResponse<List<D>>> getList(
+  public ResponseEntity<ApiResponse<PageResponse<D>>> getList(
       @RequestParam(required = false, name = "query") List<String> query,
       @RequestParam(required = false, name = "sort") String sort,
       @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
       @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
+
     PagedAndSortedResultRequestDto paging = new PagedAndSortedResultRequestDto(offset, limit, sort);
     PagedResultDto<D> page;
+
     if (query != null) {
       List<SearchCriteria> params = SearchCriteriaParser.parse(query);
       page = params.isEmpty() ? getService().getPage(paging) : getService().getPage(params, paging);
@@ -55,26 +56,57 @@ public class GetController<
       page = getService().getPage(paging);
     }
 
-    APIListResponse<List<D>> resp = APIResponseBuilder.paged(page, offset, limit);
-    return ResponseEntity.ok(resp);
+    PageResponse<D> pageResponse = buildPageResponse(page, offset, limit);
+    return ResponseEntity.ok(ApiResponse.success(pageResponse));
   }
 
   @GetMapping("/{id}")
-  public APIResponses<D> getById(@PathVariable ID id) {
+  public ResponseEntity<ApiResponse<D>> getById(@PathVariable ID id) {
     D output = getService().get(id);
     if (output == null) {
       throw new ObjectNotFoundException("Object not found. Invalid ID: " + id);
     }
-    return APIResponseBuilder.ok(output);
+    return ResponseEntity.ok(ApiResponse.success(output));
   }
 
-  public APIListResponse<List<D>> getList(FilterInput request) {
+  public ResponseEntity<ApiResponse<PageResponse<D>>> getList(FilterInput request) {
     if (request.getPaging() == null) {
       request.setPaging(new PagedAndSortedResultRequestDto());
     }
     PagedResultDto<D> page =
         getService().getPage(request.mapToSearchCriteria(), request.getPaging());
-    return APIResponseBuilder.paged(
-        page, request.getPaging().getOffset(), request.getPaging().getLimit());
+
+    PageResponse<D> pageResponse =
+        buildPageResponse(page, request.getPaging().getOffset(), request.getPaging().getLimit());
+    return ResponseEntity.ok(ApiResponse.success(pageResponse));
+  }
+
+  @GetMapping("/count")
+  public ResponseEntity<ApiResponse<Long>> count(
+      @RequestParam(required = false, name = "query") List<String> query) {
+    long count;
+    if (query != null) {
+      List<SearchCriteria> params = SearchCriteriaParser.parse(query);
+      count = getService().count(params);
+    } else {
+      count = getService().count(null);
+    }
+    return ResponseEntity.ok(ApiResponse.success(count));
+  }
+
+  private PageResponse<D> buildPageResponse(PagedResultDto<D> page, int offset, int limit) {
+    int currentPage = offset / limit;
+    int totalPages = (int) Math.ceil((double) page.getTotalElements() / limit);
+
+    return PageResponse.<D>builder()
+        .content(page.getElements())
+        .totalPages(totalPages)
+        .totalElements(page.getTotalElements())
+        .currentPage(currentPage)
+        .pageSize(limit)
+        .first(currentPage == 0)
+        .last(currentPage >= totalPages - 1 || totalPages == 0)
+        .empty(page.getElements().isEmpty())
+        .build();
   }
 }

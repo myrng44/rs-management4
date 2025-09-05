@@ -20,14 +20,13 @@ import ck4.nvb.rsmanagement.core.module.users.userrole.domain.repository.UserRol
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import ck4.nvb.rsmanagement.core.web.security.service.AuthService;
 import ck4.nvb.rsmanagement.core.web.util.CommonPasswordEncoder;
-
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import javax.crypto.spec.SecretKeySpec;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,13 +35,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.crypto.spec.SecretKeySpec;
-
-
 @Service("userGetServiceWithRole")
 @RequiredArgsConstructor
 @Slf4j
-public class UserGetServiceWithRoleImpl<D,ID, T> implements UserGetServiceWithRole {
+public class UserGetServiceWithRoleImpl<D, ID, T> implements UserGetServiceWithRole {
 
   @Value("${jwt.secret}")
   private String JWT_SECRET;
@@ -95,6 +91,22 @@ public class UserGetServiceWithRoleImpl<D,ID, T> implements UserGetServiceWithRo
 
     List<UserRole> userRoles = userRoleRepository.findByUserId(userId);
     return userRoles.stream().map(this::buildUserRoleDto).collect(Collectors.toList());
+  }
+
+
+  @Override
+  @Transactional(readOnly = true)
+  public UserRoleDto getUserSession(Long userId, Long storeId) throws AppException {
+    User user =
+            userRepository.findById(userId).orElseThrow(() -> new AppException("User not found"));
+
+    List<UserRoleDto> allRoles = getAllUserRoles(userId);
+    UserRoleDto currentRole =
+            allRoles.stream()
+                    .filter(role -> role.getStoreId().equals(storeId))
+                    .findFirst()
+                    .orElseThrow(() -> new AppException("User has no role for this store"));
+    return currentRole;
   }
 
   private User authenticateUser(String username, String password) throws AppException {
@@ -185,7 +197,6 @@ public class UserGetServiceWithRoleImpl<D,ID, T> implements UserGetServiceWithRo
     return buildUserRoleDto(userRole, user);
   }
 
-
   /*
 
   login
@@ -213,32 +224,35 @@ public class UserGetServiceWithRoleImpl<D,ID, T> implements UserGetServiceWithRo
     String token = generateJwtToken(user.getId(), user.getUsername(), roles, permissions);
 
     return LoginResponse.builder()
-            .id(user.getId())
-            .userName(user.getUsername())
-            .fullName(user.getName())
-            .email(user.getEmail())
-            .phone(user.getPhone())
-            .storeId(user.getStoreId())
-            .lastLogin(user.getLastLogin())
-            .token(token)
-            .roles(roles)
-            .permissions(permissions)
-            .build();
+        .id(user.getId())
+        .userName(user.getUsername())
+        .fullName(user.getName())
+        .email(user.getEmail())
+        .phone(user.getPhone())
+        .storeId(user.getStoreId())
+        .lastLogin(user.getLastLogin())
+        .token(token)
+        .roles(roles)
+        .permissions(permissions)
+        .build();
   }
 
-  private String generateJwtToken(Long userId, String username, List<String> roles, List<String> permissions) {
+  private String generateJwtToken(
+      Long userId, String username, List<String> roles, List<String> permissions) {
     if (roles == null) roles = new ArrayList<>();
     if (permissions == null) permissions = new ArrayList<>();
-    Key key = new SecretKeySpec(Base64.getDecoder().decode(JWT_SECRET), SignatureAlgorithm.HS256.getJcaName());
+    Key key =
+        new SecretKeySpec(
+            Base64.getDecoder().decode(JWT_SECRET), SignatureAlgorithm.HS256.getJcaName());
     return Jwts.builder()
-            .setSubject(username)
-            .claim("userId", userId)
-            .claim("roles", roles)
-            .claim("permissions", permissions)
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
-            .signWith(key, SignatureAlgorithm.HS256)
-            .compact();
+        .setSubject(username)
+        .claim("userId", userId)
+        .claim("roles", roles)
+        .claim("permissions", permissions)
+        .setIssuedAt(new Date())
+        .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
+        .signWith(key, SignatureAlgorithm.HS256)
+        .compact();
   }
 
   // created
@@ -256,7 +270,8 @@ public class UserGetServiceWithRoleImpl<D,ID, T> implements UserGetServiceWithRo
 
     Long currentUserId = getCurrentUserId();
 
-    User user =User.builder()
+    User user =
+        User.builder()
             .username(request.getUserName())
             .password(passwordEncoder.encode(request.getPassWord()))
             .name(request.getFullName())
@@ -271,24 +286,29 @@ public class UserGetServiceWithRoleImpl<D,ID, T> implements UserGetServiceWithRo
 
     Set<Long> roleIds = request.getRoleIds();
     if (roleIds != null && !roleIds.isEmpty()) {
-      List<UserRole> userRoles = roleIds.stream()
-              .map(roleId -> {
-                if (!roleRepository.existsById(roleId)) {
-                  log.warn("Role ID not found: {}", roleId);
-                  return null;
-                }
-                Role role = roleRepository.findById(roleId)
-                        .orElseThrow(() -> {
-                          log.error("Role not found: {}", roleId);
-                          return new RuntimeException("Role not found: " + roleId);
-                        });
-                return UserRole.builder()
+      List<UserRole> userRoles =
+          roleIds.stream()
+              .map(
+                  roleId -> {
+                    if (!roleRepository.existsById(roleId)) {
+                      log.warn("Role ID not found: {}", roleId);
+                      return null;
+                    }
+                    Role role =
+                        roleRepository
+                            .findById(roleId)
+                            .orElseThrow(
+                                () -> {
+                                  log.error("Role not found: {}", roleId);
+                                  return new RuntimeException("Role not found: " + roleId);
+                                });
+                    return UserRole.builder()
                         .userId(savedUser.getId())
                         .roleId(roleId)
                         .user(savedUser)
                         .role(role)
                         .build();
-              })
+                  })
               .filter(Objects::nonNull)
               .collect(Collectors.toList());
 
@@ -308,20 +328,20 @@ public class UserGetServiceWithRoleImpl<D,ID, T> implements UserGetServiceWithRo
     log.info("User created with roles: {}, permissions: {}", roles, permissions);
 
     return UserDTO.builder()
-            .id(savedUser.getId())
-            .userName(savedUser.getUsername())
-            .fullName(savedUser.getName())
-            .email(savedUser.getEmail())
-            .phone(savedUser.getPhone())
-            .storeId(savedUser.getStoreId())
-            .lastLogin(savedUser.getLastLogin())
-            .createAt(savedUser.getCreatedTime())
-            .createBy(savedUser.getCreatorId())
-            .updateAt(savedUser.getUpdatedTime())
-            .updateBy(savedUser.getUpdaterID())
-            .roles(roles)
-            .permissions(permissions)
-            .build();
+        .id(savedUser.getId())
+        .userName(savedUser.getUsername())
+        .fullName(savedUser.getName())
+        .email(savedUser.getEmail())
+        .phone(savedUser.getPhone())
+        .storeId(savedUser.getStoreId())
+        .lastLogin(savedUser.getLastLogin())
+        .createdTime(savedUser.getCreatedTime())
+        .creatorId(savedUser.getCreatorId())
+        .updatedTime(savedUser.getUpdatedTime())
+        .updaterId(savedUser.getUpdaterID())
+        .roles(roles)
+        .permissions(permissions)
+        .build();
   }
 
   /*
@@ -332,11 +352,14 @@ public class UserGetServiceWithRoleImpl<D,ID, T> implements UserGetServiceWithRo
   public UserDTO updateUser(Long userId, UpdateUserRequest request) {
     log.info("Updating user with id: {}", userId);
 
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> {
-              log.error("User not found: {}", userId);
-              return new RuntimeException("User not found: " + userId);
-            });
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(
+                () -> {
+                  log.error("User not found: {}", userId);
+                  return new RuntimeException("User not found: " + userId);
+                });
 
     Long currentUserId = getCurrentUserId();
 
@@ -355,34 +378,36 @@ public class UserGetServiceWithRoleImpl<D,ID, T> implements UserGetServiceWithRo
     log.info("Updated user: id={}, username={}", updatedUser.getId(), updatedUser.getUsername());
 
     List<String> roles = authService.getUserRoles(updatedUser.getId());
-    List<String> permissions = rolePermissionRepository.findPermissionCodesByRoleIds(
+    List<String> permissions =
+        rolePermissionRepository.findPermissionCodesByRoleIds(
             userRoleRepository.findByUserId(userId).stream()
-                    .map(ur -> ur.getRole().getId())
-                    .collect(Collectors.toSet())
-    );
+                .map(ur -> ur.getRole().getId())
+                .collect(Collectors.toSet()));
 
     log.info("User updated with roles: {}, permissions: {}", roles, permissions);
 
     return UserDTO.builder()
-            .id(updatedUser.getId())
-            .userName(updatedUser.getUsername())
-            .fullName(updatedUser.getName())
-            .email(updatedUser.getEmail())
-            .phone(updatedUser.getPhone())
-            .storeId(updatedUser.getStoreId())
-            .lastLogin(updatedUser.getLastLogin())
-            .createAt(updatedUser.getCreatedTime())
-            .createBy(updatedUser.getCreatorId())
-            .updateAt(updatedUser.getUpdatedTime())
-            .updateBy(updatedUser.getUpdaterID())
-            .roles(roles)
-            .permissions(permissions)
-            .build();
+        .id(updatedUser.getId())
+        .userName(updatedUser.getUsername())
+        .fullName(updatedUser.getName())
+        .email(updatedUser.getEmail())
+        .phone(updatedUser.getPhone())
+        .storeId(updatedUser.getStoreId())
+        .lastLogin(updatedUser.getLastLogin())
+        .createdTime(updatedUser.getCreatedTime())
+        .creatorId(updatedUser.getCreatorId())
+        .updatedTime(updatedUser.getUpdatedTime())
+        .updaterId(updatedUser.getUpdaterID())
+        .roles(roles)
+        .permissions(permissions)
+        .build();
   }
 
   public Long getCurrentUserId() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof String) {
+    if (authentication != null
+        && authentication.isAuthenticated()
+        && authentication.getPrincipal() instanceof String) {
       String username = (String) authentication.getPrincipal();
       return authService.getUserIdByUsername(username);
     }
@@ -390,11 +415,14 @@ public class UserGetServiceWithRoleImpl<D,ID, T> implements UserGetServiceWithRo
   }
 
   public UserDTO findById(Long userId) {
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> {
-              log.error("User not found: {}", userId);
-              return new RuntimeException("User not found");
-            });
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(
+                () -> {
+                  log.error("User not found: {}", userId);
+                  return new RuntimeException("User not found");
+                });
 
     return convertToDTO(user);
   }
@@ -402,59 +430,58 @@ public class UserGetServiceWithRoleImpl<D,ID, T> implements UserGetServiceWithRo
   public List<UserDTO> findAll() {
     log.info("Fetching all users");
     List<User> users = userRepository.findAll();
-    return users.stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
+    return users.stream().map(this::convertToDTO).collect(Collectors.toList());
   }
 
   @Transactional
   public void deleteById(Long userId) {
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> {
-              log.error("User not found: {}", userId);
-              return new RuntimeException("User not found: " + userId);
-            });
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(
+                () -> {
+                  log.error("User not found: {}", userId);
+                  return new RuntimeException("User not found: " + userId);
+                });
     userRoleRepository.deleteByUserId(userId);
     userRepository.delete(user);
     log.info("Deleted user with id: {}", userId);
   }
 
-
   protected UserDTO convertToDTO(User entity) {
     List<String> roles = authService.getUserRoles(entity.getId());
-    List<String> permissions = rolePermissionRepository.findPermissionCodesByRoleIds(
+    List<String> permissions =
+        rolePermissionRepository.findPermissionCodesByRoleIds(
             userRoleRepository.findByUserId(entity.getId()).stream()
-                    .map(ur -> ur.getRole().getId())
-                    .collect(Collectors.toSet())
-    );
+                .map(ur -> ur.getRole().getId())
+                .collect(Collectors.toSet()));
 
     return UserDTO.builder()
-            .id(entity.getId())
-            .userName(entity.getUsername())
-            .fullName(entity.getName())
-            .email(entity.getEmail())
-            .phone(entity.getPhone())
-            .storeId(entity.getStoreId())
-            .lastLogin(entity.getLastLogin())
-            .createAt(entity.getCreatedTime())
-            .createBy(entity.getCreatorId())
-            .updateAt(entity.getUpdatedTime())
-            .updateBy(entity.getUpdaterID())
-            .roles(roles)
-            .permissions(permissions)
-            .build();
+        .id(entity.getId())
+        .userName(entity.getUsername())
+        .fullName(entity.getName())
+        .email(entity.getEmail())
+        .phone(entity.getPhone())
+        .storeId(entity.getStoreId())
+        .lastLogin(entity.getLastLogin())
+        .createdTime(entity.getCreatedTime())
+        .creatorId(entity.getCreatorId())
+        .updatedTime(entity.getUpdatedTime())
+        .updaterId(entity.getUpdaterID())
+        .roles(roles)
+        .permissions(permissions)
+        .build();
   }
-
 
   protected User convertToEntity(UserDTO dto) {
     return User.builder()
-            .username(dto.getUserName())
-            .name(dto.getFullName())
-            .email(dto.getEmail())
-            .phone(dto.getPhone())
-            .storeId(dto.getStoreId())
-            .lastLogin(dto.getLastLogin())
-            .build();
+        .username(dto.getUserName())
+        .name(dto.getFullName())
+        .email(dto.getEmail())
+        .phone(dto.getPhone())
+        .storeId(dto.getStoreId())
+        .lastLogin(dto.getLastLogin())
+        .build();
   }
 
   void updateEntityFromDTO(User entity, UserDTO dto) {

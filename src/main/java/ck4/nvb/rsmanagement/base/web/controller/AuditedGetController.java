@@ -8,9 +8,8 @@ import ck4.nvb.rsmanagement.base.application.exception.ObjectNotFoundException;
 import ck4.nvb.rsmanagement.base.application.service.CreationAuditedCrudService;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.CreationAudited;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponses;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.PageResponse;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
 import ck4.nvb.rsmanagement.base.web.utils.SearchCriteriaParser;
 import java.io.Serializable;
@@ -33,7 +32,6 @@ public abstract class AuditedGetController<
     UID extends Comparable<UID> & Serializable> {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
   private final CreationAuditedCrudService<D, T, ID, User, UID> service;
 
   protected AuditedGetController(CreationAuditedCrudService<D, T, ID, User, UID> service) {
@@ -43,15 +41,16 @@ public abstract class AuditedGetController<
   public abstract User extractUser(Authentication auth);
 
   @GetMapping
-  public APIListResponse<List<D>> getList(
+  public ResponseEntity<ApiResponse<PageResponse<D>>> getList(
       Authentication auth,
       @RequestParam(required = false, name = "query") List<String> query,
       @RequestParam(required = false, name = "sort") String sort,
       @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
       @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
-    User user = extractUser(auth);
 
+    User user = extractUser(auth);
     PagedResultDto<D> page;
+
     if (query != null) {
       List<SearchCriteria> params = SearchCriteriaParser.parse(query);
       if (params.isEmpty()) {
@@ -65,36 +64,59 @@ public abstract class AuditedGetController<
       page = getService().getPage(new PagedAndSortedResultRequestDto(offset, limit, sort), user);
     }
 
-    return APIResponseBuilder.paged(page, offset, limit);
+    PageResponse<D> pageResponse = buildPageResponse(page, offset, limit);
+    return ResponseEntity.ok(ApiResponse.success(pageResponse));
   }
 
   @GetMapping("/{id}")
-  public APIResponses<D> getById(Authentication auth, @PathVariable ID id) {
+  public ResponseEntity<ApiResponse<D>> getById(Authentication auth, @PathVariable ID id) {
     User user = extractUser(auth);
-
     D output = getService().get(id, user);
 
     if (output == null) throw new ObjectNotFoundException("Object not found. Invalid ID: " + id);
-    return APIResponseBuilder.ok(output);
+
+    return ResponseEntity.ok(ApiResponse.success(output));
   }
 
-  public APIListResponse<List<D>> getList(Authentication auth, FilterInput request) {
+  public ResponseEntity<ApiResponse<PageResponse<D>>> getList(
+      Authentication auth, FilterInput request) {
     User user = extractUser(auth);
     if (request.getPaging() == null) request.setPaging(new PagedAndSortedResultRequestDto());
+
     PagedResultDto<D> page =
         getService().getPage(request.mapToSearchCriteria(), request.getPaging(), user);
-    return APIResponseBuilder.paged(
-        page, request.getPaging().getOffset(), request.getPaging().getLimit());
+
+    PageResponse<D> pageResponse =
+        buildPageResponse(page, request.getPaging().getOffset(), request.getPaging().getLimit());
+    return ResponseEntity.ok(ApiResponse.success(pageResponse));
   }
 
   @GetMapping("/count")
-  public ResponseEntity<Long> count(
+  public ResponseEntity<ApiResponse<Long>> count(
       @RequestParam(required = false, name = "query") List<String> query) {
+    long count;
     if (query != null) {
       List<SearchCriteria> params = SearchCriteriaParser.parse(query);
-      return ResponseEntity.ok(getService().count(params));
+      count = getService().count(params);
+    } else {
+      count = getService().count(null);
     }
-    // Remove this line - let the service handle deleted filter automatically
-    return ResponseEntity.ok(getService().count(null)); // or empty list
+    return ResponseEntity.ok(ApiResponse.success(count));
+  }
+
+  private PageResponse<D> buildPageResponse(PagedResultDto<D> page, int offset, int limit) {
+    int currentPage = offset / limit;
+    int totalPages = (int) Math.ceil((double) page.getTotalElements() / limit);
+
+    return PageResponse.<D>builder()
+        .content(page.getElements())
+        .totalPages(totalPages)
+        .totalElements(page.getTotalElements())
+        .currentPage(currentPage)
+        .pageSize(limit)
+        .first(currentPage == 0)
+        .last(currentPage >= totalPages - 1 || totalPages == 0)
+        .empty(page.getElements().isEmpty())
+        .build();
   }
 }

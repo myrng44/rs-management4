@@ -5,18 +5,16 @@ import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.stores.store.domain.Store;
 import ck4.nvb.rsmanagement.core.module.stores.store.domain.StoreRepository;
 import ck4.nvb.rsmanagement.core.module.stores.store.service.dto.StoreDto;
-
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service("storeService")
 public class StoreCrudServiceImpl
-    extends FullAuditedCrudServiceImpl<StoreDto, Store, Long, UserGetDto, Long> {
+        extends FullAuditedCrudServiceImpl<StoreDto, Store, Long, UserGetDto, Long> {
 
   protected StoreCrudServiceImpl(StoreRepository repository) {
     super(repository, Store.class);

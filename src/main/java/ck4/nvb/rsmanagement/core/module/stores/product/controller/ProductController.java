@@ -1,6 +1,9 @@
 package ck4.nvb.rsmanagement.core.module.stores.product.controller;
 
+import ck4.nvb.rsmanagement.base.application.annotation.RequirePermission;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.PageResponse;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.ProductServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductCreateDto;
@@ -12,10 +15,9 @@ import lombok.Getter;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/products")
@@ -41,8 +43,13 @@ public class ProductController
     if (principal instanceof UserGetDto) {
       return (UserGetDto) principal;
     }
+
     if (principal instanceof UserRoleDto) {
-      return new ModelMapper().map(principal, UserGetDto.class);
+      UserRoleDto userRoleDto = (UserRoleDto) principal;
+      UserGetDto userGetDto = new UserGetDto();
+      userGetDto.setId(userRoleDto.getUserId());
+      userGetDto.setUserName(userRoleDto.getUserName());
+      return userGetDto;
     }
     return null;
   }
@@ -51,5 +58,20 @@ public class ProductController
   public ResponseEntity<Integer> remainQuantity(Authentication auth, @RequestParam long productId) {
     UserGetDto user = extractUser(auth);
     return ResponseEntity.ok(getProductService().getRemainQuantity(productId, user.getStoreId()));
+  }
+
+  @GetMapping
+  @Override
+  @RequirePermission(value= {"PRODUCT_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
+  public ResponseEntity<ApiResponse<PageResponse<ProductGetDto>>> getList(Authentication auth, List<String> query, String sort, int offset, int limit) {
+    return super.getList(auth, query, sort, offset, limit);
+  }
+
+  @Override
+  @PostMapping
+  @RequirePermission(value= {"PRODUCT_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
+  public ResponseEntity<ApiResponse<ProductGetDto>> create
+          (Authentication auth, @RequestBody ProductCreateDto productCreateDto) {
+    return super.create(auth, productCreateDto);
   }
 }

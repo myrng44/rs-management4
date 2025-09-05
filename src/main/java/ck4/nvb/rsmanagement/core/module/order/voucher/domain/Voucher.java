@@ -1,10 +1,16 @@
 package ck4.nvb.rsmanagement.core.module.order.voucher.domain;
 
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleLine;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,4 +53,5 @@ public class Voucher extends FullAuditedSerialIdEntity {
 
   @Column(name = "audience_type")
   private String audienceType;
+
 }

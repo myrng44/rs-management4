@@ -6,11 +6,9 @@ import ck4.nvb.rsmanagement.core.module.users.role.domain.entity.Role;
 import ck4.nvb.rsmanagement.core.module.users.role.domain.repository.RoleRepository;
 import ck4.nvb.rsmanagement.core.module.users.role.service.RoleService;
 import ck4.nvb.rsmanagement.core.module.users.role.service.dto.RoleDto;
-
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import java.util.List;
 import java.util.Map;
-
-import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 

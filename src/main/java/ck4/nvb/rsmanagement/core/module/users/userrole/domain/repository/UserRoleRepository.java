@@ -15,10 +15,13 @@ public interface UserRoleRepository extends BaseFullAuditedRepository<UserRole, 
   List<UserRole> findByStoreId(Long storeId);
 
   List<UserRole> findByRoleId(Long roleId);
+
   void deleteByUserId(Long userId);
+
   void deleteByUserIdAndRoleId(Long userId, Long roleId);
 
-  @Query("SELECT ur FROM UserRole ur LEFT JOIN FETCH ur.role r LEFT JOIN FETCH r.rolePermissions rp LEFT JOIN FETCH rp.permission p WHERE ur.userId = :userId")
+  @Query(
+      "SELECT ur FROM UserRole ur LEFT JOIN FETCH ur.role r LEFT JOIN FETCH r.rolePermissions rp LEFT JOIN FETCH rp.permission p WHERE ur.userId = :userId")
   List<UserRole> findByUserIdWithPermissions(@Param("userId") Long userId);
 
   void deleteByUserIdAndRoleIdAndStoreId(Long userId, Long roleId, Long storeId);

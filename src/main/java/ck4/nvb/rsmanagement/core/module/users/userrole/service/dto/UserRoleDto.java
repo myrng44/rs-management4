@@ -1,6 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.users.userrole.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,4 +29,22 @@ public class UserRoleDto extends EntityDto<Long> {
 
   // permissions for role
   private List<String> permissions;
+
+  // THÊM session fields từ UserSessionDto
+  private String currentStoreName;
+  private String ipAddress;
+  private String deviceSession;
+  private String traceId;
+
+  // Helper method
+  public UserGetDto toUserGetDto() {
+    UserGetDto dto = new UserGetDto();
+    dto.setId(userId);
+    dto.setUserName(userName);
+    dto.setFullName(fullName);
+    dto.setEmail(email);
+    dto.setPhone(phone);
+    dto.setStoreId(storeId);
+    return dto;
+  }
 }

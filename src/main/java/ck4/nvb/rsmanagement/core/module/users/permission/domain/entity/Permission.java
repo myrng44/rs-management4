@@ -3,10 +3,9 @@ package ck4.nvb.rsmanagement.core.module.users.permission.domain.entity;
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
 import ck4.nvb.rsmanagement.core.module.users.rolepermission.domain.entity.RolePermission;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.util.List;
 
 @Entity
 @Getter

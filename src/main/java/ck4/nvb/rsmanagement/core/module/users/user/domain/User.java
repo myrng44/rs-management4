@@ -3,11 +3,9 @@ package ck4.nvb.rsmanagement.core.module.users.user.domain;
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
 import ck4.nvb.rsmanagement.core.module.users.userrole.domain.entity.UserRole;
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,7 +19,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-
 public class User extends FullAuditedSerialIdEntity implements UserDetails {
 
   @Column(name = "username", nullable = false, unique = true)
@@ -44,7 +41,6 @@ public class User extends FullAuditedSerialIdEntity implements UserDetails {
 
   @Column(name = "last_login")
   LocalDateTime lastLogin;
-
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   List<UserRole> userRoles;

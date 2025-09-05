@@ -1,13 +1,18 @@
 package ck4.nvb.rsmanagement.core.module.order.customer.controller;
 
+import ck4.nvb.rsmanagement.base.application.annotation.RequirePermission;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
 import ck4.nvb.rsmanagement.core.module.order.customer.domain.Customer;
 import ck4.nvb.rsmanagement.core.module.order.customer.service.CustomerCrudServiceImpl;
 import ck4.nvb.rsmanagement.core.module.order.customer.service.dto.CustomerDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,5 +46,12 @@ public class CustomerController
       return userGetDto;
     }
     return null;
+  }
+
+  @Override
+  @PostMapping
+  @RequirePermission(value = {"CUSTOMER_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
+  public ResponseEntity<ApiResponse<CustomerDto>> create (Authentication auth, @RequestBody CustomerDto customerDto) {
+    return super.create(auth, customerDto);
   }
 }

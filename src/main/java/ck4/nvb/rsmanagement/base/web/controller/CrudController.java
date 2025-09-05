@@ -6,9 +6,10 @@ import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.base.application.exception.ObjectNotFoundException;
 import ck4.nvb.rsmanagement.base.application.service.CrudService;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponses;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
 import java.io.Serializable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 public class CrudController<
@@ -28,23 +29,31 @@ public class CrudController<
   }
 
   @PostMapping
-  public APIResponses<D> create(@RequestBody C entity) {
+  public ResponseEntity<ApiResponse<D>> create(@RequestBody C entity) {
     D result = getService().create(entity);
-    return APIResponseBuilder.created(result, "created success!");
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            ApiResponse.<D>builder()
+                .code(201)
+                .message("Created successfully!")
+                .data(result)
+                .build());
   }
 
   @PutMapping("/{id}")
-  public APIResponses<D> update(@PathVariable ID id, @RequestBody U entity) {
+  public ResponseEntity<ApiResponse<D>> update(@PathVariable ID id, @RequestBody U entity) {
     D result = getService().update(id, entity);
-    return APIResponseBuilder.success(result, "updated success!");
+    return ResponseEntity.ok(
+        ApiResponse.<D>builder().code(200).message("Updated successfully!").data(result).build());
   }
 
   @DeleteMapping("/{id}")
-  public APIResponses<Void> delete(@PathVariable ID id) {
+  public ResponseEntity<ApiResponse<Void>> delete(@PathVariable ID id) {
     if (!getService().exists(id))
       throw new ObjectNotFoundException("Object not found. Invalid ID: " + id);
 
     getService().delete(id);
-    return APIResponseBuilder.success(null, "deleted success!");
+    return ResponseEntity.ok(
+        ApiResponse.<Void>builder().code(200).message("Deleted successfully!").data(null).build());
   }
 }

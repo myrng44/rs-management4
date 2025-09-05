@@ -20,6 +20,9 @@ public class Store extends FullAuditedSerialIdEntity {
   @Column(name = "address")
   private String address;
 
+  @Column(name = "location_id")
+  private Long locationId;
+
   @Column(name = "phone")
   private String phone;
 }

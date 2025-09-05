@@ -2,7 +2,7 @@ package ck4.nvb.rsmanagement.core.module.dashboard;
 
 import ck4.nvb.rsmanagement.base.application.exception.AppException;
 import ck4.nvb.rsmanagement.core.module.order.customer.domain.CustomerRepository;
-import ck4.nvb.rsmanagement.core.module.order.saleorder.domain.SaleOrderRepository;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrderRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -23,16 +23,16 @@ public class DashboardServiceImpl implements DashboardService {
     int totalProducts = getProductRepository().countProductsByDeletedIsFalse();
 
     int totalOrders =
-        getOrderRepository()
-            .countOrdersByCreatedTimeBetween(
-                LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay());
+            getOrderRepository()
+                    .countOrdersByCreatedTimeBetween(
+                            LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay());
     long monthlyRevenue =
-        Optional.ofNullable(
-                getOrderRepository()
-                    .sumTotalFinalPriceBetween(
-                        LocalDate.now().withDayOfMonth(1).atStartOfDay(),
-                        LocalDate.now().plusMonths(1).withDayOfMonth(1).atStartOfDay()))
-            .orElse(0L);
+            Optional.ofNullable(
+                            getOrderRepository()
+                                    .sumTotalFinalPriceBetween(
+                                            LocalDate.now().withDayOfMonth(1).atStartOfDay(),
+                                            LocalDate.now().plusMonths(1).withDayOfMonth(1).atStartOfDay()))
+                    .orElse(0L);
 
     int totalCustomers = getCustomerRepository().countCustomerByDeletedIsFalse();
 

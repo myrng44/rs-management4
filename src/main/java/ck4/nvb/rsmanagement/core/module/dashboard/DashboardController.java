@@ -1,5 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.dashboard;
 
+import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,8 @@ public class DashboardController {
   private final DashboardServiceImpl dashboardService;
 
   @GetMapping
-  public ResponseEntity<DashboardSummaryDto> getDashboardSummary() {
-    return ResponseEntity.ok(getDashboardService().getDashboardSummary());
+  public ResponseEntity<ApiResponse<DashboardSummaryDto>> getDashboardSummary() {
+    DashboardSummaryDto dto = dashboardService.getDashboardSummary();
+    return ResponseEntity.ok(ApiResponse.success(dto));
   }
 }

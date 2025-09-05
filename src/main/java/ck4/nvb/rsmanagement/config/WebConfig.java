@@ -12,9 +12,9 @@ public class WebConfig implements WebMvcConfigurer {
         .addMapping("/**")
         .allowedOriginPatterns(
             "http://localhost:*",
-            "https://ckmanrs.vercel.app/*",
-            "https://rs-man-4-production.up.railway.app/*",
-            "https://storeman4.netlify.app/*")
+            "https://ckmanrs.vercel.app",
+            "https://rs-man-4-production.up.railway.app",
+            "https://storeman4.netlify.app")
         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
         .allowedHeaders("*")
         .allowCredentials(true);

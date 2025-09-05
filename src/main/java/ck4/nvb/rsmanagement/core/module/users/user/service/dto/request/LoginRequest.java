@@ -1,6 +1,5 @@
 package ck4.nvb.rsmanagement.core.module.users.user.service.dto.request;
 
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,6 +9,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LoginRequest {
-    String userName;
-    String passWord;
+  String userName;
+  String passWord;
 }

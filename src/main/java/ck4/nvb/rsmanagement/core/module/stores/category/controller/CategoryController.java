@@ -1,13 +1,17 @@
 package ck4.nvb.rsmanagement.core.module.stores.category.controller;
 
+import ck4.nvb.rsmanagement.base.application.annotation.RequirePermission;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
 import ck4.nvb.rsmanagement.core.module.stores.category.domain.Category;
 import ck4.nvb.rsmanagement.core.module.stores.category.service.CategoryServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.category.service.dto.CategoryDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
-import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,12 +32,25 @@ public class CategoryController
     }
 
     Object principal = auth.getPrincipal();
-
     if (principal instanceof UserGetDto) {
       return (UserGetDto) principal;
-    } else if (principal instanceof UserRoleDto) {
-      return new ModelMapper().map(principal, UserGetDto.class);
+    }
+
+    if (principal instanceof UserRoleDto) {
+      UserRoleDto userRoleDto = (UserRoleDto) principal;
+      UserGetDto userGetDto = new UserGetDto();
+      userGetDto.setId(userRoleDto.getUserId());
+      userGetDto.setUserName(userRoleDto.getUserName());
+      return userGetDto;
     }
     return null;
+  }
+
+  @Override
+  @PostMapping
+  @RequirePermission(value= {"CATEGORY_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
+  public ResponseEntity<ApiResponse<CategoryDto>> create
+          (Authentication auth, @RequestBody CategoryDto categoryDto) {
+    return super.create(auth, categoryDto);
   }
 }

@@ -5,7 +5,6 @@ import ck4.nvb.rsmanagement.base.domain.entity.interfaces.SoftDeletable;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
-
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
