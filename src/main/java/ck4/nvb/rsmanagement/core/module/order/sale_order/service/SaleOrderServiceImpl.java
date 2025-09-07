@@ -98,15 +98,14 @@ public class SaleOrderServiceImpl
 
   public SaleOrderGetFullDto create(SaleOrderCreateDto createDto, UserGetDto user)
           throws AppException {
-    System.out.println(createDto.getStoreId());
     super.checkCreatePermission(createDto, user);
 
     // check inventory availability first
-    validateInventoryAvailability(createDto, user, createDto.getStoreId());
+    validateInventoryAvailability(createDto, user);
 
     int finalPrice = 0;
     SaleOrder saleOrder = createDto.mapToEntity();
-//    saleOrder.setStoreId(user.getStoreId());
+    saleOrder.setStoreId(user.getStoreId());
     saleOrder.setCreatorId(user.getId());
     saleOrder.setCreatedTime(LocalDateTime.now());
     saleOrder.setNew(true);
@@ -146,32 +145,33 @@ public class SaleOrderServiceImpl
       saleLineDto.setSaleOrderId(saleOrder.getId());
       SaleLineGetDto createdLine = saleLineService.create(saleLineDto, user);
 
+      // allocate inventory or this line
       allocateInventoryForSaleLine(
               createdLine.getId(),
               saleLineDto.getProductId(),
               saleLineDto.getQtyOrdered(),
               user);
     }
+
     return mapToEntityDto(saleOrder);
   }
 
-  private void validateInventoryAvailability(SaleOrderCreateDto createDto, UserGetDto user, Long storeId) throws AppException {
+  /** validate if there's enough inventory available for all products in the order */
+  private void validateInventoryAvailability(SaleOrderCreateDto createDto, UserGetDto user) throws AppException {
     for (SaleLineDto lineDto : createDto.getLines()) {
-      Integer availableQty = getTotalAvailableQuantity(lineDto.getProductId(),user, storeId);
-      System.out.println(availableQty + "   "  + lineDto.getQtyOrdered());
+      Long availableQty = getTotalAvailableQuantity(lineDto.getProductId(), user);
       if (availableQty < lineDto.getQtyOrdered()) {
         throw new AppException(
                 String.format(
                         "Insufficient inventory for product ID %d. Required: %d, Available: %d",
                         lineDto.getProductId(), lineDto.getQtyOrdered(), availableQty));
       }
-
     }
   }
 
   /** get total available quantity for a product in a specific store */
-  private Integer getTotalAvailableQuantity(Long productId, UserGetDto user, Long storeId) throws AppException {
-    return batchStockRepository.getTotalAvailableQuantityByProductAndStore(productId, storeId);
+  private Long getTotalAvailableQuantity(Long productId, UserGetDto user) throws AppException {
+    return batchStockRepository.getTotalAvailableQuantityByProductAndStore(productId, user.getStoreId());
   }
 
   /** allocate inventory for a sale line using FIFO strategy */

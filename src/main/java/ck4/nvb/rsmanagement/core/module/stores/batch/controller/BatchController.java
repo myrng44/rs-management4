@@ -2,7 +2,7 @@ package ck4.nvb.rsmanagement.core.module.stores.batch.controller;
 
 import ck4.nvb.rsmanagement.base.application.annotation.RequirePermission;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.Batch;
 import ck4.nvb.rsmanagement.core.module.stores.batch.service.IBatchService;
 import ck4.nvb.rsmanagement.core.module.stores.batch.service.dto.BatchDto;
@@ -59,22 +59,35 @@ public class BatchController
   @GetMapping("/by-product")
   @RequirePermission(value = {"BATCH_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
   public ResponseEntity<ApiResponse<List<BatchDto>>> getByProduct(
-          @RequestParam(name = "productId", required = false) Long productId,
+          @RequestParam(name = "productId", required = false) String productId,
           @RequestParam(name = "productIds", required = false) String productIds) {
 
     if (productId != null) {
-      List<BatchDto> list = batchService.findByProductId(productId);
-      return ResponseEntity.ok(ApiResponse.success(list));
+      try {
+        Long id = Long.valueOf(productId);
+        List<BatchDto> list = batchService.findByProductId(id);
+        return ResponseEntity.ok(ApiResponse.success(list));
+      } catch (NumberFormatException e) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(400, "productId không hợp lệ: " + productId));
+      }
     }
 
     if (productIds != null && !productIds.trim().isEmpty()) {
-      List<Long> ids = Arrays.stream(productIds.split(","))
-              .map(String::trim)
-              .filter(s -> !s.isEmpty())
-              .map(Long::valueOf)
-              .collect(Collectors.toList());
-      List<BatchDto> list = batchService.findByProductIds(ids);
-      return ResponseEntity.ok(ApiResponse.success(list));
+      try {
+        List<Long> ids = Arrays.stream(productIds.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Long::valueOf)  // Sử dụng Long.valueOf() thay vì Integer.parseInt()
+                .collect(Collectors.toList());
+
+        System.out.println("Debug - Parsed productIds: " + ids);
+        List<BatchDto> list = batchService.findByProductIds(ids);
+        System.out.println("Debug - Found batches: " + list.size());
+
+        return ResponseEntity.ok(ApiResponse.success(list));
+      } catch (NumberFormatException e) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(400, "productIds chứa giá trị không hợp lệ: " + productIds));
+      }
     }
 
     return ResponseEntity.badRequest().body(ApiResponse.error(400,"productId hoặc productIds là bắt buộc"));

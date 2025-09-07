@@ -2,15 +2,14 @@ package ck4.nvb.rsmanagement.core.module.order.sale_order.controller;
 
 import ck4.nvb.rsmanagement.base.application.dto.FilterInput;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.PageResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.PageResponse;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleLineService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleOrderService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.OrderFulfillmentService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.*;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
-import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.TopProductProjection;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import java.util.List;
@@ -48,6 +47,7 @@ public class SaleOrderController
       return null;
     }
     Object principal = auth.getPrincipal();
+
     if (principal instanceof UserRoleDto) {
       UserRoleDto userRoleDto = (UserRoleDto) principal;
       UserGetDto userGetDto = new UserGetDto();
@@ -65,10 +65,10 @@ public class SaleOrderController
   }
 
   @GetMapping("/most")
-  public ResponseEntity<ApiResponse<List<TopProductProjection>>> getMostSoldProductsLastDay(
+  public ResponseEntity<ApiResponse<List<ProductGetDto.WithSales>>> getMostSoldProductsLastDay(
       Authentication auth, @RequestParam int days, @RequestParam int noProducts) {
     UserGetDto user = extractUser(auth);
-    List<TopProductProjection> products = saleLineService.getMostSoldProductsLastDay(days, noProducts);
+    List<ProductGetDto.WithSales> products = saleLineService.getMostSoldProductsLastDay(days, noProducts);
     return ResponseEntity.ok(ApiResponse.success(products));
   }
 

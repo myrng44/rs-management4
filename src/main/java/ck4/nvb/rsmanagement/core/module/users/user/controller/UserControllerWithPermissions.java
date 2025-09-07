@@ -1,7 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.users.user.controller;
 
 import ck4.nvb.rsmanagement.base.application.annotation.RequirePermission;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserDTO;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.request.CreateUserRequest;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.request.UpdateUserRequest;

@@ -2,13 +2,12 @@ package ck4.nvb.rsmanagement.core.module.order.paymentmethod.controller;
 
 import ck4.nvb.rsmanagement.base.application.dto.FilterInput;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.PageResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.PageResponse;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.domain.PaymentMethod;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.IPaymentService;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.PaymentMethodServiceImpl;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.dto.PaymentMethodDto;
-import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.dto.PaymentMethodGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import org.springframework.beans.factory.annotation.Autowired;

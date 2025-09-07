@@ -20,6 +20,8 @@ public class SaleOrderCreateDto extends BaseSaleOrderDto implements CreateInput<
   @JsonSerialize(using = ToStringSerializer.class)
   private Long storeId;
 
+//  private Long customerId;
+
   @NotEmpty private List<SaleLineDto> lines;
 
   @JsonSerialize(using = ToStringSerializer.class)

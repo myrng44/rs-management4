@@ -2,7 +2,7 @@ package ck4.nvb.rsmanagement.core.module.stores.batch_stock.controller;
 
 import ck4.nvb.rsmanagement.base.application.annotation.RequirePermission;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.BatchStockServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockDto;

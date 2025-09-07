@@ -27,6 +27,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.crypto.spec.SecretKeySpec;
+
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -221,7 +223,7 @@ public class UserGetServiceWithRoleImpl<D, ID, T> implements UserGetServiceWithR
     List<String> roles = authService.getUserRoles(user.getId());
     List<String> permissions = authService.getUserPermissions(user.getId());
 
-    String token = generateJwtToken(user.getId(), user.getUsername(), roles, permissions);
+    String token = generateJwtToken(user.getId(), user.getUsername(), roles, permissions, user.getStoreId());
 
     return LoginResponse.builder()
         .id(user.getId())
@@ -238,21 +240,26 @@ public class UserGetServiceWithRoleImpl<D, ID, T> implements UserGetServiceWithR
   }
 
   private String generateJwtToken(
-      Long userId, String username, List<String> roles, List<String> permissions) {
+          Long userId, String username, List<String> roles, List<String> permissions, Long storeId) {
+
     if (roles == null) roles = new ArrayList<>();
     if (permissions == null) permissions = new ArrayList<>();
-    Key key =
-        new SecretKeySpec(
-            Base64.getDecoder().decode(JWT_SECRET), SignatureAlgorithm.HS256.getJcaName());
+
+    // Nếu JWT_SECRET là Base64 encoded:
+    byte[] keyBytes = Base64.getDecoder().decode(JWT_SECRET);
+    Key key = Keys.hmacShaKeyFor(keyBytes);
+
     return Jwts.builder()
-        .setSubject(username)
-        .claim("userId", userId)
-        .claim("roles", roles)
-        .claim("permissions", permissions)
-        .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
-        .signWith(key, SignatureAlgorithm.HS256)
-        .compact();
+            .setSubject(username)
+            // Lưu id/storeId dưới dạng STRING để tránh mất độ chính xác ở client JS
+            .claim("userId", String.valueOf(userId))
+            .claim("storeId", String.valueOf(storeId))
+            .claim("roles", roles)
+            .claim("permissions", permissions)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
+            .signWith(key, SignatureAlgorithm.HS256)
+            .compact();
   }
 
   // created

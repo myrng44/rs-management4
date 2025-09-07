@@ -2,8 +2,8 @@ package ck4.nvb.rsmanagement.core.module.stores.product.controller;
 
 import ck4.nvb.rsmanagement.base.application.annotation.RequirePermission;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
-import ck4.nvb.rsmanagement.base.web.controller.api.response.PageResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.PageResponse;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.ProductServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductCreateDto;
@@ -12,7 +12,6 @@ import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductUpdate
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import lombok.Getter;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

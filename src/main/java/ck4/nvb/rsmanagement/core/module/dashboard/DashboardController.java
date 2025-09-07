@@ -1,6 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.dashboard;
 
-import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

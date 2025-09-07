@@ -1,7 +1,8 @@
 package ck4.nvb.rsmanagement.core.web.security.filter;
 
+import ck4.nvb.rsmanagement.core.module.users.user.domain.User;
+import ck4.nvb.rsmanagement.core.module.users.user.domain.UserRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
-import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,29 +32,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   @Value("${jwt.secret}")
   private String JWT_SECRET;
 
+  @Autowired
+  private UserRepository userRepository; // optional fallback
+
+  private Long toLong(Object value) {
+    if (value == null) return null;
+    if (value instanceof Number n) return n.longValue();
+    try {
+      return Long.parseLong(value.toString());
+    } catch (NumberFormatException ex) {
+      return null;
+    }
+  }
+
   @Override
-  protected void doFilterInternal(
-          HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
           throws ServletException, IOException {
     String token = extractToken(request);
     if (token != null && validateToken(token)) {
       Claims claims = getClaims(token);
       String username = claims.getSubject();
-      Long userId = claims.get("userId", Long.class); // Thêm userId vào JWT claims
-      Long storeId = claims.get("storeId", Long.class); // Nếu cần
-      List<String> roles = claims.get("roles", List.class);
-      List<String> permissions = claims.get("permissions", List.class);
 
-      if (roles == null) roles = new ArrayList<>();
-      if (permissions == null) permissions = new ArrayList<>();
+      // sẽ nhận được String (theo patch trên) => toLong() sẽ convert đúng
+      Long userId = toLong(claims.get("userId"));
+      Long storeId = toLong(claims.get("storeId"));
+
+      List<String> roles = toStringList(claims.get("roles"));
+      List<String> permissions = toStringList(claims.get("permissions"));
 
       List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-      authorities.addAll(
-              roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
-      authorities.addAll(
-              permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+      authorities.addAll(roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+      authorities.addAll(permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
 
-      // Tạo UserGetDto thay vì chỉ username
       UserGetDto userDto = new UserGetDto();
       userDto.setId(userId);
       userDto.setUserName(username);
@@ -65,12 +76,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
-  private String extractToken(HttpServletRequest request) {
-    String bearerToken = request.getHeader("Authorization");
-    if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-      return bearerToken.substring(7);
-    }
-    return null;
+
+
+  // parse claims with signing key
+  private Claims getClaims(String token) {
+    byte[] keyBytes = Base64.getDecoder().decode(JWT_SECRET);
+    SecretKey key = Keys.hmacShaKeyFor(keyBytes);
+
+    return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
   }
 
   private boolean validateToken(String token) {
@@ -78,14 +91,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       getClaims(token);
       return true;
     } catch (Exception e) {
+      log.debug("Invalid JWT: {}", e.getMessage());
       return false;
     }
   }
 
-  private Claims getClaims(String token) {
-    byte[] keyBytes = Base64.getDecoder().decode(JWT_SECRET);
-    SecretKey key = Keys.hmacShaKeyFor(keyBytes);
+  @SuppressWarnings("unchecked")
+  private List<String> toStringList(Object obj) {
+    if (obj == null) return new ArrayList<>();
+    if (obj instanceof List) {
+      return ((List<?>) obj).stream().map(Object::toString).collect(Collectors.toList());
+    }
+    return List.of(obj.toString());
+  }
 
-    return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+  private String extractToken(HttpServletRequest request) {
+    String bearerToken = request.getHeader("Authorization");
+    if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+      return bearerToken.substring(7);
+    }
+    return null;
   }
 }
+
+
+

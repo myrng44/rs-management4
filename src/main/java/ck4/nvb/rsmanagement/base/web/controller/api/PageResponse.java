@@ -1,4 +1,4 @@
-package ck4.nvb.rsmanagement.base.web.controller.api.response;
+package ck4.nvb.rsmanagement.base.web.controller.api;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

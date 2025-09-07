@@ -1,6 +1,6 @@
 package ck4.nvb.rsmanagement.core.web.security.controller;
 
-import ck4.nvb.rsmanagement.base.web.controller.api.response.ApiResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
 import ck4.nvb.rsmanagement.core.module.users.user.domain.User;
 import ck4.nvb.rsmanagement.core.module.users.user.domain.UserRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserDTO;

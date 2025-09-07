@@ -25,7 +25,7 @@ public interface BatchStockRepository extends BaseFullAuditedRepository<BatchSto
                   AND bs.qty_available > 0
                 """,
           nativeQuery = true)
-  Integer getTotalAvailableQuantityByProductAndStore(
+  Long getTotalAvailableQuantityByProductAndStore(
           @Param("productId") Long productId, @Param("storeId") Long storeId);
 
   /** Find available batch stocks for a product in a store, ordered by expiry date (FIFO) */
