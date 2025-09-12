@@ -21,18 +21,6 @@ public class BatchStockDto extends EntityDto<Long>
   private String status;
   private Integer version;
 
-  /*  @JsonFormat(
-      shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'HH:mm:ss",
-      timezone = "Asia/Ho_Chi_Minh")
-  private Date startDate;
-
-  @JsonFormat(
-      shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'HH:mm:ss",
-      timezone = "Asia/Ho_Chi_Minh")
-  private Date deliveryDate;*/
-
   @Override
   public BatchStock mapToEntity() {
     return new ModelMapper().map(this, BatchStock.class);

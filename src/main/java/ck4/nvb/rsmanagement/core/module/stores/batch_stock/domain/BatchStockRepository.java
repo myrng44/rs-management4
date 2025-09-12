@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository("importLogRepository")
 public interface BatchStockRepository extends BaseFullAuditedRepository<BatchStock, Long, Long> {
-  /** Get total available quantity for a product in a specific store */
   @Query(
           value =
                   """

@@ -16,6 +16,8 @@ public class StoreDto extends EntityDto<Long> implements CreateInput<Store>, Upd
 
   private String address;
 
+  private Long locationId;
+
   private String phone;
 
   @Override
@@ -35,6 +37,10 @@ public class StoreDto extends EntityDto<Long> implements CreateInput<Store>, Upd
     if (entity.getAddress() != null) {
       this.address = entity.getAddress();
       isModified = true;
+    }
+
+    if (entity.getLocationId() != null) {
+      this.locationId = entity.getLocationId();
     }
 
     if (entity.getPhone() != null) {

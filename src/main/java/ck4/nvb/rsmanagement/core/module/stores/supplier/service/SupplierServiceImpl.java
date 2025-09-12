@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 
 @Service("supplierService")
 public class SupplierServiceImpl
-    extends FullAuditedCrudServiceImpl<SupplierDto, Supplier, Long, UserGetDto, Long> {
+        extends FullAuditedCrudServiceImpl<SupplierDto, Supplier, Long, UserGetDto, Long>
+        implements ISupplierService {
 
   protected SupplierServiceImpl(SupplierRepository repository) {
     super(repository, Supplier.class);
@@ -34,7 +35,7 @@ public class SupplierServiceImpl
   public Map<String, List<SearchOperator>> getSearchableKeys() {
     Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
     keys.put("name", List.of(SearchOperator.EQUALS, SearchOperator.CONTAINS));
-    keys.put("locationId", List.of(SearchOperator.CONTAINS));
+    keys.put("location_id", List.of(SearchOperator.CONTAINS, SearchOperator.EQUALS));
     keys.put("contact", List.of(SearchOperator.CONTAINS));
     return keys;
   }
@@ -43,7 +44,7 @@ public class SupplierServiceImpl
   public Set<String> getSortableKeys() {
     Set<String> keys = super.getSortableKeys();
     keys.add("name");
-    keys.add("locationId");
+    keys.add("location_id");
     keys.add("contact");
     return keys;
   }
