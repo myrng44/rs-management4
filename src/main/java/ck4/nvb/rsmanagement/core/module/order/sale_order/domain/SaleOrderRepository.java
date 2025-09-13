@@ -29,7 +29,7 @@ public interface SaleOrderRepository extends BaseFullAuditedRepository<SaleOrder
             SELECT SUM(so.final_price) AS revenue
             FROM sale_order so
             WHERE so.deleted=false
-                AND so.order_id=:orderId
+                AND so.store_id=:storeId
         """,
           nativeQuery = true)
   long sumTotalFinalPriceOfAStoreBetween(LocalDateTime from, LocalDateTime to, Long storeId);

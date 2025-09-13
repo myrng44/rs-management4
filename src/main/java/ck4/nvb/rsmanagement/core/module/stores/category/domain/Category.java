@@ -14,6 +14,6 @@ public class Category extends FullAuditedSerialIdEntity {
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "desc")
-  private String desc;
+  @Column(name = "description")
+  private String description;
 }

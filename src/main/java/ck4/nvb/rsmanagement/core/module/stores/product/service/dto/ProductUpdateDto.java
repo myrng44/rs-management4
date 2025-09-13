@@ -14,7 +14,7 @@ public class ProductUpdateDto extends EntityDto<Long> implements UpdateInput<Pro
 
   private String sku;
   private String name;
-  private String desc;
+  private String description;
   private Integer unitPrice;
   private Long categoryId;
 
@@ -31,8 +31,8 @@ public class ProductUpdateDto extends EntityDto<Long> implements UpdateInput<Pro
       entity.setName(name);
       isModified = true;
     }
-    if (desc == null || !desc.equals(entity.getDesc())) {
-      entity.setDesc(desc);
+    if (description == null || !description.equals(entity.getDescription())) {
+      entity.setDescription(description);
       isModified = true;
     }
 

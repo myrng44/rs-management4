@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum RoleName {
-  SYSADMIN("SYSADMIN"),
-  ADMIN("ADMIN"),
-  MANAGER("MANAGER"),
-  STAFF("STAFF"),
+  SYSADMIN("Quản trị hệ thống"),
+  ADMIN("Quản trị viên"),
+  MANAGER("Quản lý"),
+  STAFF("Nhân viên"),
   INVENTORY_STAFF("INVENTORY_STAFF");
 
   private final String name;

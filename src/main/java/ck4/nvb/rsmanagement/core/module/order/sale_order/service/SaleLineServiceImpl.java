@@ -101,7 +101,7 @@ public class SaleLineServiceImpl
                     ((Number) row.get("id")).longValue(),
                     (String) row.get("sku"),
                     (String) row.get("name"),
-                    (String) row.get("desc"),
+                    (String) row.get("description"),
                     ((Number) row.get("unitPrice")).intValue(),
                     row.get("categoryId") != null ? ((Number) row.get("categoryId")).longValue() : null,
                     ((Number) row.get("totalQuantitySold")).longValue()

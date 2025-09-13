@@ -1,3 +1,0 @@
-ALTER TABLE user_role
-    ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP,
-    ADD COLUMN IF NOT EXISTS deleted_by BIGINT;

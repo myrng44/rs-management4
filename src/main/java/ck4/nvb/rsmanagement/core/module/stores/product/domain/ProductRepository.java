@@ -18,5 +18,5 @@ public interface ProductRepository extends BaseFullAuditedRepository<Product, Lo
       nativeQuery = true)
   int remainQuantity(Long productId, Long storeId);
 
-  int countProductsByDeletedIsFalse();
+  long countProductsByDeletedIsFalse();
 }

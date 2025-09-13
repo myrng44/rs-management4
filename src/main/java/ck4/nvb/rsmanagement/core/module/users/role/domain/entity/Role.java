@@ -15,6 +15,6 @@ public class Role extends FullAuditedSerialIdEntity {
   @Column(name = "name", nullable = false, unique = true)
   private RoleName name;
 
-  @Column(name = "desc")
+  @Column(name = "description")
   private String desc;
 }

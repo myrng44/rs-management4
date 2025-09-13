@@ -69,7 +69,7 @@ public class TestPasswordEncoder {
 
   public static void main(String[] args) {
     // Ví dụ 1: Mã hóa password đơn giản
-    String password = "admin1234";
+    String password = "admin001";
     String hashedPassword = encodePassword(password);
     System.out.println("Password gốc: " + password);
     System.out.println("BCrypt hash: " + hashedPassword);

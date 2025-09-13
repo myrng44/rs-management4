@@ -51,7 +51,7 @@ public abstract class BaseSearchController<E, ID> {
     @GetMapping("/search/fuzzy")
     public ResponseEntity<List<E>> fuzzySearch(@RequestParam String q) {
         SearchRequest request = new SearchRequest(q).enableFuzzy();
-        List<E> results = getHybridService().advancedSearch(request);
+        List<E> results = getHybridService().fuzzySearch(q);
         return ResponseEntity.ok(results);
     }
 }

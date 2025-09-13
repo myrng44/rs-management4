@@ -11,7 +11,7 @@ import lombok.Setter;
 public class ProductGetDto extends EntityDto<Long> {
   private String sku;
   private String name;
-  private String desc;
+  private String description;
   private Integer unitPrice;
   private Long categoryId;
 
@@ -20,7 +20,7 @@ public class ProductGetDto extends EntityDto<Long> {
           Long id,
           String sku,
           String name,
-          String desc,
+          String description,
           Integer unitPrice,
           Long categoryId,
           Long totalQuantitySold
@@ -31,7 +31,7 @@ public class ProductGetDto extends EntityDto<Long> {
               product.getId(),
               product.getSku(),
               product.getName(),
-              product.getDesc(),
+              product.getDescription(),
               product.getUnitPrice(),
               product.getCategoryId(),
               totalQuantitySold

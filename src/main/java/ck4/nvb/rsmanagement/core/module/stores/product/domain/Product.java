@@ -1,6 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.stores.product.domain;
 
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
+import ck4.nvb.rsmanagement.base.search.annotation.SearchableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -12,6 +13,11 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "product")
+@SearchableEntity(
+        indexName = "products",
+        searchFields = {"name", "sku", "desc"},
+        autoSync = true
+)
 public class Product extends FullAuditedSerialIdEntity {
 
   @Column(name = "name", nullable = false)
@@ -20,8 +26,8 @@ public class Product extends FullAuditedSerialIdEntity {
   @Column(name = "sku", nullable = false, unique = true)
   private String sku;
 
-  @Column(name = "\"desc\"")
-  private String desc;
+  @Column(name = "description")
+  private String description;
 
   @Column(name = "unit_price", nullable = false)
   private Integer unitPrice;

@@ -86,4 +86,10 @@ public class CustomerController
   public APIListResponse<List<CustomerDto>> getList(Authentication auth, FilterInput request) {
     return super.getList(auth, request);
   }
+
+  @GetMapping("/count-new")
+  @Override
+  public APIResponse<Long> count(@RequestParam(required = false) List<String> query) {
+    return super.count(query);
+  }
 }

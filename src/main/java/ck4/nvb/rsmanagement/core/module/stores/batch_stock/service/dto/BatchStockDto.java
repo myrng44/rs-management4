@@ -15,9 +15,6 @@ public class BatchStockDto extends EntityDto<Long>
 
   private Long batchId;
   private Long storeId;
-  private Integer qtyTotal;
-  private Integer qtyAvailable;
-  private Integer qtyReversed;
   private String status;
   private Integer version;
 

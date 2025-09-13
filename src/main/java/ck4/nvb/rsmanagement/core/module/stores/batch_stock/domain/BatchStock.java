@@ -22,15 +22,6 @@ public class BatchStock extends FullAuditedSerialIdEntity {
   @Column(name = "store_id")
   private Long storeId;
 
-  @Column(name = "qty_total")
-  private Integer qtyTotal;
-
-  @Column(name = "qty_available")
-  private Integer qtyAvailable;
-
-  @Column(name = "qty_reversed")
-  private Integer qtyReversed;
-
   @Column(name = "status")
   private String status;
 

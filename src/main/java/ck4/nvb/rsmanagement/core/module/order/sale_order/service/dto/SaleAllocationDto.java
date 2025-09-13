@@ -17,9 +17,8 @@ import org.modelmapper.ModelMapper;
 public class SaleAllocationDto extends EntityDto<Long>
     implements CreateInput<SaleAllocation>, UpdateInput<SaleAllocation> {
   private Long saleLineId;
-  private Long batchStockId;
-  private Integer qtyAllocated;
-  private Integer qtyPicked;
+  private Long batchItemId;
+  private Integer soldQty;
   private Integer unitCostSnap;
 
   @Override

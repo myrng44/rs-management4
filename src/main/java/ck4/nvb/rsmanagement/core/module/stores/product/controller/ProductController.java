@@ -4,6 +4,7 @@ import ck4.nvb.rsmanagement.base.application.dto.FilterInput;
 import ck4.nvb.rsmanagement.base.web.controller.api.method.AuditedAPICrudMethod;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
+import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.IProductService;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductCreateDto;
@@ -106,5 +107,12 @@ public class ProductController
   @Override
   public APIListResponse<List<ProductGetDto>> getList(Authentication auth, FilterInput request) {
     return super.getList(auth, request);
+  }
+
+  @GetMapping("/count")
+  @RequiredPermission(PermissionCode.VIEW_STORE_REPORT)
+  @Override
+  public APIResponse<Long> count( @RequestParam(required = false) List<String> query) {
+    return APIResponseBuilder.ok(getService().count(null));
   }
 }

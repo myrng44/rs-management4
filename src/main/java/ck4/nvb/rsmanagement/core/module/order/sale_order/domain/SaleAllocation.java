@@ -22,11 +22,8 @@ public class SaleAllocation extends FullAuditedSerialIdEntity {
   @Column(name = "batch_stock_id")
   private Long batchStockId;
 
-  @Column(name = "qty_allocated")
-  private Integer qtyAllocated;
-
-  @Column(name = "qty_picked")
-  private Integer qtyPicked;
+  @Column(name = "sold_qty")
+  private Integer soldQty;
 
   @Column(name = "unit_cost_snap")
   private Integer unitCostSnap;

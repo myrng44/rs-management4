@@ -25,7 +25,7 @@ public interface SaleLineRepository extends BaseFullAuditedRepository<SaleLine, 
   @Query(
       value =
           """
-        SELECT p.id as id, p.sku as sku, p.name as name, p."desc" as "desc",
+        SELECT p.id as id, p.sku as sku, p.name as name, p.description,
                p.unit_price as unitPrice, p.category_id as categoryId,
                top_sold.total_quantity as totalQuantitySold
         FROM product p
@@ -49,7 +49,7 @@ public interface SaleLineRepository extends BaseFullAuditedRepository<SaleLine, 
   @Query(
           value =
                   """
-                SELECT p.id as id, p.sku as sku, p.name as name, p."desc" as "desc",
+                SELECT p.id as id, p.sku as sku, p.name as name, p.description,
                        p.unit_price as unitPrice, p.category_id as categoryId,
                        top_sold.total_quantity as totalQuantitySold
                 FROM product p

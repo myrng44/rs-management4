@@ -16,13 +16,13 @@ public class CategoryDto extends EntityDto<Long>
 
   private String name;
 
-  private String desc;
+  private String description;
 
   @Override
   public Category mapToEntity() {
     Category category = new Category();
     category.setName(name);
-    category.setDesc(desc);
+    category.setDescription(description);
     return category;
   }
 
@@ -35,8 +35,8 @@ public class CategoryDto extends EntityDto<Long>
       isModified = true;
     }
 
-    if (!desc.equals(entity.getDesc())) {
-      entity.setDesc(desc);
+    if (!description.equals(entity.getDescription())) {
+      entity.setDescription(description);
       isModified = true;
     }
     return isModified;

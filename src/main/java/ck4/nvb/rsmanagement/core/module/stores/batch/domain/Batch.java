@@ -20,25 +20,4 @@ public class Batch extends FullAuditedSerialIdEntity {
 
   @Column(name = "batch_code")
   private String batchCode;
-
-  @Column(name = "product_id")
-  private Long productId;
-
-  @Column(name = "original_qty")
-  private Integer originalQty;
-
-  @Column(name = "supplier_id")
-  private Long supplierId;
-
-  @Column(name = "import_price")
-  private Integer importedPrice;
-
-  @Column(name = "manufacture_date")
-  private LocalDateTime manufactureDate;
-
-  @Column(name = "expiry_date")
-  private LocalDateTime expiryDate;
-
-  @Column(name = "arrival_date")
-  private LocalDateTime arrivalDate;
 }

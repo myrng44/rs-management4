@@ -35,31 +35,12 @@ public class BatchStockServiceImpl
   @Override
   public Map<String, List<SearchOperator>> getSearchableKeys() {
     Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
-    keys.put("fromStock", List.of(SearchOperator.EQUALS));
-    keys.put("toStore", List.of(SearchOperator.EQUALS));
-    keys.put(
-        "startDate",
-        List.of(
-            SearchOperator.EQUALS,
-            SearchOperator.GREATER_THAN,
-            SearchOperator.LESS_THAN,
-            SearchOperator.BETWEEN));
-    keys.put(
-        "deliveryDate",
-        List.of(
-            SearchOperator.EQUALS,
-            SearchOperator.LESS_THAN,
-            SearchOperator.GREATER_THAN,
-            SearchOperator.BETWEEN));
-    keys.put("status", List.of(SearchOperator.EQUALS));
     return keys;
   }
 
   @Override
   public Set<String> getSortableKeys() {
     Set<String> keys = super.getSortableKeys();
-    keys.add("startDate");
-    keys.add("deliveryDate");
     return keys;
   }
 

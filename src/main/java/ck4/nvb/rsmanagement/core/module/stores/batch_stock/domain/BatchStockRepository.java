@@ -10,6 +10,21 @@ import org.springframework.stereotype.Repository;
 
 @Repository("importLogRepository")
 public interface BatchStockRepository extends BaseFullAuditedRepository<BatchStock, Long, Long> {
+
+  @Query(
+          value = """
+        SELECT bs.*
+        FROM batch_stock bs
+        JOIN store st ON bs.store_id = st.id
+        WHERE bs.store_id = :storeId
+            AND bs.status = :status
+            AND bs.deleted = false
+    """,
+          nativeQuery = true
+  )
+  List<BatchStock> findByStoreIdAndStatusAndDeletedIsFalse(Long storeId, String status);
+
+
   /** Get total available quantity for a product in a specific store */
   @Query(
       value =

@@ -4,6 +4,7 @@ import ck4.nvb.rsmanagement.base.search.annotation.SearchableEntity;
 import ck4.nvb.rsmanagement.base.search.dto.SearchRequest;
 import ck4.nvb.rsmanagement.base.search.dto.SearchResponse;
 import ck4.nvb.rsmanagement.base.search.sync.DataSyncService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public abstract class BaseHybridService<E, T extends BaseSearchDocument<ID>, ID> {
 
     @Autowired
@@ -131,26 +133,28 @@ public abstract class BaseHybridService<E, T extends BaseSearchDocument<ID>, ID>
      * Fuzzy search using Elasticsearch
      */
     public List<E> fuzzySearch(String keyword) {
-        return fuzzySearch(keyword, 0, 50);
+        return fuzzySearch(keyword, 0, 20);
     }
 
     /**
      * Fuzzy search with pagination using Elasticsearch
      */
     public List<E> fuzzySearch(String keyword, int page, int size) {
+        log.debug("BaseHybridService.fuzzySearch called: keyword='{}', page={}, size={}, service={}",
+                keyword, page, size, getSearchService().getClass().getSimpleName());
         try {
             SearchResponse<T> searchResponse = getSearchService().fuzzySearch(keyword, page, size);
-
+            log.debug("Elastic returned {} hits", searchResponse == null ? "null" : searchResponse.getTotalElements());
             if (searchResponse.isEmpty()) {
                 return List.of();
             }
-
             List<ID> ids = searchResponse.getContent().stream()
                     .map(BaseSearchDocument::getId)
                     .collect(Collectors.toList());
-
+            log.debug("IDs from ES: {}", ids);
             return findEntitiesByIds(ids);
         } catch (IOException e) {
+            log.error("Failed to execute fuzzy search via ES", e);
             throw new RuntimeException("Failed to execute fuzzy search", e);
         }
     }
@@ -273,4 +277,9 @@ public abstract class BaseHybridService<E, T extends BaseSearchDocument<ID>, ID>
      * Structured search using QueryDSL (fallback)
      */
     protected abstract List<E> structuredSearch(SearchRequest request);
+
+    /**
+     * Convert entity to search document
+     */
+    protected abstract T convertToSearchDocument(E entity);
 }

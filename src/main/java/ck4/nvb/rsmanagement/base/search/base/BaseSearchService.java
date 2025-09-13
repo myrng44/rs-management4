@@ -9,7 +9,9 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public abstract class BaseSearchService<T extends BaseSearchDocument<ID>, ID> {
     @Autowired
     protected ElasticsearchClient elasticsearchClient;
@@ -41,8 +44,13 @@ public abstract class BaseSearchService<T extends BaseSearchDocument<ID>, ID> {
      * Default index name (override if needed)
      */
     protected String resolveIndexName() {
-        return documentClass.getSimpleName().toLowerCase();
-    }
+        // Nếu class document có @Document(indexName="..."), dùng indexName đó
+        Document ann = documentClass.getAnnotation(Document.class);
+        if (ann != null && ann.indexName() != null && !ann.indexName().isBlank()) {
+            return ann.indexName();
+        }
+        // Fallback: tên class lowercase (giữ backward-compat)
+        return documentClass.getSimpleName().toLowerCase();    }
 
     protected String getIndexName() {
         return this.indexName;
@@ -71,20 +79,34 @@ public abstract class BaseSearchService<T extends BaseSearchDocument<ID>, ID> {
     public List<String> getSuggestions(String prefix, String field) throws IOException {
         Query query = queryBuilder.buildPrefixQuery(prefix, field);
 
-        co.elastic.clients.elasticsearch.core.SearchResponse<T> resp = elasticsearchClient.search(
-                s -> s.index(getIndexName())
-                        .query(query)
-                        .size(10),
-                documentClass
-        );
+        if (elasticsearchClient == null) {
+            log.error("ElasticsearchClient is null — check ElasticsearchConfig bean and dependencies");
+            throw new IllegalStateException("ElasticsearchClient not configured");
+        }
 
-        return resp.hits().hits().stream()
-                .map(Hit::source)
-                .filter(Objects::nonNull)
-                .map(doc -> extractFieldValue(doc, field))
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toList());
+        try {
+            co.elastic.clients.elasticsearch.core.SearchResponse<T> resp = elasticsearchClient.search(
+                    s -> s.index(getIndexName())
+                            .query(query)
+                            .size(10),
+                    documentClass
+            );
+
+            return resp.hits().hits().stream()
+                    .map(Hit::source)
+                    .filter(Objects::nonNull)
+                    .map(doc -> extractFieldValue(doc, field))
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            // log đầy đủ để biết nguyên nhân gây 500
+            log.error("Elasticsearch search failed — index={}, prefix={}, field={}, query={}",
+                    getIndexName(), prefix, field, query, e);
+            // ném tiếp để controller trả 500, hoặc anh có thể xử lý khác tùy ý
+            throw e;
+        }
     }
 
     public T indexDocument(T document) throws IOException {
@@ -138,6 +160,7 @@ public abstract class BaseSearchService<T extends BaseSearchDocument<ID>, ID> {
     // === Private helper ===
 
     private SearchResponse<T> executeSearch(Query query, int page, int size) throws IOException {
+        log.debug("executeSearch index={}, page={}, size={}, query={}", getIndexName(), page, size, query);
         co.elastic.clients.elasticsearch.core.SearchResponse<T> resp = elasticsearchClient.search(
                 s -> s.index(getIndexName())
                         .query(query)
@@ -145,6 +168,8 @@ public abstract class BaseSearchService<T extends BaseSearchDocument<ID>, ID> {
                         .size(size),
                 documentClass
         );
+        log.debug("ElasticsearchResponse: hits={}, total={}", resp.hits().hits().size(),
+                resp.hits()!=null && resp.hits().total()!=null ? resp.hits().total().value() : "unknown");
 
         List<T> content = resp.hits().hits().stream()
                 .map(Hit::source)

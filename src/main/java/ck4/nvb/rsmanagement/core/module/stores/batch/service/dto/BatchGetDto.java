@@ -10,8 +10,4 @@ import java.time.LocalDateTime;
 @Setter
 public class BatchGetDto extends EntityDto<Long> {
     private String batchCode;
-    private String supplierName;
-    private Integer importedPrice;
-    private LocalDateTime manufactureDate;
-    private LocalDateTime expiryDate;
 }

@@ -13,13 +13,6 @@ import org.modelmapper.ModelMapper;
 @Setter
 public class BatchDto extends EntityDto<Long> implements CreateInput<Batch>, UpdateInput<Batch> {
   private String batchCode;
-  private Long productId;
-  private Long supplierId;
-  private Integer originalQty;
-  private Integer importedPrice;
-  private LocalDateTime manufactureDate;
-  private LocalDateTime expiryDate;
-  private LocalDateTime arrivalDate;
 
   @Override
   public Batch mapToEntity() {

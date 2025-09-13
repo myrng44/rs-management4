@@ -38,7 +38,7 @@ public class BatchServiceImpl
 
   @Override
   public BatchGetDto mapToEntityDto(Batch entity) {
-    SupplierDto supplier = supplierService.get(entity.getSupplierId());
+/*    SupplierDto supplier = supplierService.get(entity.getSupplierId());
     BatchGetDto batchGetDto = new BatchGetDto();
     batchGetDto.setId(entity.getId());
     batchGetDto.setBatchCode(entity.getBatchCode());
@@ -46,61 +46,19 @@ public class BatchServiceImpl
     batchGetDto.setImportedPrice(entity.getImportedPrice());
     batchGetDto.setManufactureDate(entity.getManufactureDate());
     batchGetDto.setExpiryDate(entity.getExpiryDate());
-    return batchGetDto;
+    return batchGetDto;*/
+    return modelMapper.map(entity, BatchGetDto.class);
   }
 
   @Override
   public Map<String, List<SearchOperator>> getSearchableKeys() {
     Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
-    keys.put(
-        "quantity",
-        List.of(
-            SearchOperator.BETWEEN,
-            SearchOperator.LESS_THAN,
-            SearchOperator.GREATER_THAN,
-            SearchOperator.GREATER_THAN_OR_EQUAL,
-            SearchOperator.LESS_THAN_OR_EQUAL));
-    keys.put(
-        "importedPrice",
-        List.of(
-            SearchOperator.BETWEEN,
-            SearchOperator.LESS_THAN,
-            SearchOperator.GREATER_THAN,
-            SearchOperator.GREATER_THAN_OR_EQUAL,
-            SearchOperator.LESS_THAN_OR_EQUAL));
-    keys.put(
-        "manufacturingDate",
-        List.of(
-            SearchOperator.BETWEEN,
-            SearchOperator.GREATER_THAN_OR_EQUAL,
-            SearchOperator.LESS_THAN_OR_EQUAL,
-            SearchOperator.EQUALS));
-    keys.put(
-        "expiryDate",
-        List.of(
-            SearchOperator.EQUALS,
-            SearchOperator.GREATER_THAN_OR_EQUAL,
-            SearchOperator.LESS_THAN_OR_EQUAL,
-            SearchOperator.BETWEEN));
-    keys.put(
-        "currentQuantity",
-        List.of(
-            SearchOperator.BETWEEN,
-            SearchOperator.GREATER_THAN_OR_EQUAL,
-            SearchOperator.LESS_THAN_OR_EQUAL));
-    keys.put("status", List.of(SearchOperator.EQUALS));
     return keys;
   }
 
   @Override
   public Set<String> getSortableKeys() {
     Set<String> keys = super.getSortableKeys();
-    keys.add("quantity");
-    keys.add("importedPrice");
-    keys.add("manufacturingDate");
-    keys.add("expiryDate");
-    keys.add("currentQuantity");
-    keys.add("status");
     return keys;
   }
 }

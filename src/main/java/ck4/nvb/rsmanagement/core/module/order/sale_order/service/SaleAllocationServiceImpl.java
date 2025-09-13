@@ -29,4 +29,16 @@ public class SaleAllocationServiceImpl
   public SaleAllocationDto mapToEntityDto(SaleAllocation entity) {
     return modelMapper.map(entity, SaleAllocationDto.class);
   }
+
+  @Override
+  public Integer getTotalSoldQuantityByBatchItem(Long batchItemId) {
+    if (batchItemId == null) return 0;
+    Integer total = getRepository().sumSoldQtyByBatchItemId(batchItemId);
+    return total == null ? 0 : total;  }
+
+  @Override
+  public Integer getTotalSoldQuantityByBatchStockAndProduct(Long batchStockId, Long productId) {
+    if (batchStockId == null || productId == null) return 0;
+    Integer total = getRepository().sumSoldQtyByBatchStockAndProduct(batchStockId, productId);
+    return total == null ? 0 : total;  }
 }

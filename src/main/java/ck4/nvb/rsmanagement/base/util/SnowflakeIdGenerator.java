@@ -1,7 +1,7 @@
 package ck4.nvb.rsmanagement.base.util;
 
 public class SnowflakeIdGenerator {
-  private final long twepoch = 1609459200000L; // 01/01/2021
+  private final long twepoch = 1735689600000L; // 01/01/2025
   private final long datacenterIdBits = 5L;
   private final long workerIdBits = 5L;
   private final long sequenceBits = 12L;

@@ -14,7 +14,7 @@ public class ProductCreateDto extends EntityDto<Long> implements CreateInput<Pro
 
   private String sku;
   private String name;
-  private String desc;
+  private String description;
   private Integer unitPrice;
   private Long categoryId;
 
@@ -23,7 +23,7 @@ public class ProductCreateDto extends EntityDto<Long> implements CreateInput<Pro
     Product product = new Product();
     product.setSku(sku);
     product.setName(name);
-    product.setDesc(desc);
+    product.setDescription(description);
     product.setUnitPrice(unitPrice);
     product.setCategoryId(categoryId);
     return product;

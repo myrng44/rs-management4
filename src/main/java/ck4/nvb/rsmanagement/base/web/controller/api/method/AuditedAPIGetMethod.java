@@ -78,12 +78,12 @@ public abstract class AuditedAPIGetMethod<
         page, request.getPaging().getOffset(), request.getPaging().getLimit());
   }
 
-  public ResponseEntity<Long> count(List<String> query) {
+  public APIResponse<Long> count(List<String> query) {
     if (query != null) {
       List<SearchCriteria> params = SearchCriteriaParser.parse(query);
-      return ResponseEntity.ok(getService().count(params));
+      return APIResponseBuilder.ok(getService().count(params));
     }
     // Remove this line - let the service handle deleted filter automatically
-    return ResponseEntity.ok(getService().count(null)); // or empty list
+    return APIResponseBuilder.ok(getService().count(null)); // or empty list
   }
 }
