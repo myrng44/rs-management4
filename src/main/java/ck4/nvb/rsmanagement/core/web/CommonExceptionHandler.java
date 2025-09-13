@@ -8,6 +8,7 @@ import ck4.nvb.rsmanagement.base.web.error.ErrorCode;
 import ck4.nvb.rsmanagement.base.web.error.FieldError;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -18,6 +19,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 
 @ControllerAdvice
 @Slf4j
@@ -26,6 +28,13 @@ public class CommonExceptionHandler {
     String t = MDC.get("traceId");
     return t == null ? "" : t;
   }
+
+/*  @ExceptionHandler(Exception.class)
+  public ResponseEntity<Object> handleAll(Exception ex, WebRequest req) {
+    log.error("Unhandled exception", ex); // in full stacktrace
+    Map<String,Object> body = Map.of("error", ex.getClass().getName(), "message", ex.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+  }*/
 
   @ExceptionHandler(ObjectNotFoundException.class)
   public ResponseEntity<APIResponse<Object>> handleNotFound(ObjectNotFoundException ex) {

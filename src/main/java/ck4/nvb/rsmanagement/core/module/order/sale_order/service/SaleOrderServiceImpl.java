@@ -173,25 +173,16 @@ public class SaleOrderServiceImpl
 
   /** get total available quantity for a product in a specific store */
   private Long getTotalAvailableQuantity(Long productId, UserGetDto user) throws AppException {
-    // Get all active batch stocks for this store
-    List<BatchStock> activeBatchStocks = batchStockRepository
-            .findByStoreIdAndStatusAndDeletedIsFalse(user.getStoreId(), "ACTIVE");
+    List<BatchItem> batchItems = batchItemRepository.findAvailableByProductAndStoreOrdered(productId, user.getStoreId());
+    long totalAvailable = 0L;
 
-    long totalAvailable = 0;
-
-    for (BatchStock batchStock : activeBatchStocks) {
-      // Get batch items for this product in this batch
-      List<BatchItem> batchItems = batchItemRepository
-              .findByBatchIdAndProductIdAndDeletedIsFalse(batchStock.getBatchId(), productId);
-
-      for (BatchItem batchItem : batchItems) {
-        // Calculate available quantity: original_qty - sold_qty
-        Integer originalQty = batchItem.getOriginalQty();
-        Integer soldQty = getSoldQuantityForBatchItem(batchStock.getId(), productId);
-
-        totalAvailable += Math.max(0, originalQty - soldQty);
-      }
+    for (BatchItem batchItem : batchItems) {
+      Integer original = batchItem.getOriginalQty() == null ? 0 : batchItem.getOriginalQty();
+      Integer sold = saleAllocationService.getTotalSoldQuantityByBatchItem(batchItem.getId());
+      int avail = Math.max(0, original - (sold == null ? 0 : sold));
+      totalAvailable += avail;
     }
+
     return totalAvailable;
   }
 
@@ -208,33 +199,33 @@ public class SaleOrderServiceImpl
   private void allocateInventoryForSaleLine(
       Long saleLineId, Long productId, Integer qtyNeeded, UserGetDto user)
       throws AppException {
-    // FIFO theo expiry_date
     List<BatchItem> availableBatchItems = batchItemRepository.findAvailableByProductAndStoreOrdered(productId, user.getStoreId());
 
     int remaining = qtyNeeded;
     for (BatchItem bi : availableBatchItems) {
       if (remaining <= 0) break;
 
-      int soldQty = saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId());
-      int available = bi.getOriginalQty() - soldQty;
-      int allocateQty = Math.min(remaining, available);
+      int original = bi.getOriginalQty() == null ? 0 : bi.getOriginalQty();
+      int sold = saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId()) == null ? 0 : saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId());
+      int avail = Math.max(0, original - sold);
+      if (avail <= 0) continue;
 
-      if (allocateQty > 0) {
-        SaleAllocationDto alloc = new SaleAllocationDto();
-        alloc.setSaleLineId(saleLineId);
-        alloc.setBatchItemId(bi.getId());  // thay vì batchStockId
-        alloc.setSoldQty(allocateQty);
-        alloc.setUnitCostSnap(bi.getImportPrice());
-        saleAllocationService.create(alloc, user);
+      int allocateQty = Math.min(remaining, avail);
 
-        remaining -= allocateQty;
-        getLogger().info("Allocated {} units from batch_item {} for sale line {}",
-                allocateQty, bi.getId(), saleLineId);
-      }
+      SaleAllocationDto alloc = new SaleAllocationDto();
+      alloc.setSaleLineId(saleLineId);
+      alloc.setBatchItemId(bi.getId());
+      alloc.setSoldQty(allocateQty);
+      alloc.setUnitCostSnap(bi.getImportPrice());
+      saleAllocationService.create(alloc, user);
+
+      remaining -= allocateQty;
+      getLogger().info("Allocated {} units from batch_item {} for sale line {}", allocateQty, bi.getId(), saleLineId);
     }
 
     if (remaining > 0) {
-      throw new AppException("Unable to fully allocate inventory for product " + productId + ". Missing " + remaining + " units");
+      throw new AppException(
+              String.format("Unable to fully allocate inventory for product %d. Missing %d units", productId, remaining));
     }
   }
 

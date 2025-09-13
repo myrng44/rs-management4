@@ -18,8 +18,6 @@ public class SaleLineDto extends EntityDto<Long>
   private String saleOrderId;
   private Long productId;
   private Integer qtyOrdered;
-  private Integer qtyAllocated;
-  private Integer qtyPicked;
   private Integer unitPrice;
 
   @Override
@@ -44,14 +42,6 @@ public class SaleLineDto extends EntityDto<Long>
     }
     if (!qtyOrdered.equals(entity.getQtyOrdered())) {
       entity.setQtyOrdered(qtyOrdered);
-      isModified = true;
-    }
-    if (!qtyAllocated.equals(entity.getQtyAllocated())) {
-      entity.setQtyAllocated(qtyAllocated);
-      isModified = true;
-    }
-    if (!qtyPicked.equals(entity.getQtyPicked())) {
-      entity.setQtyPicked(qtyPicked);
       isModified = true;
     }
     return isModified;
