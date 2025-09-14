@@ -6,36 +6,29 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
-
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class SaleOrderCreateDto extends BaseSaleOrderDto implements CreateInput<SaleOrder> {
-
-
-  @JsonSerialize(using = ToStringSerializer.class)
-  private Long storeId;
-
-//  private Long customerId;
 
   @NotEmpty private List<SaleLineDto> lines;
 
-  @JsonSerialize(using = ToStringSerializer.class)
-  private Long voucherId;
+  private String voucherCode;
 
   private Long paymentId;
+
   @Override
   public SaleOrder mapToEntity() {
 
     SaleOrder saleOrder = new SaleOrder();
     saleOrder.setCustomerId(getCustomerId());
     saleOrder.setNote(getNote());
-    saleOrder.setStoreId(storeId);
-    saleOrder.setVoucherId(voucherId);
     saleOrder.setPaymentId(paymentId);
     return saleOrder;
   }

@@ -28,7 +28,4 @@ public class Product extends FullAuditedSerialIdEntity {
 
   @Column(name = "category_id")
   private Long categoryId;
-
-  @Column(name = "supplier_id")
-  private Long supplierId;
 }

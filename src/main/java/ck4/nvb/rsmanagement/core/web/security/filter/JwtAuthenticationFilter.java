@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private String JWT_SECRET;
 
   @Autowired
-  private UserRepository userRepository; // optional fallback
+  private UserRepository userRepository;
 
   private Long toLong(Object value) {
     if (value == null) return null;
@@ -53,7 +53,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       Claims claims = getClaims(token);
       String username = claims.getSubject();
 
-      // sẽ nhận được String (theo patch trên) => toLong() sẽ convert đúng
       Long userId = toLong(claims.get("userId"));
       Long storeId = toLong(claims.get("storeId"));
 

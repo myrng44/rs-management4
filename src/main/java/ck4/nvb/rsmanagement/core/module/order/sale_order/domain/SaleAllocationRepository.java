@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository("saleAllocationRepository")
 public interface SaleAllocationRepository
         extends BaseFullAuditedRepository<SaleAllocation, Long, Long> {
+
   /** Find all allocations for a specific order */
   @Query(
           """
@@ -22,71 +23,44 @@ public interface SaleAllocationRepository
       """)
   List<SaleAllocation> findAllocationsByOrderId(@Param("orderId") String orderId);
 
-  /** Find allocations by sale line ID */
-  @Query(
-          """
-        SELECT sa
-        FROM SaleAllocation sa
-        WHERE sa.saleLineId = :saleLineId
-          AND sa.deleted = false
-        ORDER BY sa.id
-      """)
-  List<SaleAllocation> findAllocationsBySaleLineId(@Param("saleLineId") Long saleLineId);
+  /**
+   * Sum sold_qty for a specific batch_item.
+   *
+   * We can't rely on sale_allocation.batch_item_id (not present in new schema),
+   * so we join sale_allocation -> sale_line -> batch_stock -> batch -> batch_item
+   * and match the target batch_item.id.
+   */
+  @Query(value = """
+    SELECT COALESCE(SUM(sa.sold_qty), 0)
+    FROM sale_allocation sa
+    JOIN sale_line sl ON sa.sale_line_id = sl.id
+    JOIN batch_stock bs ON sa.batch_stock_id = bs.id
+    JOIN batch b ON bs.batch_id = b.id
+    JOIN batch_item bi ON bi.batch_id = b.id AND bi.product_id = sl.product_id
+    WHERE bi.id = :batchItemId
+      AND sa.deleted = false
+      AND sl.deleted = false
+      AND bi.deleted = false
+    """, nativeQuery = true)
+  Integer sumSoldQtyByBatchItemId(@Param("batchItemId") Long batchItemId);
 
-  /** Find allocations by batch stock ID */
-  @Query(
-          """
-        SELECT sa
-        FROM SaleAllocation sa
-        WHERE sa.batchStockId = :batchStockId
-          AND sa.deleted = false
-        ORDER BY sa.id
-      """)
-  List<SaleAllocation> findAllocationsByBatchStockId(@Param("batchStockId") Long batchStockId);
-
-  /** Get total allocated quantity for a batch stock */
-  @Query(
-          """
-        SELECT COALESCE(SUM(sa.qtyAllocated), 0)
-        FROM SaleAllocation sa
-        WHERE sa.batchStockId = :batchStockId
-          AND sa.deleted = false
-      """)
-  Integer getTotalAllocatedQuantityByBatchStock(@Param("batchStockId") Long batchStockId);
-
-  /** Get total picked quantity for a batch stock */
-  @Query(
-          """
-        SELECT COALESCE(SUM(sa.qtyPicked), 0)
-        FROM SaleAllocation sa
-        WHERE sa.batchStockId = :batchStockId
-          AND sa.deleted = false
-      """)
-  Integer getTotalPickedQuantityByBatchStock(@Param("batchStockId") Long batchStockId);
-
-  /** Find incomplete allocations (not fully picked) */
-  @Query(
-          """
-        SELECT sa
-        FROM SaleAllocation sa
-        WHERE sa.qtyPicked < sa.qtyAllocated
-          AND sa.deleted = false
-        ORDER BY sa.createdTime
-      """)
-  List<SaleAllocation> findIncompleteAllocations();
-
-  /** Find allocations for a specific product across all stores */
-  @Query(
-          """
-        SELECT sa
-        FROM SaleAllocation sa
-        JOIN BatchStock bs ON sa.batchStockId = bs.id
-        JOIN Batch b ON bs.batchId = b.id
-        WHERE b.productId = :productId
-          AND sa.deleted = false
-          AND bs.deleted = false
-          AND b.deleted = false
-        ORDER BY sa.createdTime DESC
-      """)
-  List<SaleAllocation> findAllocationsByProduct(@Param("productId") Long productId);
+  /**
+   * Sum sold_qty for a given batch_stock and product.
+   * Join through sale_line to ensure allocation belongs to the product.
+   */
+  @Query(value = """
+    SELECT COALESCE(SUM(sa.sold_qty), 0)
+    FROM sale_allocation sa
+    JOIN sale_line sl ON sa.sale_line_id = sl.id
+    JOIN batch_stock bs ON sa.batch_stock_id = bs.id
+    JOIN batch b ON bs.batch_id = b.id
+    JOIN batch_item bi ON bi.batch_id = b.id AND bi.product_id = sl.product_id
+    WHERE bs.id = :batchStockId
+      AND sl.product_id = :productId
+      AND sa.deleted = false
+      AND sl.deleted = false
+      AND bi.deleted = false
+    """, nativeQuery = true)
+  Integer sumSoldQtyByBatchStockAndProduct(@Param("batchStockId") Long batchStockId,
+                                           @Param("productId") Long productId);
 }

@@ -16,7 +16,6 @@ public class ProductCreateDto extends BaseProductDto implements CreateInput<Prod
   private String description;
   private Integer unitPrice;
   private Long categoryId;
-  private Long supplierId;
 
   @Override
   public Product mapToEntity() {
@@ -26,7 +25,6 @@ public class ProductCreateDto extends BaseProductDto implements CreateInput<Prod
     product.setDescription(description);
     product.setUnitPrice(unitPrice);
     product.setCategoryId(categoryId);
-    product.setSupplierId(supplierId);
     return product;
   }
 }

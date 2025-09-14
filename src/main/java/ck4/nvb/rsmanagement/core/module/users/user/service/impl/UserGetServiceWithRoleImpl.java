@@ -251,7 +251,6 @@ public class UserGetServiceWithRoleImpl<D, ID, T> implements UserGetServiceWithR
 
     return Jwts.builder()
             .setSubject(username)
-            // Lưu id/storeId dưới dạng STRING để tránh mất độ chính xác ở client JS
             .claim("userId", String.valueOf(userId))
             .claim("storeId", String.valueOf(storeId))
             .claim("roles", roles)

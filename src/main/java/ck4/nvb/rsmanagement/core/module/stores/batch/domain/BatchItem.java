@@ -1,7 +1,9 @@
 package ck4.nvb.rsmanagement.core.module.stores.batch.domain;
 
 import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,15 +19,25 @@ import java.time.LocalDateTime;
 @Table(name = "batch_item")
 public class BatchItem extends FullAuditedSerialIdEntity {
 
-  @Column(name = "batch_id")
+  @Column(name = "batch_id", nullable = false)
   private Long batchId;
 
-  @Column(name = "product_id")
+  @Column(name = "product_id", nullable = false)
   private Long productId;
 
-  @Column(name = "qty")
-  private Integer qty;
+  @Column(name = "supplier_id", nullable = false)
+  private Long supplierId;
 
-  @Column(name = "import_price")
+  @Column(name = "original_qty", nullable = false)
+  private Integer originalQty;
+
+  @Column(name = "import_price", nullable = false)
   private Integer importPrice;
+
+  @Column(name = "manufacture_date", nullable = false)
+  private LocalDateTime manufactureDate;
+
+  @Column(name = "expiry_date", nullable = false)
+  private LocalDateTime expiryDate;
+
 }

@@ -13,5 +13,4 @@ public abstract class BaseProductDto extends EntityDto<Long> {
   private String description;
   private Integer unitPrice;
   private Long categoryId;
-  private Long supplierId;
 }

@@ -11,13 +11,10 @@ import org.modelmapper.ModelMapper;
 @Getter
 @Setter
 public class BatchStockDto extends EntityDto<Long>
-    implements CreateInput<BatchStock>, UpdateInput<BatchStock> {
+        implements CreateInput<BatchStock>, UpdateInput<BatchStock> {
 
   private Long batchId;
   private Long storeId;
-  private Integer qtyTotal;
-  private Integer qtyAvailable;
-  private Integer qtyReversed;
   private String status;
   private Integer version;
 

@@ -1,46 +1,49 @@
 package ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain;
 
 import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
-import java.util.List;
-
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockGetDto;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository("importLogRepository")
 public interface BatchStockRepository extends BaseFullAuditedRepository<BatchStock, Long, Long> {
+
   @Query(
           value =
                   """
-                SELECT COALESCE(SUM(bs.qty_available))
+                SELECT COALESCE(SUM(bi.original_qty), 0)
                 FROM batch_stock bs
                 JOIN batch b ON bs.batch_id = b.id
-                WHERE b.product_id = :productId
+                JOIN batch_item bi ON bi.batch_id = b.id
+                WHERE bi.product_id = :productId
                   AND bs.store_id = :storeId
                   AND bs.status = 'ACTIVE'
                   AND bs.deleted = false
                   AND b.deleted = false
-                  AND bs.qty_available > 0
+                  AND bi.deleted = false
                 """,
           nativeQuery = true)
   Long getTotalAvailableQuantityByProductAndStore(
           @Param("productId") Long productId, @Param("storeId") Long storeId);
 
-  /** Find available batch stocks for a product in a store, ordered by expiry date (FIFO) */
+  /** Find batches (batch_stock rows) that contain product in store, ordered by expiry (FIFO) */
   @Query(
           value =
                   """
                 SELECT bs.*
                 FROM batch_stock bs
                 JOIN batch b ON bs.batch_id = b.id
-                WHERE b.product_id = :productId
+                JOIN batch_item bi ON bi.batch_id = b.id
+                WHERE bi.product_id = :productId
                   AND bs.store_id = :storeId
                   AND bs.status = 'ACTIVE'
                   AND bs.deleted = false
                   AND b.deleted = false
-                  AND bs.qty_available > 0
-                ORDER BY b.expiry_date ASC, b.arrival_date ASC
+                  AND bi.deleted = false
+                ORDER BY bi.expiry_date ASC
                 """,
           nativeQuery = true)
   List<BatchStock> findAvailableBatchStocksByProductAndStore(
@@ -49,25 +52,26 @@ public interface BatchStockRepository extends BaseFullAuditedRepository<BatchSto
   /** Find available batch stock infos for a product in a store, order by expiry date (FIFO) */
   @Query(value = """
     SELECT p.name as productName,
-            bs.qty_total as qtyTotal,
-            bs.qty_available as qtyAvailable,
-            bs.qty_reversed as qtyReversed,
+            bi.original_qty as qtyTotal,
+            bi.original_qty as qtyAvailable,
+            0 as qtyReversed,
             b.batch_code as batchCode,
             spl.name as supplierName,
-            b.import_price as importedPrice,
-            b.manufacture_date as manufactureDate,
-            b.expiry_date as expiryDate
+            bi.import_price as importedPrice,
+            bi.manufacture_date as manufactureDate,
+            bi.expiry_date as expiryDate
     FROM batch_stock bs
-    JOIN batch b ON bs.batch_id = b.id
-    JOIN product p ON p.id = b.product_id
-    JOIN supplier spl ON spl.id = b.supplier_id
-    WHERE b.product_id = :productId
+    JOIN batch b ON b.id = bs.batch_id
+    JOIN batch_item bi ON bi.batch_id = b.id
+    JOIN product p ON p.id = bi.product_id
+    JOIN supplier spl ON spl.id = bi.supplier_id
+    WHERE bi.product_id = :productId
         AND bs.store_id = :storeId
         AND bs.status = 'ACTIVE'
         AND bs.deleted = false
         AND b.deleted = false
-        AND bs.qty_available > 0
-    ORDER BY b.expiry_date ASC
+        AND bi.deleted = false
+    ORDER BY bi.expiry_date ASC
     """,
           nativeQuery = true)
   List<BatchStockGetDto> findAvailableBatchInfoByProductAndStore(@Param("productId") Long productId, @Param("storeId") Long storeId);
@@ -79,20 +83,21 @@ public interface BatchStockRepository extends BaseFullAuditedRepository<BatchSto
                 SELECT bs.*
                 FROM batch_stock bs
                 JOIN batch b ON bs.batch_id = b.id
+                JOIN batch_item bi ON bi.batch_id = b.id
                 WHERE bs.store_id = :storeId
                   AND bs.status = 'ACTIVE'
                   AND bs.deleted = false
                   AND b.deleted = false
-                  AND bs.qty_available > 0
-                  AND b.expiry_date <= :expiryThreshold
-                ORDER BY b.expiry_date ASC
+                  AND bi.deleted = false
+                  AND bi.expiry_date <= :expiryThreshold
+                ORDER BY bi.expiry_date ASC
                 """,
           nativeQuery = true)
   List<BatchStock> findExpiringBatchStocks(
           @Param("storeId") Long storeId,
           @Param("expiryThreshold") java.time.LocalDateTime expiryThreshold);
 
-  /** Find batch stocks by batch ID and store ID */
+  /** Find batch stocks by batch_id and store ID */
   @Query(
           value =
                   """
@@ -113,15 +118,16 @@ public interface BatchStockRepository extends BaseFullAuditedRepository<BatchSto
                 SELECT bs.*
                 FROM batch_stock bs
                 JOIN batch b ON bs.batch_id = b.id
-                JOIN product p ON b.product_id = p.id
+                JOIN batch_item bi ON bi.batch_id = b.id
+                JOIN product p ON bi.product_id = p.id
                 WHERE bs.store_id = :storeId
                   AND bs.status = 'ACTIVE'
                   AND bs.deleted = false
                   AND b.deleted = false
                   AND p.deleted = false
-                  AND bs.qty_available <= :threshold
-                  AND bs.qty_available > 0
-                ORDER BY bs.qty_available ASC
+                  AND bi.deleted = false
+                  AND bi.original_qty <= :threshold
+                ORDER BY bi.original_qty ASC
                 """,
           nativeQuery = true)
   List<BatchStock> findLowInventoryBatchStocks(

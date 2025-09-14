@@ -3,6 +3,8 @@ package ck4.nvb.rsmanagement.core.module.stores.batch.service;
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
 import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.Batch;
+import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchItem;
+import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchItemRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch.service.dto.BatchDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
@@ -27,6 +29,9 @@ public class BatchCrudServiceImpl
 
   @Autowired private ModelMapper modelMapper;
 
+  @Autowired
+  private BatchItemRepository batchItemRepository;
+
   @Override
   public BatchRepository getRepository() {
     return (BatchRepository) super.getRepository();
@@ -37,6 +42,7 @@ public class BatchCrudServiceImpl
     return modelMapper.map(entity, BatchDto.class);
   }
 
+  // getSearchableKeys / getSortableKeys giữ nguyên như trước (nếu cần)
   @Override
   public Map<String, List<SearchOperator>> getSearchableKeys() {
     Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
@@ -95,8 +101,9 @@ public class BatchCrudServiceImpl
   @Override
   public List<BatchDto> findByProductId(Long productId) {
     List<Batch> batches = getRepository().findByProductId(productId);
-    return batches.stream().map(this::toDto).collect(Collectors.toList());
+    return batches.stream().map(b -> toDto(b, productId)).collect(Collectors.toList());
   }
+
 
   @Override
   public List<BatchDto> findByProductIds(List<Long> productIds) {
@@ -104,14 +111,26 @@ public class BatchCrudServiceImpl
       return List.of();
     }
     List<Batch> batches = getRepository().findByProductIdIn(productIds);
-    return batches.stream().map(this::toDto).collect(Collectors.toList());
+    // map với productId đầu tiên (giữ lại logic cũ)
+    return batches.stream().map(b -> toDto(b, productIds.get(0))).collect(Collectors.toList());
   }
 
-  // Simple entity -> dto mapping. Nếu bạn có mapper (MapStruct / custom) thì dùng nó.
-  private BatchDto toDto(Batch b) {
+  private BatchDto toDto(Batch b, Long productId) {
     BatchDto dto = new BatchDto();
     BeanUtils.copyProperties(b, dto);
-    // Nếu tên trường khác (ví dụ importedPrice vs importPrice) thì map thủ công
+    // Lấy các batch_item của batch
+    List<BatchItem> items = batchItemRepository.findByBatchId(b.getId())
+            .stream().filter(bi -> productId == null || productId.equals(bi.getProductId()))
+            .collect(Collectors.toList());
+    if (!items.isEmpty()) {
+      BatchItem bi = items.get(0);
+      dto.setImportedPrice(bi.getImportPrice());
+      dto.setOriginalQty(bi.getOriginalQty());
+      dto.setSupplierId(bi.getSupplierId());
+      dto.setManufactureDate(bi.getManufactureDate());
+      dto.setExpiryDate(bi.getExpiryDate());
+    }
     return dto;
   }
+
 }

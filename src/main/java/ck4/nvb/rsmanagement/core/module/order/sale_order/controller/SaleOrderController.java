@@ -7,7 +7,6 @@ import ck4.nvb.rsmanagement.base.web.controller.api.PageResponse;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleLineService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleOrderService;
-import ck4.nvb.rsmanagement.core.module.order.sale_order.service.OrderFulfillmentService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.*;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
@@ -34,7 +33,6 @@ public class SaleOrderController
         SaleOrderUpdateDto> {
 
   @Autowired private ISaleLineService saleLineService;
-  @Autowired private OrderFulfillmentService fulfillmentService;
   @Autowired private ModelMapper modelMapper;
 
   public SaleOrderController(ISaleOrderService service) {
@@ -116,162 +114,5 @@ public class SaleOrderController
   public ResponseEntity<ApiResponse<PageResponse<SaleOrderGetFullDto>>> getList(
           Authentication auth, FilterInput request) {
     return super.getList(auth, request);
-  }
-
-  @GetMapping("/{orderId}/fulfillment/status")
-  public ResponseEntity<ApiResponse<OrderFulfillmentStatusDto>> getFulfillmentStatus(
-      Authentication auth, @PathVariable String orderId) {
-
-    OrderFulfillmentService.OrderFulfillmentStatus status =
-        fulfillmentService.getOrderFulfillmentStatus(orderId);
-
-    OrderFulfillmentStatusDto statusDto = new OrderFulfillmentStatusDto();
-    statusDto.setOrderId(orderId);
-    statusDto.setStatus(status);
-    statusDto.setCanFulfill(fulfillmentService.canFulfillOrder(orderId));
-
-    return ResponseEntity.ok(ApiResponse.success(statusDto));
-  }
-
-  @GetMapping("/{orderId}/allocations")
-  public ResponseEntity<ApiResponse<List<SaleAllocationDto>>> getOrderAllocations(
-      Authentication auth, @PathVariable String orderId) {
-
-    List<SaleAllocationDto> allocations = fulfillmentService.getOrderAllocationDetails(orderId);
-    return ResponseEntity.ok(ApiResponse.success(allocations));
-  }
-
-  @PostMapping("/{orderId}/fulfillment/pick")
-  public ResponseEntity<ApiResponse<String>> pickOrderItems(
-      Authentication auth, @PathVariable String orderId) {
-
-    UserGetDto user = extractUser(auth);
-
-    try {
-      List<SaleLineGetDto> saleLines =
-          saleLineService.getAll(
-              List.of(
-                  new ck4.nvb.rsmanagement.base.web.utils.SearchCriteria(
-                      "saleOrderId",
-                      ck4.nvb.rsmanagement.base.web.utils.SearchOperator.EQUALS,
-                      orderId)));
-
-      for (SaleLineGetDto saleLine : saleLines) {
-        fulfillmentService.pickItemsForSaleLine(saleLine.getId(), user);
-      }
-
-      return ResponseEntity.ok(
-          ApiResponse.<String>builder()
-              .code(200)
-              .message("All items for order " + orderId + " have been picked.")
-              .data("Order items picked successfully")
-              .build());
-
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(ApiResponse.error(500, "Failed to pick order items: " + e.getMessage()));
-    }
-  }
-
-  @PostMapping("/lines/{saleLineId}/pick")
-  public ResponseEntity<ApiResponse<String>> pickSaleLineItems(
-      Authentication auth,
-      @PathVariable Long saleLineId,
-      @RequestBody PickItemsRequestDto request) {
-
-    UserGetDto user = extractUser(auth);
-
-    try {
-      if (request.getQtyToPick() != null) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(
-                ApiResponse.error(
-                    400, "Partial picking not yet implemented. Use full pick instead."));
-      } else {
-        fulfillmentService.pickItemsForSaleLine(saleLineId, user);
-        return ResponseEntity.ok(
-            ApiResponse.<String>builder()
-                .code(200)
-                .message("All items for sale line " + saleLineId + " have been picked.")
-                .data("Sale line items picked successfully")
-                .build());
-      }
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(ApiResponse.error(500, "Failed to pick sale line items: " + e.getMessage()));
-    }
-  }
-
-  @PostMapping("/{orderId}/fulfillment/complete")
-  public ResponseEntity<ApiResponse<String>> completeOrderFulfillment(
-      Authentication auth, @PathVariable String orderId) {
-
-    UserGetDto user = extractUser(auth);
-
-    try {
-      if (!fulfillmentService.canFulfillOrder(orderId)) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(
-                ApiResponse.error(
-                    400, "Order cannot be completed. Some items are not yet picked."));
-      }
-
-      fulfillmentService.completeOrderFulfillment(orderId, user);
-      return ResponseEntity.ok(
-          ApiResponse.<String>builder()
-              .code(200)
-              .message("Order " + orderId + " has been completed and inventory updated.")
-              .data("Order fulfillment completed")
-              .build());
-
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(ApiResponse.error(500, "Failed to complete order fulfillment: " + e.getMessage()));
-    }
-  }
-
-  @PostMapping("/{orderId}/fulfillment/cancel")
-  public ResponseEntity<ApiResponse<String>> cancelOrder(
-      Authentication auth, @PathVariable String orderId) {
-
-    UserGetDto user = extractUser(auth);
-
-    try {
-      fulfillmentService.cancelOrder(orderId, user);
-      return ResponseEntity.ok(
-          ApiResponse.<String>builder()
-              .code(200)
-              .message("Order " + orderId + " has been cancelled and inventory released.")
-              .data("Order cancelled successfully")
-              .build());
-
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(ApiResponse.error(500, "Failed to cancel order: " + e.getMessage()));
-    }
-  }
-
-  @PostMapping("/allocations/{allocationId}/pick")
-  public ResponseEntity<ApiResponse<String>> partialPickFromAllocation(
-      Authentication auth,
-      @PathVariable Long allocationId,
-      @RequestBody PartialPickRequestDto request) {
-
-    UserGetDto user = extractUser(auth);
-
-    try {
-      fulfillmentService.partialPick(allocationId, request.getQtyToPick(), user);
-      return ResponseEntity.ok(
-          ApiResponse.<String>builder()
-              .code(200)
-              .message(
-                  "Picked " + request.getQtyToPick() + " items from allocation " + allocationId)
-              .data("Partial pick completed")
-              .build());
-
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(ApiResponse.error(500, "Failed to partial pick: " + e.getMessage()));
-    }
   }
 }

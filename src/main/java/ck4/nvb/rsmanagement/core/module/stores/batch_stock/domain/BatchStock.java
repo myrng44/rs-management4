@@ -16,20 +16,11 @@ import lombok.Setter;
 @Entity
 @Table(name = "batch_stock")
 public class BatchStock extends FullAuditedSerialIdEntity {
-  @Column(name = "batch_id")
+  @Column(name = "batch_id", nullable = false)
   private Long batchId;
 
-  @Column(name = "store_id")
+  @Column(name = "store_id", nullable = false)
   private Long storeId;
-
-  @Column(name = "qty_total")
-  private Integer qtyTotal;
-
-  @Column(name = "qty_available")
-  private Integer qtyAvailable;
-
-  @Column(name = "qty_reversed")
-  private Integer qtyReversed;
 
   @Column(name = "status")
   private String status;

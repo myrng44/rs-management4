@@ -4,7 +4,6 @@ import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,27 +17,6 @@ import lombok.Setter;
 @Table(name = "batch")
 public class Batch extends FullAuditedSerialIdEntity {
 
-  @Column(name = "batch_code")
+  @Column(name = "batch_code", nullable = false, length = 50)
   private String batchCode;
-
-  @Column(name = "product_id")
-  private Long productId;
-
-  @Column(name = "original_qty")
-  private Integer originalQty;
-
-  @Column(name = "supplier_id")
-  private Long supplierId;
-
-  @Column(name = "import_price")
-  private Integer importedPrice;
-
-  @Column(name = "manufacture_date")
-  private LocalDateTime manufactureDate;
-
-  @Column(name = "expiry_date")
-  private LocalDateTime expiryDate;
-
-  @Column(name = "arrival_date")
-  private LocalDateTime arrivalDate;
 }

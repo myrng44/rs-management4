@@ -13,13 +13,14 @@ import org.modelmapper.ModelMapper;
 @Setter
 public class BatchDto extends EntityDto<Long> implements CreateInput<Batch>, UpdateInput<Batch> {
   private String batchCode;
-  private Long productId;
+
+  // giữ các field dùng để hiển thị/tiện ích từ batch_item
   private Long supplierId;
-  private Integer originalQty;
   private Integer importedPrice;
+  private Integer originalQty;
   private LocalDateTime manufactureDate;
   private LocalDateTime expiryDate;
-  private LocalDateTime arrivalDate;
+  private LocalDateTime arrivalDate; // nếu bạn vẫn cần arrival
 
   @Override
   public Batch mapToEntity() {
@@ -28,6 +29,7 @@ public class BatchDto extends EntityDto<Long> implements CreateInput<Batch>, Upd
 
   @Override
   public boolean mapToEntity(Batch entity) {
+    // implement if needed
     return false;
   }
 }

@@ -12,6 +12,7 @@ public class BatchGetDto extends EntityDto<Long> {
     private String batchCode;
     private String supplierName;
     private Integer importedPrice;
+    private Integer originalQty;
     private LocalDateTime manufactureDate;
     private LocalDateTime expiryDate;
 }

@@ -16,7 +16,6 @@ public class ProductUpdateDto extends BaseProductDto implements UpdateInput<Prod
   private String description;
   private Integer unitPrice;
   private Long categoryId;
-  private Long supplierId;
   private boolean enabled;
 
   @Override

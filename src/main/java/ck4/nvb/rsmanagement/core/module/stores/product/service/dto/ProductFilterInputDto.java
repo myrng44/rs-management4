@@ -19,7 +19,6 @@ public class ProductFilterInputDto implements FilterInput {
   private Integer minPrice;
   private Integer maxPrice;
   private Long categoryId;
-  private Long supplierId;
 
   // paging and sorting
   private PagedAndSortedResultRequestDto paging;
@@ -49,10 +48,6 @@ public class ProductFilterInputDto implements FilterInput {
 
     if (categoryId != null) {
       criteria.add(new SearchCriteria("categoryId", SearchOperator.EQUALS, categoryId.toString()));
-    }
-
-    if (supplierId != null) {
-      criteria.add(new SearchCriteria("supplierId", SearchOperator.EQUALS, supplierId.toString()));
     }
 
     return criteria;

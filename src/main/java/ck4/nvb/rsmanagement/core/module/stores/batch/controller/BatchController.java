@@ -77,7 +77,7 @@ public class BatchController
         List<Long> ids = Arrays.stream(productIds.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
-                .map(Long::valueOf)  // Sử dụng Long.valueOf() thay vì Integer.parseInt()
+                .map(Long::valueOf)
                 .collect(Collectors.toList());
 
         System.out.println("Debug - Parsed productIds: " + ids);

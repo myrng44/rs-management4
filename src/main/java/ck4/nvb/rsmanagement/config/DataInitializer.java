@@ -69,10 +69,10 @@ public class DataInitializer implements CommandLineRunner {
 
       // Create users
       User admin =
-          createUser("admin", "password123", "System Admin", "admin@circlek.com", "0123456789", 613088873376989189L);
+          createUser("admin", "password123", "System Admin", "admin@circlek.com", "0123456789", 1967119892788416522L);
       User manager =
           createUser(
-              "manager1", "password123", "Store Manager", "manager1@circlek.com", "0123456788", 1L);
+              "manager1", "password123", "Store Manager", "manager1@circlek.com", "0123456788", 1967119892788416523L);
       User employee =
           createUser(
               "employee1",
@@ -80,7 +80,7 @@ public class DataInitializer implements CommandLineRunner {
               "Store Employee",
               "employee1@circlek.com",
               "0123456787",
-              1L);
+                  1967119892788416524L);
 
       // Assign roles to users
       assignRoleToUser(admin, adminRole);
