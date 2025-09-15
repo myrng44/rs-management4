@@ -19,6 +19,8 @@ import ck4.nvb.rsmanagement.core.module.stores.batch.domain.Batch;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch_item.domain.BatchItem;
 import ck4.nvb.rsmanagement.core.module.stores.batch_item.domain.BatchItemRepository;
+import ck4.nvb.rsmanagement.core.module.stores.batch_item.service.IBatchItemService;
+import ck4.nvb.rsmanagement.core.module.stores.batch_item.service.dto.BatchItemDto;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStockRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
@@ -55,7 +57,7 @@ public class SaleOrderServiceImpl
   @Autowired private ProductRepository productRepository;
   @Autowired private BatchRepository batchRepository;
   @Autowired private BatchStockRepository batchStockRepository;
-  @Autowired private BatchItemRepository batchItemRepository;
+  @Autowired private IBatchItemService batchItemService;
 
   @Override
   public SaleOrderGetFullDto mapToEntityDto(SaleOrder entity) {
@@ -173,14 +175,11 @@ public class SaleOrderServiceImpl
 
   /** get total available quantity for a product in a specific store */
   private Long getTotalAvailableQuantity(Long productId, UserGetDto user) throws AppException {
-    List<BatchItem> batchItems = batchItemRepository.findAvailableByProductAndStoreOrdered(productId, user.getStoreId());
+    List<BatchItemDto.WithBatchInfo> batchItems = batchItemService.findAvailableBatchesInfoForProduct(productId, user.getStoreId());
     long totalAvailable = 0L;
 
-    for (BatchItem batchItem : batchItems) {
-      Integer original = batchItem.getOriginalQty() == null ? 0 : batchItem.getOriginalQty();
-      Integer sold = saleAllocationService.getTotalSoldQuantityByBatchItem(batchItem.getId());
-      int avail = Math.max(0, original - (sold == null ? 0 : sold));
-      totalAvailable += avail;
+    for (BatchItemDto.WithBatchInfo batchItem : batchItems) {
+      totalAvailable += batchItem.remainQty();
     }
 
     return totalAvailable;
@@ -199,28 +198,32 @@ public class SaleOrderServiceImpl
   private void allocateInventoryForSaleLine(
       Long saleLineId, Long productId, Integer qtyNeeded, UserGetDto user)
       throws AppException {
-    List<BatchItem> availableBatchItems = batchItemRepository.findAvailableByProductAndStoreOrdered(productId, user.getStoreId());
+    List<BatchItemDto.WithBatchInfo> availableBatchItems = batchItemService.findAvailableBatchesInfoForProduct(productId, user.getStoreId());
 
     int remaining = qtyNeeded;
-    for (BatchItem bi : availableBatchItems) {
+    for (BatchItemDto.WithBatchInfo bi : availableBatchItems) {
       if (remaining <= 0) break;
 
-      int original = bi.getOriginalQty() == null ? 0 : bi.getOriginalQty();
-      int sold = saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId()) == null ? 0 : saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId());
-      int avail = Math.max(0, original - sold);
-      if (avail <= 0) continue;
+      int avail = Math.max(0, bi.remainQty());
+      if (avail == 0) continue;
 
       int allocateQty = Math.min(remaining, avail);
 
       SaleAllocationDto alloc = new SaleAllocationDto();
       alloc.setSaleLineId(saleLineId);
-      alloc.setBatchItemId(bi.getId());
+      alloc.setBatchItemId(bi.id());
       alloc.setSoldQty(allocateQty);
-      alloc.setUnitCostSnap(bi.getImportPrice());
+      alloc.setUnitCostSnap(bi.importPrice());
       saleAllocationService.create(alloc, user);
 
+      BatchItemDto updatedRemainQty = new BatchItemDto();
+
+      updatedRemainQty.setImportPrice(bi.importPrice());
+      updatedRemainQty.setRemainQty(allocateQty < avail ? avail  - allocateQty : 0);
+      batchItemService.update(bi.id(), updatedRemainQty, user);
+
       remaining -= allocateQty;
-      getLogger().info("Allocated {} units from batch_item {} for sale line {}", allocateQty, bi.getId(), saleLineId);
+      getLogger().info("Allocated {} units from batch_item {} for sale line {}", allocateQty, bi.id(), saleLineId);
     }
 
     if (remaining > 0) {

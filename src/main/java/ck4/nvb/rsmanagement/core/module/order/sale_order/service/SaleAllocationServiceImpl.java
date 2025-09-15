@@ -1,5 +1,7 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.service;
 
+import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
+import ck4.nvb.rsmanagement.base.application.exception.AppException;
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleAllocation;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleAllocationRepository;
@@ -41,4 +43,9 @@ public class SaleAllocationServiceImpl
     if (batchStockId == null || productId == null) return 0;
     Integer total = getRepository().sumSoldQtyByBatchStockAndProduct(batchStockId, productId);
     return total == null ? 0 : total;  }
+
+  @Override
+  public SaleAllocationDto create(CreateInput<SaleAllocation> createDto, UserGetDto user) throws AppException {
+    return super.create(createDto, user);
+  }
 }

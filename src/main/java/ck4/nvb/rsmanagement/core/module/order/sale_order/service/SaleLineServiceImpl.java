@@ -65,7 +65,10 @@ public class SaleLineServiceImpl
       Product product = productService.getEntity(((SaleLineDto) createDto).getProductId());
       ((SaleLineDto) createDto).setUnitPrice(product.getUnitPrice());
     }
-    return super.create(createDto, user);
+    SaleLineGetDto response = super.create(createDto, user);
+    //tru so luong ordered_qty trong batch_item
+
+    return response;
   }
 
   @Override

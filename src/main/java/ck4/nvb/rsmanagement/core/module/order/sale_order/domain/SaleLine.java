@@ -26,12 +26,6 @@ public class SaleLine extends FullAuditedSerialIdEntity {
   @Column(name = "qty_ordered")
   private Integer qtyOrdered;
 
-  @Column(name = "qty_allocated")
-  private Integer qtyAllocated;
-
-  @Column(name = "qty_picked")
-  private Integer qtyPicked;
-
   @Column(name = "unit_price")
   private Integer unitPrice;
 }

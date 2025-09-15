@@ -21,6 +21,7 @@ public class BatchItemDto extends EntityDto<Long> implements CreateInput<BatchIt
     private Long productId;
     private Long supplierId;
     private Integer originalQty;
+    private Integer remainQty;
     private Integer importPrice;
     private LocalDateTime manufactureDate;
     private LocalDateTime expiryDate;
@@ -32,6 +33,45 @@ public class BatchItemDto extends EntityDto<Long> implements CreateInput<BatchIt
 
     @Override
     public boolean mapToEntity(BatchItem entity) {
-        return false;
+        boolean isModified = false;
+
+        if (entity.getRemainQty() != remainQty) {
+            entity.setRemainQty(remainQty);
+            isModified = true;
+        }
+        if (entity.getImportPrice() != importPrice) {
+            entity.setImportPrice(importPrice);
+            isModified = true;
+        }
+        return isModified;
+    }
+
+    public record WithBatchInfo(
+            Long id,
+            Long batchId,
+            String batchCode,
+            String productName,
+            String supplierName,
+            Integer originalQty,
+            Integer remainQty,
+            Integer importPrice,
+            LocalDateTime manufactureDate,
+            LocalDateTime expiryDate
+    ) {
+        public WithBatchInfo(BatchItemDto batchItemDto, String batchCode,
+                             String productName, String supplierName) {
+            this(
+                    batchItemDto.getId(),
+                    batchItemDto.getBatchId(),
+                    batchCode,
+                    productName,
+                    supplierName,
+                    batchItemDto.getOriginalQty(),
+                    batchItemDto.getRemainQty(),
+                    batchItemDto.getImportPrice(),
+                    batchItemDto.getManufactureDate(),
+                    batchItemDto.getExpiryDate()
+            );
+        }
     }
 }

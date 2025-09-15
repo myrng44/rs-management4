@@ -56,4 +56,26 @@ public interface BatchStockRepository extends BaseFullAuditedRepository<BatchSto
     """,
   nativeQuery = true)
   List<BatchStockGetDto> findAvailableBatchInfoByProductAndStore(@Param("productId") Long productId, @Param("storeId") Long storeId);
+
+  // Validate trước khi insert sale_allocation
+  @Query(
+          value = """
+            SELECT COUNT(1)
+            FROM batch_stock bs
+                     JOIN batch_item bi ON bi.batch_id = bs.batch_id
+                     JOIN sale_line sl ON sl.id = :saleLineId
+                     JOIN sale_order so ON so.id = sl.sale_order_id
+            WHERE bi.id = :batchItemId
+              AND bs.store_id = so.store_id
+              AND bs.status = 'ACTIVE'
+              AND bs.deleted = false
+              AND bi.deleted = false
+              AND sl.deleted = false
+              AND so.deleted = false
+            """,
+          nativeQuery = true
+  )
+  int validateSaleAllocation(@Param("saleLineId") long saleLineId,
+                             @Param("batchItemId") long batchItemId);
+
 }

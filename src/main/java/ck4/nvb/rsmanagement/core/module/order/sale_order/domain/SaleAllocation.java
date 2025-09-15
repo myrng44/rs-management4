@@ -19,8 +19,8 @@ public class SaleAllocation extends FullAuditedSerialIdEntity {
   @Column(name = "sale_line_id")
   private Long saleLineId;
 
-  @Column(name = "batch_stock_id")
-  private Long batchStockId;
+  @Column(name = "batch_item_id")
+  private Long batchItemId;
 
   @Column(name = "sold_qty")
   private Integer soldQty;

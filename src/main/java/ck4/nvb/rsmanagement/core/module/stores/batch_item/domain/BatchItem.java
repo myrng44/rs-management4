@@ -30,6 +30,9 @@ public class BatchItem extends FullAuditedSerialIdEntity {
     @Column(name = "original_qty")
     private Integer originalQty;
 
+    @Column(name = "remain_qty")
+    private Integer remainQty;
+
     @Column(name = "import_price")
     private Integer importPrice;
 
