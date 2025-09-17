@@ -112,7 +112,7 @@ public class ProductController
   @GetMapping("/count")
   @RequiredPermission(PermissionCode.VIEW_STORE_REPORT)
   @Override
-  public APIResponse<Long> count( @RequestParam(required = false) List<String> query) {
+  public APIResponse<Long> count(@RequestParam(required = false) List<String> query) {
     return APIResponseBuilder.ok(getService().count(null));
   }
 }

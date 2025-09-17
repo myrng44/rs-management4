@@ -32,7 +32,7 @@ public class CommonExceptionHandler {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Object> handleAll(Exception ex, WebRequest req) {
     log.error("Unhandled exception", ex); // in full stacktrace
-    Map<String,Object> body = Map.of("error", ex.getClass().getName(), "message", ex.getMessage());
+    Map<String, Object> body = Map.of("error", ex.getClass().getName(), "message", ex.getMessage());
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
   }
 
@@ -76,7 +76,7 @@ public class CommonExceptionHandler {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new APIResponse<>(metadata, null));
   }
 
-/*  @ExceptionHandler(Exception.class)
+  /*  @ExceptionHandler(Exception.class)
   public ResponseEntity<APIResponse<Object>> handleGeneric(Exception ex) {
     APIResponseMetadata metadata =
         new APIResponseMetadata(ErrorCode.INTERNAL_SERVER_ERROR, "Internal server error");

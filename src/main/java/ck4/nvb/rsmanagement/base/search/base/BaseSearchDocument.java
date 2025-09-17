@@ -11,18 +11,19 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class BaseSearchDocument<ID> {
-    @Id
-    protected ID id;
+  @Id protected ID id;
 
-    /**
-     * Convert from JPA entity -> search document
-     * @param entity
-     */
-    public abstract void fromEntity(Object entity);
+  /**
+   * Convert from JPA entity -> search document
+   *
+   * @param entity
+   */
+  public abstract void fromEntity(Object entity);
 
-    /**
-     * Get search content to build query
-     * @return
-     */
-    public abstract String getSearchableContent();
+  /**
+   * Get search content to build query
+   *
+   * @return
+   */
+  public abstract String getSearchableContent();
 }

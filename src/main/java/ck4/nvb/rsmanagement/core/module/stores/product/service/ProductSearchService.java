@@ -8,21 +8,20 @@ import org.springframework.stereotype.Service;
 
 @Service("productSearchService")
 public class ProductSearchService extends BaseSearchService<ProductSearchDocument, Long> {
-    @Autowired
-    private ProductSearchRepository productSearchRepository;
+  @Autowired private ProductSearchRepository productSearchRepository;
 
-    @Override
-    protected String[] getSearchFields() {
-        return new String[]{"name", "sku", "desc"};
-    }
+  @Override
+  protected String[] getSearchFields() {
+    return new String[] {"name", "sku", "desc"};
+  }
 
-    @Override
-    protected String extractFieldValue(ProductSearchDocument document, String field) {
-        return switch (field) {
-            case "name" -> document.getName();
-            case "sku" -> document.getSku();
-            case "desc" -> document.getDesc();
-            default -> "";
-        };
-    }
+  @Override
+  protected String extractFieldValue(ProductSearchDocument document, String field) {
+    return switch (field) {
+      case "name" -> document.getName();
+      case "sku" -> document.getSku();
+      case "desc" -> document.getDesc();
+      default -> "";
+    };
+  }
 }

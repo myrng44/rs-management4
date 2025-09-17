@@ -5,7 +5,6 @@ import ck4.nvb.rsmanagement.base.web.controller.api.method.AuditedAPICrudMethod;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
-import ck4.nvb.rsmanagement.core.module.stores.batch.service.IBatchService;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.BatchStockServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockDto;
@@ -13,9 +12,8 @@ import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStoc
 import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
-import java.util.List;
-
 import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -97,12 +95,17 @@ public class BatchStockController
 
   @GetMapping("/products/{productId}")
   @RequiredPermission(PermissionCode.MANAGE_STORE_SETTINGS)
-  public APIListResponse<List<BatchStockGetDto>> getAllBatchStocksInfoByProduct(Authentication auth, @PathVariable Long productId) {
+  public APIListResponse<List<BatchStockGetDto>> getAllBatchStocksInfoByProduct(
+      Authentication auth, @PathVariable Long productId) {
     UserGetDto userGetDto = extractUser(auth);
-    List<BatchStockGetDto> output = batchStockService.getAllBatchByProduct(productId, userGetDto.getStoreId());
-    getLogger().debug("GET /batch-stocks/products/{} called by userId={}, storeId={}", productId,
-            userGetDto != null ? userGetDto.getId() : null, userGetDto.getStoreId());
+    List<BatchStockGetDto> output =
+        batchStockService.getAllBatchByProduct(productId, userGetDto.getStoreId());
+    getLogger()
+        .debug(
+            "GET /batch-stocks/products/{} called by userId={}, storeId={}",
+            productId,
+            userGetDto != null ? userGetDto.getId() : null,
+            userGetDto.getStoreId());
     return APIResponseBuilder.successList(output, 0, 10, output.size(), "listed successfully");
   }
-
 }

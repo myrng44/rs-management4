@@ -1,12 +1,9 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.domain;
 
 import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
-import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-
-import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -47,8 +44,8 @@ public interface SaleLineRepository extends BaseFullAuditedRepository<SaleLine, 
       @Param("numberOfProducts") int numberOfProducts);
 
   @Query(
-          value =
-                  """
+      value =
+          """
                 SELECT p.id as id, p.sku as sku, p.name as name, p.description,
                        p.unit_price as unitPrice, p.category_id as categoryId,
                        top_sold.total_quantity as totalQuantitySold
@@ -65,10 +62,10 @@ public interface SaleLineRepository extends BaseFullAuditedRepository<SaleLine, 
                 ) AS top_sold ON p.id = top_sold.product_id
                 ORDER BY top_sold.total_quantity DESC
             """,
-          nativeQuery = true)
+      nativeQuery = true)
   List<Map<String, Object>> findMostSoldProductsOfIntervalWithQtyOfAStore(
-          @Param("start") LocalDateTime start,
-          @Param("end") LocalDateTime end,
-          @Param("numberOfProducts") int numberOfProducts,
-          @Param("storeId") Long storeId);
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end,
+      @Param("numberOfProducts") int numberOfProducts,
+      @Param("storeId") Long storeId);
 }

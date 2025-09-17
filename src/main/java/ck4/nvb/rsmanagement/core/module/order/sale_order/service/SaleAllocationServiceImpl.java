@@ -33,19 +33,8 @@ public class SaleAllocationServiceImpl
   }
 
   @Override
-  public Integer getTotalSoldQuantityByBatchItem(Long batchItemId) {
-    if (batchItemId == null) return 0;
-    Integer total = getRepository().sumSoldQtyByBatchItemId(batchItemId);
-    return total == null ? 0 : total;  }
-
-  @Override
-  public Integer getTotalSoldQuantityByBatchStockAndProduct(Long batchStockId, Long productId) {
-    if (batchStockId == null || productId == null) return 0;
-    Integer total = getRepository().sumSoldQtyByBatchStockAndProduct(batchStockId, productId);
-    return total == null ? 0 : total;  }
-
-  @Override
-  public SaleAllocationDto create(CreateInput<SaleAllocation> createDto, UserGetDto user) throws AppException {
+  public SaleAllocationDto create(CreateInput<SaleAllocation> createDto, UserGetDto user)
+      throws AppException {
     return super.create(createDto, user);
   }
 }

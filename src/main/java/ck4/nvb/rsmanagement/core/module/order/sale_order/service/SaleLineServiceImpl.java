@@ -66,7 +66,7 @@ public class SaleLineServiceImpl
       ((SaleLineDto) createDto).setUnitPrice(product.getUnitPrice());
     }
     SaleLineGetDto response = super.create(createDto, user);
-    //tru so luong ordered_qty trong batch_item
+    // tru so luong ordered_qty trong batch_item
 
     return response;
   }
@@ -92,32 +92,38 @@ public class SaleLineServiceImpl
     LocalDateTime end = LocalDateTime.now();
     LocalDateTime start = end.minusDays(days);
 
-    List<Map<String, Object>> results = getRepository().findMostSoldProductsOfIntervalWithQty(start, end, noProducts);
-
+    List<Map<String, Object>> results =
+        getRepository().findMostSoldProductsOfIntervalWithQty(start, end, noProducts);
 
     return getWithSales(results);
   }
 
   private List<ProductGetDto.WithSales> getWithSales(List<Map<String, Object>> results) {
     return results.stream()
-            .map(row -> new ProductGetDto.WithSales(
+        .map(
+            row ->
+                new ProductGetDto.WithSales(
                     ((Number) row.get("id")).longValue(),
                     (String) row.get("sku"),
                     (String) row.get("name"),
                     (String) row.get("description"),
                     ((Number) row.get("unitPrice")).intValue(),
-                    row.get("categoryId") != null ? ((Number) row.get("categoryId")).longValue() : null,
-                    ((Number) row.get("totalQuantitySold")).longValue()
-            ))
-            .toList();
+                    row.get("categoryId") != null
+                        ? ((Number) row.get("categoryId")).longValue()
+                        : null,
+                    ((Number) row.get("totalQuantitySold")).longValue()))
+        .toList();
   }
 
   @Override
-  public List<ProductGetDto.WithSales> getMostSoldProductsLastDayOfAStore(int days, int noProducts, Long storeId) {
+  public List<ProductGetDto.WithSales> getMostSoldProductsLastDayOfAStore(
+      int days, int noProducts, Long storeId) {
     LocalDateTime end = LocalDateTime.now();
     LocalDateTime start = end.minusDays(days);
 
-    List<Map<String, Object>> results = getRepository().findMostSoldProductsOfIntervalWithQtyOfAStore(start, end, noProducts, storeId);
+    List<Map<String, Object>> results =
+        getRepository()
+            .findMostSoldProductsOfIntervalWithQtyOfAStore(start, end, noProducts, storeId);
 
     return getWithSales(results);
   }

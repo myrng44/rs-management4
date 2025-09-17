@@ -7,15 +7,11 @@ import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.domain.PaymentMethod;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.IPaymentService;
-import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.PaymentMethodServiceImpl;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.dto.PaymentMethodDto;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.dto.PaymentMethodGetDto;
-import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import java.util.List;
-
-import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -107,11 +103,13 @@ public class PaymentMethodController
   }
 
   @GetMapping("/usage")
-  public APIListResponse<List<PaymentMethodGetDto.WithUsageStats>> getUsageStats(Authentication auth, @RequestParam int days) {
+  public APIListResponse<List<PaymentMethodGetDto.WithUsageStats>> getUsageStats(
+      Authentication auth, @RequestParam int days) {
     UserGetDto user = extractUser(auth);
 
     List<PaymentMethodGetDto.WithUsageStats> output = service.getUsageStatsOfInterval(days);
 
-    return APIResponseBuilder.successList(output, 0, output.size(), output.size(), "get usage stats successfully");
+    return APIResponseBuilder.successList(
+        output, 0, output.size(), output.size(), "get usage stats successfully");
   }
 }

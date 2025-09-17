@@ -11,9 +11,8 @@ import ck4.nvb.rsmanagement.core.module.stores.batch.service.dto.BatchGetDto;
 import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
-import java.util.List;
-
 import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
+import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +41,8 @@ public class BatchController
       UserGetDto userGetDto = new UserGetDto();
       userGetDto.setId(userRoleDto.getUserId());
       userGetDto.setUserName(userRoleDto.getUserName());
+      userGetDto.setStoreId(userRoleDto.getStoreId());
+      userGetDto.setRoleName(userRoleDto.getRoleName());
       return userGetDto;
     }
     return null;

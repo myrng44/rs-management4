@@ -10,9 +10,8 @@ import ck4.nvb.rsmanagement.core.module.stores.category.service.dto.CategoryDto;
 import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
-import java.util.List;
-
 import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
+import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 

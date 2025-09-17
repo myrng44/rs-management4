@@ -14,11 +14,9 @@ import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.Permissio
 import ck4.nvb.rsmanagement.core.module.users.role.domain.entity.RoleName;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
-
+import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -73,18 +71,21 @@ public class SaleOrderController
       Authentication auth, @RequestParam int days, @RequestParam int noProducts) {
     UserGetDto user = extractUser(auth);
 
-    if (user.getRoleName().equals(RoleName.SYSADMIN.getName()) ||
-    user.getRoleName().equals(RoleName.ADMIN.getName())) {
+    if (user.getRoleName().equals(RoleName.SYSADMIN.getName())
+        || user.getRoleName().equals(RoleName.ADMIN.getName())) {
       return saleLineService.getMostSoldProductsLastDay(days, noProducts);
     } else {
-      return saleLineService.getMostSoldProductsLastDayOfAStore(days, noProducts, user.getStoreId());
+      return saleLineService.getMostSoldProductsLastDayOfAStore(
+          days, noProducts, user.getStoreId());
     }
   }
 
   @GetMapping("/{storeId}/most-products")
   public List<ProductGetDto.WithSales> getMostSoldProductsLastDay(
-          Authentication auth, @PathVariable Long storeId, @RequestParam int days, @RequestParam int noProducts
-  ) {
+      Authentication auth,
+      @PathVariable Long storeId,
+      @RequestParam int days,
+      @RequestParam int noProducts) {
     UserGetDto user = extractUser(auth);
 
     return saleLineService.getMostSoldProductsLastDayOfAStore(days, noProducts, storeId);
@@ -145,16 +146,16 @@ public class SaleOrderController
 
   @GetMapping("/revenue")
   @RequiredPermission(PermissionCode.VIEW_STORE_REPORT)
-  public APIResponse<Long> getAStoreRevenue(Authentication auth, @RequestParam(required = false, defaultValue = "30") int days) {
+  public APIResponse<Long> getAStoreRevenue(
+      Authentication auth, @RequestParam(required = false, defaultValue = "30") int days) {
     UserGetDto user = extractUser(auth);
     LocalDateTime end = LocalDateTime.now();
     LocalDateTime start = end.minusDays(days);
     if (RoleName.SYSADMIN.getName().equals(user.getRoleName())
-    || RoleName.ADMIN.getName().equals(user.getRoleName())) {
+        || RoleName.ADMIN.getName().equals(user.getRoleName())) {
       return APIResponseBuilder.ok(saleOrderService.getAllStoreRevenueBetween(start, end));
     }
-    return APIResponseBuilder.ok(saleOrderService.getAStoreRevenueBetween(start, end, user.getStoreId()));
+    return APIResponseBuilder.ok(
+        saleOrderService.getAStoreRevenueBetween(start, end, user.getStoreId()));
   }
-
-  // ===== FULFILLMENT ENDPOINTS =====
 }

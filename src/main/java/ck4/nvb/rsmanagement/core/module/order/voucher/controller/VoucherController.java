@@ -11,11 +11,10 @@ import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.Permissio
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import ck4.nvb.rsmanagement.core.web.util.RequiredPermission;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/vouchers")
@@ -59,7 +58,8 @@ public class VoucherController
   @PutMapping("/{voucherId}")
   @RequiredPermission(PermissionCode.UPDATE_VOUCHER)
   @Override
-  public APIResponse<VoucherDto> update(Authentication auth, @PathVariable Long voucherId, @RequestBody VoucherDto entity) {
+  public APIResponse<VoucherDto> update(
+      Authentication auth, @PathVariable Long voucherId, @RequestBody VoucherDto entity) {
     return super.update(auth, voucherId, entity);
   }
 
@@ -73,12 +73,11 @@ public class VoucherController
   @GetMapping
   @Override
   public APIListResponse<List<VoucherDto>> getList(
-          Authentication auth,
-          @RequestParam(required = false, name = "query") List<String> query,
-          @RequestParam(required = false, name = "sort") String sort,
-          @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
-          @RequestParam(required = false, name = "limit", defaultValue = "10") int limit
-  ) {
+      Authentication auth,
+      @RequestParam(required = false, name = "query") List<String> query,
+      @RequestParam(required = false, name = "sort") String sort,
+      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
+      @RequestParam(required = false, name = "limit", defaultValue = "10") int limit) {
     return super.getList(auth, query, sort, offset, limit);
   }
 

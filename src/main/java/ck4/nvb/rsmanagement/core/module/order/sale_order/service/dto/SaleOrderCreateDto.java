@@ -2,8 +2,6 @@ package ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 import lombok.AllArgsConstructor;

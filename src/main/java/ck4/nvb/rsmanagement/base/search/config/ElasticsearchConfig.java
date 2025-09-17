@@ -25,68 +25,65 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableConfigurationProperties(ElasticsearchProperties.class)
 public class ElasticsearchConfig {
 
-    @Value("${spring.elasticsearch.uris:http://localhost:9201}")
-    private String elasticsearchUrl;
+  @Value("${spring.elasticsearch.uris:http://localhost:9201}")
+  private String elasticsearchUrl;
 
-    @Value("${spring.elasticsearch.username:}")
-    private String username;
+  @Value("${spring.elasticsearch.username:}")
+  private String username;
 
-    @Value("${spring.elasticsearch.password:}")
-    private String password;
+  @Value("${spring.elasticsearch.password:}")
+  private String password;
 
-    @Value("${rs.elasticsearch.ssl.enabled:false}")
-    private boolean sslEnabled;
+  @Value("${rs.elasticsearch.ssl.enabled:false}")
+  private boolean sslEnabled;
 
-    @Value("${rs.elasticsearch.ssl.verification:false}")
-    private boolean sslVerification;
+  @Value("${rs.elasticsearch.ssl.verification:false}")
+  private boolean sslVerification;
 
-    @Bean
-    public RestClient restClient() {
-        var builder = RestClient.builder(HttpHost.create(elasticsearchUrl));
+  @Bean
+  public RestClient restClient() {
+    var builder = RestClient.builder(HttpHost.create(elasticsearchUrl));
 
-        builder.setHttpClientConfigCallback(httpClientBuilder -> {
-            // Configure credentials
-            if (!username.isEmpty() && !password.isEmpty()) {
-                var credentialsProvider = new BasicCredentialsProvider();
-                credentialsProvider.setCredentials(
-                        AuthScope.ANY,
-                        new UsernamePasswordCredentials(username, password)
-                );
-                httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+    builder.setHttpClientConfigCallback(
+        httpClientBuilder -> {
+          // Configure credentials
+          if (!username.isEmpty() && !password.isEmpty()) {
+            var credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(
+                AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+          }
+
+          // Configure SSL for HTTPS connections
+          if (elasticsearchUrl.startsWith("https://")) {
+            try {
+              SSLContextBuilder sslBuilder = SSLContextBuilder.create();
+
+              if (!sslVerification) {
+                // Trust all certificates (Development only)
+                sslBuilder.loadTrustMaterial(null, (chain, authType) -> true);
+                httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+              } else {
+                // For production: trust self-signed or configure proper truststore
+                sslBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+              }
+
+              httpClientBuilder.setSSLContext(sslBuilder.build());
+            } catch (Exception e) {
+              throw new RuntimeException("Failed to configure SSL context", e);
             }
+          }
 
-            // Configure SSL for HTTPS connections
-            if (elasticsearchUrl.startsWith("https://")) {
-                try {
-                    SSLContextBuilder sslBuilder = SSLContextBuilder.create();
-
-                    if (!sslVerification) {
-                        // Trust all certificates (Development only)
-                        sslBuilder.loadTrustMaterial(null, (chain, authType) -> true);
-                        httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
-                    } else {
-                        // For production: trust self-signed or configure proper truststore
-                        sslBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-                    }
-
-                    httpClientBuilder.setSSLContext(sslBuilder.build());
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to configure SSL context", e);
-                }
-            }
-
-            return httpClientBuilder;
+          return httpClientBuilder;
         });
 
-        return builder.build();
-    }
+    return builder.build();
+  }
 
-    @Bean
-    public ElasticsearchClient elasticsearchClient(RestClient restClient) {
-        ElasticsearchTransport transport = new RestClientTransport(
-                restClient,
-                new JacksonJsonpMapper()
-        );
-        return new ElasticsearchClient(transport);
-    }
+  @Bean
+  public ElasticsearchClient elasticsearchClient(RestClient restClient) {
+    ElasticsearchTransport transport =
+        new RestClientTransport(restClient, new JacksonJsonpMapper());
+    return new ElasticsearchClient(transport);
+  }
 }

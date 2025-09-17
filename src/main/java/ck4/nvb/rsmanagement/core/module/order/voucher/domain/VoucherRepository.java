@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository("voucherRepository")
 public interface VoucherRepository extends BaseFullAuditedRepository<Voucher, Long, Long> {
-    Voucher findFirstByCodeAndDeletedFalse(String voucherCode);
+  Voucher findFirstByCodeAndDeletedFalse(String voucherCode);
 }

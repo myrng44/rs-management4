@@ -6,7 +6,6 @@ import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStockRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockDto;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockGetDto;
-import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.InventorySummaryDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,8 @@ import org.springframework.stereotype.Service;
 
 @Service("importLogService")
 public class BatchStockServiceImpl
-    extends FullAuditedCrudServiceImpl<BatchStockDto, BatchStock, Long, UserGetDto, Long> {
+    extends FullAuditedCrudServiceImpl<BatchStockDto, BatchStock, Long, UserGetDto, Long>
+    implements IBatchStockService {
 
   protected BatchStockServiceImpl(BatchStockRepository repository) {
     super(repository, BatchStock.class);

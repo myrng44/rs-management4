@@ -8,28 +8,18 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SearchableEntity {
-    /**
-     * Elasticsearch index name
-     */
-    String indexName();
+  /** Elasticsearch index name */
+  String indexName();
 
-    /**
-     * Fields to include in search (empty = all fields)
-     */
-    String[] searchFields() default {};
+  /** Fields to include in search (empty = all fields) */
+  String[] searchFields() default {};
 
-    /**
-     * ID field name in JPA entity
-     */
-    String idField() default "id";
+  /** ID field name in JPA entity */
+  String idField() default "id";
 
-    /**
-     * Enable auto-sync to Elasticsearch
-     */
-    boolean autoSync() default true;
+  /** Enable auto-sync to Elasticsearch */
+  boolean autoSync() default true;
 
-    /**
-     * Batch size for bulk operations
-     */
-    int batchSize() default 100;
+  /** Batch size for bulk operations */
+  int batchSize() default 100;
 }

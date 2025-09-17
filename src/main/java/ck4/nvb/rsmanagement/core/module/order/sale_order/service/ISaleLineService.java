@@ -17,7 +17,9 @@ public interface ISaleLineService
    * @param noProducts number of product to be returned
    * @return a list of products
    */
-  List<ProductGetDto.WithSales> getMostSoldProductsLastDay(int days, int noProducts) throws AppException;
+  List<ProductGetDto.WithSales> getMostSoldProductsLastDay(int days, int noProducts)
+      throws AppException;
 
-  List<ProductGetDto.WithSales> getMostSoldProductsLastDayOfAStore(int days, int noProducts, Long storeId) throws AppException;
+  List<ProductGetDto.WithSales> getMostSoldProductsLastDayOfAStore(
+      int days, int noProducts, Long storeId) throws AppException;
 }

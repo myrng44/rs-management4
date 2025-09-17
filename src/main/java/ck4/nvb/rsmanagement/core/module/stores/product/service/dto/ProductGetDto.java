@@ -17,34 +17,27 @@ public class ProductGetDto extends EntityDto<Long> {
 
   // Nested record cho specific use cases
   public record WithSales(
-          Long id,
-          String sku,
-          String name,
-          String description,
-          Integer unitPrice,
-          Long categoryId,
-          Long totalQuantitySold
-  ) {
+      Long id,
+      String sku,
+      String name,
+      String description,
+      Integer unitPrice,
+      Long categoryId,
+      Long totalQuantitySold) {
     // Constructor từ ProductGetDto
     public WithSales(ProductGetDto product, Long totalQuantitySold) {
       this(
-              product.getId(),
-              product.getSku(),
-              product.getName(),
-              product.getDescription(),
-              product.getUnitPrice(),
-              product.getCategoryId(),
-              totalQuantitySold
-      );
+          product.getId(),
+          product.getSku(),
+          product.getName(),
+          product.getDescription(),
+          product.getUnitPrice(),
+          product.getCategoryId(),
+          totalQuantitySold);
     }
   }
 
   // Có thể có thêm các record khác cho các use case khác
   public record WithStock(
-          Long id,
-          String sku,
-          String name,
-          Integer unitPrice,
-          Integer remainingStock
-  ) {}
+      Long id, String sku, String name, Integer unitPrice, Integer remainingStock) {}
 }

@@ -14,10 +14,9 @@ import lombok.*;
 @Entity
 @Table(name = "product")
 @SearchableEntity(
-        indexName = "products",
-        searchFields = {"name", "sku", "desc"},
-        autoSync = true
-)
+    indexName = "products",
+    searchFields = {"name", "sku", "desc"},
+    autoSync = true)
 public class Product extends FullAuditedSerialIdEntity {
 
   @Column(name = "name", nullable = false)

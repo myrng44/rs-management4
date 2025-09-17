@@ -15,17 +15,12 @@ import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrderReposit
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.*;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.Voucher;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.VoucherRepository;
-import ck4.nvb.rsmanagement.core.module.stores.batch.domain.Batch;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchRepository;
-import ck4.nvb.rsmanagement.core.module.stores.batch_item.domain.BatchItem;
-import ck4.nvb.rsmanagement.core.module.stores.batch_item.domain.BatchItemRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch_item.service.IBatchItemService;
 import ck4.nvb.rsmanagement.core.module.stores.batch_item.service.dto.BatchItemDto;
-import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStockRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +121,8 @@ public class SaleOrderServiceImpl
               * saleLineDto.getQtyOrdered();
     }
     if (createDto.getVoucherCode() != null) {
-      Voucher voucher = voucherRepository.findFirstByCodeAndDeletedFalse(createDto.getVoucherCode());
+      Voucher voucher =
+          voucherRepository.findFirstByCodeAndDeletedFalse(createDto.getVoucherCode());
       saleOrder.setVoucherId(voucher.getId());
       Integer discount = 0;
       if (voucher.getDiscountPer() > 0) {
@@ -151,17 +147,15 @@ public class SaleOrderServiceImpl
 
       // allocate inventory or this line
       allocateInventoryForSaleLine(
-          createdLine.getId(),
-          saleLineDto.getProductId(),
-          saleLineDto.getQtyOrdered(),
-          user);
+          createdLine.getId(), saleLineDto.getProductId(), saleLineDto.getQtyOrdered(), user);
     }
 
     return mapToEntityDto(saleOrder);
   }
 
   /** validate if there's enough inventory available for all products in the order */
-  private void validateInventoryAvailability(SaleOrderCreateDto createDto, UserGetDto user) throws AppException {
+  private void validateInventoryAvailability(SaleOrderCreateDto createDto, UserGetDto user)
+      throws AppException {
     for (SaleLineDto lineDto : createDto.getLines()) {
       Long availableQty = getTotalAvailableQuantity(lineDto.getProductId(), user);
       if (availableQty < lineDto.getQtyOrdered()) {
@@ -175,7 +169,8 @@ public class SaleOrderServiceImpl
 
   /** get total available quantity for a product in a specific store */
   private Long getTotalAvailableQuantity(Long productId, UserGetDto user) throws AppException {
-    List<BatchItemDto.WithBatchInfo> batchItems = batchItemService.findAvailableBatchesInfoForProduct(productId, user.getStoreId());
+    List<BatchItemDto.WithBatchInfo> batchItems =
+        batchItemService.findAvailableBatchesInfoForProduct(productId, user.getStoreId());
     long totalAvailable = 0L;
 
     for (BatchItemDto.WithBatchInfo batchItem : batchItems) {
@@ -185,20 +180,11 @@ public class SaleOrderServiceImpl
     return totalAvailable;
   }
 
-  /**
-   * Get total sold quantity for a specific product from a specific batch_stock
-   */
-  private Integer getSoldQuantityForBatchItem(Long batchStockId, Long productId) {
-    // This would need a custom repository method or query
-    // For now, using a simple approach - you might want to optimize this with a custom query
-    return saleAllocationService.getTotalSoldQuantityByBatchStockAndProduct(batchStockId, productId);
-  }
-
   /** allocate inventory for a sale line using FIFO strategy */
   private void allocateInventoryForSaleLine(
-      Long saleLineId, Long productId, Integer qtyNeeded, UserGetDto user)
-      throws AppException {
-    List<BatchItemDto.WithBatchInfo> availableBatchItems = batchItemService.findAvailableBatchesInfoForProduct(productId, user.getStoreId());
+      Long saleLineId, Long productId, Integer qtyNeeded, UserGetDto user) throws AppException {
+    List<BatchItemDto.WithBatchInfo> availableBatchItems =
+        batchItemService.findAvailableBatchesInfoForProduct(productId, user.getStoreId());
 
     int remaining = qtyNeeded;
     for (BatchItemDto.WithBatchInfo bi : availableBatchItems) {
@@ -219,16 +205,23 @@ public class SaleOrderServiceImpl
       BatchItemDto updatedRemainQty = new BatchItemDto();
 
       updatedRemainQty.setImportPrice(bi.importPrice());
-      updatedRemainQty.setRemainQty(allocateQty < avail ? avail  - allocateQty : 0);
+      updatedRemainQty.setRemainQty(allocateQty < avail ? avail - allocateQty : 0);
       batchItemService.update(bi.id(), updatedRemainQty, user);
 
       remaining -= allocateQty;
-      getLogger().info("Allocated {} units from batch_item {} for sale line {}", allocateQty, bi.id(), saleLineId);
+      getLogger()
+          .info(
+              "Allocated {} units from batch_item {} for sale line {}",
+              allocateQty,
+              bi.id(),
+              saleLineId);
     }
 
     if (remaining > 0) {
       throw new AppException(
-              String.format("Unable to fully allocate inventory for product %d. Missing %d units", productId, remaining));
+          String.format(
+              "Unable to fully allocate inventory for product %d. Missing %d units",
+              productId, remaining));
     }
   }
 
@@ -257,39 +250,35 @@ public class SaleOrderServiceImpl
   }
 
   /** STATS METHODS */
-
   public Long getAllStoreRevenueBetween(LocalDateTime from, LocalDateTime to) throws AppException {
     return getRepository().sumTotalFinalPriceBetween(from, to);
   }
 
-  public Long getAStoreRevenueBetween(LocalDateTime from, LocalDateTime to, Long storeId) throws AppException {
-    return getRepository().sumTotalFinalPriceOfAStoreBetween(
-            from,
-            to,
-            storeId
-    );
+  public Long getAStoreRevenueBetween(LocalDateTime from, LocalDateTime to, Long storeId)
+      throws AppException {
+    return getRepository().sumTotalFinalPriceOfAStoreBetween(from, to, storeId);
   }
 
-  public int getAllStoreNumberOfOrderBetWeen(LocalDateTime from, LocalDateTime to) throws AppException {
+  public int getAllStoreNumberOfOrderBetWeen(LocalDateTime from, LocalDateTime to)
+      throws AppException {
     return getRepository().countOrdersByCreatedTimeBetween(from, to);
   }
 
-  public int getAStoreNumberOfOrderBetween(LocalDateTime from, LocalDateTime to, Long storeId) throws AppException {
-    return getRepository().countSaleOrdersByCreatedTimeBetweenAndStoreId(
-            from,
-            to,
-            storeId
-    );
+  public int getAStoreNumberOfOrderBetween(LocalDateTime from, LocalDateTime to, Long storeId)
+      throws AppException {
+    return getRepository().countSaleOrdersByCreatedTimeBetweenAndStoreId(from, to, storeId);
   }
 
-  public Long getAverageValuePerOrderBetWeen(LocalDateTime from, LocalDateTime to) throws AppException {
+  public Long getAverageValuePerOrderBetWeen(LocalDateTime from, LocalDateTime to)
+      throws AppException {
     long revenue = getRepository().sumTotalFinalPriceBetween(from, to);
     int noOrders = getRepository().countOrdersByCreatedTimeBetween(from, to);
 
     return revenue / noOrders;
   }
 
-  public Long getAverageValuePerOrderOfAStoreBetween(LocalDateTime from, LocalDateTime to, Long storeId) {
+  public Long getAverageValuePerOrderOfAStoreBetween(
+      LocalDateTime from, LocalDateTime to, Long storeId) {
     long revenue = getRepository().sumTotalFinalPriceOfAStoreBetween(from, to, storeId);
     int noOrders = getRepository().countSaleOrdersByCreatedTimeBetweenAndStoreId(from, to, storeId);
     return revenue / noOrders;
