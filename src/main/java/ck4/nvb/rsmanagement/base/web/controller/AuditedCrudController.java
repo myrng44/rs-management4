@@ -9,7 +9,6 @@ import ck4.nvb.rsmanagement.base.domain.entity.interfaces.CreationAudited;
 import ck4.nvb.rsmanagement.base.domain.entity.interfaces.IEntity;
 import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
 import java.io.Serializable;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -32,13 +31,8 @@ public abstract class AuditedCrudController<
   public ResponseEntity<ApiResponse<D>> create(Authentication auth, @RequestBody C entity) {
     User user = extractUser(auth);
     D result = getService().create(entity, user);
-    return ResponseEntity
-        .ok(
-            ApiResponse.<D>builder()
-                .code(201)
-                .message("Created successfully!")
-                .data(result)
-                .build());
+    return ResponseEntity.ok(
+        ApiResponse.<D>builder().code(201).message("Created successfully!").data(result).build());
   }
 
   @PutMapping("/{id}")

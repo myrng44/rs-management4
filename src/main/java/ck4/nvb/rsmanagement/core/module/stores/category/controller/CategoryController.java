@@ -48,9 +48,11 @@ public class CategoryController
 
   @Override
   @PostMapping
-  @RequirePermission(value= {"CATEGORY_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
-  public ResponseEntity<ApiResponse<CategoryDto>> create
-          (Authentication auth, @RequestBody CategoryDto categoryDto) {
+  @RequirePermission(
+      value = {"CATEGORY_ROLE", "FULL_ROLE"},
+      logic = RequirePermission.LogicType.ANY)
+  public ResponseEntity<ApiResponse<CategoryDto>> create(
+      Authentication auth, @RequestBody CategoryDto categoryDto) {
     return super.create(auth, categoryDto);
   }
 }

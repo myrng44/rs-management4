@@ -22,13 +22,11 @@ import ck4.nvb.rsmanagement.core.web.security.service.AuthService;
 import ck4.nvb.rsmanagement.core.web.util.CommonPasswordEncoder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.crypto.spec.SecretKeySpec;
-
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -95,19 +93,18 @@ public class UserGetServiceWithRoleImpl<D, ID, T> implements UserGetServiceWithR
     return userRoles.stream().map(this::buildUserRoleDto).collect(Collectors.toList());
   }
 
-
   @Override
   @Transactional(readOnly = true)
   public UserRoleDto getUserSession(Long userId, Long storeId) throws AppException {
     User user =
-            userRepository.findById(userId).orElseThrow(() -> new AppException("User not found"));
+        userRepository.findById(userId).orElseThrow(() -> new AppException("User not found"));
 
     List<UserRoleDto> allRoles = getAllUserRoles(userId);
     UserRoleDto currentRole =
-            allRoles.stream()
-                    .filter(role -> role.getStoreId().equals(storeId))
-                    .findFirst()
-                    .orElseThrow(() -> new AppException("User has no role for this store"));
+        allRoles.stream()
+            .filter(role -> role.getStoreId().equals(storeId))
+            .findFirst()
+            .orElseThrow(() -> new AppException("User has no role for this store"));
     return currentRole;
   }
 
@@ -223,7 +220,8 @@ public class UserGetServiceWithRoleImpl<D, ID, T> implements UserGetServiceWithR
     List<String> roles = authService.getUserRoles(user.getId());
     List<String> permissions = authService.getUserPermissions(user.getId());
 
-    String token = generateJwtToken(user.getId(), user.getUsername(), roles, permissions, user.getStoreId());
+    String token =
+        generateJwtToken(user.getId(), user.getUsername(), roles, permissions, user.getStoreId());
 
     return LoginResponse.builder()
         .id(user.getId())
@@ -240,7 +238,7 @@ public class UserGetServiceWithRoleImpl<D, ID, T> implements UserGetServiceWithR
   }
 
   private String generateJwtToken(
-          Long userId, String username, List<String> roles, List<String> permissions, Long storeId) {
+      Long userId, String username, List<String> roles, List<String> permissions, Long storeId) {
 
     if (roles == null) roles = new ArrayList<>();
     if (permissions == null) permissions = new ArrayList<>();
@@ -250,15 +248,15 @@ public class UserGetServiceWithRoleImpl<D, ID, T> implements UserGetServiceWithR
     Key key = Keys.hmacShaKeyFor(keyBytes);
 
     return Jwts.builder()
-            .setSubject(username)
-            .claim("userId", String.valueOf(userId))
-            .claim("storeId", String.valueOf(storeId))
-            .claim("roles", roles)
-            .claim("permissions", permissions)
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
-            .signWith(key, SignatureAlgorithm.HS256)
-            .compact();
+        .setSubject(username)
+        .claim("userId", String.valueOf(userId))
+        .claim("storeId", String.valueOf(storeId))
+        .claim("roles", roles)
+        .claim("permissions", permissions)
+        .setIssuedAt(new Date())
+        .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
+        .signWith(key, SignatureAlgorithm.HS256)
+        .compact();
   }
 
   // created

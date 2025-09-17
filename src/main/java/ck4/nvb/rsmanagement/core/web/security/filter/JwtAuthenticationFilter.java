@@ -1,6 +1,5 @@
 package ck4.nvb.rsmanagement.core.web.security.filter;
 
-import ck4.nvb.rsmanagement.core.module.users.user.domain.User;
 import ck4.nvb.rsmanagement.core.module.users.user.domain.UserRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import io.jsonwebtoken.Claims;
@@ -32,8 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   @Value("${jwt.secret}")
   private String JWT_SECRET;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
   private Long toLong(Object value) {
     if (value == null) return null;
@@ -46,8 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-          throws ServletException, IOException {
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
     String token = extractToken(request);
     if (token != null && validateToken(token)) {
       Claims claims = getClaims(token);
@@ -60,8 +59,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       List<String> permissions = toStringList(claims.get("permissions"));
 
       List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-      authorities.addAll(roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
-      authorities.addAll(permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+      authorities.addAll(
+          roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+      authorities.addAll(
+          permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
 
       UserGetDto userDto = new UserGetDto();
       userDto.setId(userId);
@@ -69,13 +70,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       userDto.setStoreId(storeId);
 
       UsernamePasswordAuthenticationToken auth =
-              new UsernamePasswordAuthenticationToken(userDto, null, authorities);
+          new UsernamePasswordAuthenticationToken(userDto, null, authorities);
       SecurityContextHolder.getContext().setAuthentication(auth);
     }
     filterChain.doFilter(request, response);
   }
-
-
 
   // parse claims with signing key
   private Claims getClaims(String token) {
@@ -112,6 +111,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     return null;
   }
 }
-
-
-

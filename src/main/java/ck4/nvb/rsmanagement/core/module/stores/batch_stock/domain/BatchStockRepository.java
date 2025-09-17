@@ -2,18 +2,18 @@ package ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain;
 
 import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockGetDto;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository("importLogRepository")
 public interface BatchStockRepository extends BaseFullAuditedRepository<BatchStock, Long, Long> {
 
   @Query(
-          value =
-                  """
+      value =
+          """
                 SELECT COALESCE(SUM(bi.original_qty), 0)
                 FROM batch_stock bs
                 JOIN batch b ON bs.batch_id = b.id
@@ -25,14 +25,14 @@ public interface BatchStockRepository extends BaseFullAuditedRepository<BatchSto
                   AND b.deleted = false
                   AND bi.deleted = false
                 """,
-          nativeQuery = true)
+      nativeQuery = true)
   Long getTotalAvailableQuantityByProductAndStore(
-          @Param("productId") Long productId, @Param("storeId") Long storeId);
+      @Param("productId") Long productId, @Param("storeId") Long storeId);
 
   /** Find batches (batch_stock rows) that contain product in store, ordered by expiry (FIFO) */
   @Query(
-          value =
-                  """
+      value =
+          """
                 SELECT bs.*
                 FROM batch_stock bs
                 JOIN batch b ON bs.batch_id = b.id
@@ -45,12 +45,14 @@ public interface BatchStockRepository extends BaseFullAuditedRepository<BatchSto
                   AND bi.deleted = false
                 ORDER BY bi.expiry_date ASC
                 """,
-          nativeQuery = true)
+      nativeQuery = true)
   List<BatchStock> findAvailableBatchStocksByProductAndStore(
-          @Param("productId") Long productId, @Param("storeId") Long storeId);
+      @Param("productId") Long productId, @Param("storeId") Long storeId);
 
   /** Find available batch stock infos for a product in a store, order by expiry date (FIFO) */
-  @Query(value = """
+  @Query(
+      value =
+          """
     SELECT p.name as productName,
             bi.original_qty as qtyTotal,
             bi.original_qty as qtyAvailable,
@@ -73,13 +75,14 @@ public interface BatchStockRepository extends BaseFullAuditedRepository<BatchSto
         AND bi.deleted = false
     ORDER BY bi.expiry_date ASC
     """,
-          nativeQuery = true)
-  List<BatchStockGetDto> findAvailableBatchInfoByProductAndStore(@Param("productId") Long productId, @Param("storeId") Long storeId);
+      nativeQuery = true)
+  List<BatchStockGetDto> findAvailableBatchInfoByProductAndStore(
+      @Param("productId") Long productId, @Param("storeId") Long storeId);
 
   /** Find batch stocks that are about to expire (for inventory management) */
   @Query(
-          value =
-                  """
+      value =
+          """
                 SELECT bs.*
                 FROM batch_stock bs
                 JOIN batch b ON bs.batch_id = b.id
@@ -92,29 +95,29 @@ public interface BatchStockRepository extends BaseFullAuditedRepository<BatchSto
                   AND bi.expiry_date <= :expiryThreshold
                 ORDER BY bi.expiry_date ASC
                 """,
-          nativeQuery = true)
+      nativeQuery = true)
   List<BatchStock> findExpiringBatchStocks(
-          @Param("storeId") Long storeId,
-          @Param("expiryThreshold") java.time.LocalDateTime expiryThreshold);
+      @Param("storeId") Long storeId,
+      @Param("expiryThreshold") java.time.LocalDateTime expiryThreshold);
 
   /** Find batch stocks by batch_id and store ID */
   @Query(
-          value =
-                  """
+      value =
+          """
                 SELECT *
                 FROM batch_stock bs
                 WHERE bs.batch_id = :batchId
                   AND bs.store_id = :storeId
                   AND bs.deleted = false
                 """,
-          nativeQuery = true)
+      nativeQuery = true)
   BatchStock findByBatchIdAndStoreId(
-          @Param("batchId") Long batchId, @Param("storeId") Long storeId);
+      @Param("batchId") Long batchId, @Param("storeId") Long storeId);
 
   /** Find batch stocks with low inventory (below threshold) */
   @Query(
-          value =
-                  """
+      value =
+          """
                 SELECT bs.*
                 FROM batch_stock bs
                 JOIN batch b ON bs.batch_id = b.id
@@ -129,7 +132,9 @@ public interface BatchStockRepository extends BaseFullAuditedRepository<BatchSto
                   AND bi.original_qty <= :threshold
                 ORDER BY bi.original_qty ASC
                 """,
-          nativeQuery = true)
+      nativeQuery = true)
   List<BatchStock> findLowInventoryBatchStocks(
-          @Param("storeId") Long storeId, @Param("threshold") Integer threshold);
+      @Param("storeId") Long storeId, @Param("threshold") Integer threshold);
+
+  Optional<BatchStock> findFirstByBatchIdAndStoreId(Long batchId, Long storeId);
 }

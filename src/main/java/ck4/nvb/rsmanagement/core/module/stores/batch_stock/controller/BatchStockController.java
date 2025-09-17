@@ -48,8 +48,11 @@ public class BatchStockController
 
   @Override
   @PostMapping
-  @RequirePermission(value = {"BATCH_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
-  public ResponseEntity<ApiResponse<BatchStockDto>> create (Authentication auth, @RequestBody BatchStockDto batchStockDto) {
+  @RequirePermission(
+      value = {"BATCH_ROLE", "FULL_ROLE"},
+      logic = RequirePermission.LogicType.ANY)
+  public ResponseEntity<ApiResponse<BatchStockDto>> create(
+      Authentication auth, @RequestBody BatchStockDto batchStockDto) {
     return super.create(auth, batchStockDto);
   }
 }

@@ -30,6 +30,5 @@ public class SaleAllocation extends FullAuditedSerialIdEntity {
   @Column(name = "unit_cost_snap", nullable = false)
   private Integer unitCostSnap;
 
-  @Transient
-  private Long batchItemId;
+  @Transient private Long batchItemId;
 }

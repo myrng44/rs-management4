@@ -4,24 +4,17 @@ import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.With;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class PaymentMethodGetDto extends EntityDto<Long> {
-    private String code;
-    private String name;
+  private String code;
+  private String name;
 
-    public record WithUsageStats(
-            String name,
-            Integer usage
-    ) {
-        public WithUsageStats(PaymentMethodGetDto paymentMethod, Integer usage) {
-            this (
-                    paymentMethod.getName(),
-                    usage
-            );
-        }
+  public record WithUsageStats(String name, Integer usage) {
+    public WithUsageStats(PaymentMethodGetDto paymentMethod, Integer usage) {
+      this(paymentMethod.getName(), usage);
     }
+  }
 }

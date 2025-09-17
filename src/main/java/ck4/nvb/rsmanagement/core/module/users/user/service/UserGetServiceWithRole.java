@@ -18,5 +18,4 @@ public interface UserGetServiceWithRole<T, D> {
   List<UserRoleDto> getAllUserRoles(Long userId) throws AppException;
 
   UserRoleDto getUserSession(Long userId, Long storeId) throws AppException;
-
 }

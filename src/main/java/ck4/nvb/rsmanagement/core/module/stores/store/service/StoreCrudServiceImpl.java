@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service("storeService")
 public class StoreCrudServiceImpl
-        extends FullAuditedCrudServiceImpl<StoreDto, Store, Long, UserGetDto, Long> {
+    extends FullAuditedCrudServiceImpl<StoreDto, Store, Long, UserGetDto, Long> {
 
   protected StoreCrudServiceImpl(StoreRepository repository) {
     super(repository, Store.class);

@@ -1,23 +1,28 @@
 package ck4.nvb.rsmanagement.core.module.stores.batch.domain;
 
 import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
+import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository("batchItemRepository")
 public interface BatchItemRepository extends BaseFullAuditedRepository<BatchItem, Long, Long> {
-    List<BatchItem> findByProductId(Long productId);
-    List<BatchItem> findByProductIdIn(List<Long> productIds);
-    List<BatchItem> findByBatchId(Long batchId);
-    List<BatchItem> findByBatchIdIn(List<Long> batchIds);
-    List<BatchItem> findByBatchIdAndProductId(Long batchId, Long productId);
+  List<BatchItem> findByProductId(Long productId);
 
-    List<BatchItem> findByBatchIdAndProductIdAndDeletedIsFalse(Long batchId, Long productId);
+  List<BatchItem> findByProductIdIn(List<Long> productIds);
 
-    @Query(value = """ 
+  List<BatchItem> findByBatchId(Long batchId);
+
+  List<BatchItem> findByBatchIdIn(List<Long> batchIds);
+
+  List<BatchItem> findByBatchIdAndProductId(Long batchId, Long productId);
+
+  List<BatchItem> findByBatchIdAndProductIdAndDeletedIsFalse(Long batchId, Long productId);
+
+  @Query(
+      value =
+          """
             SELECT bi.*
             FROM batch_item bi
             JOIN batch b ON b.id = bi.batch_id
@@ -29,10 +34,12 @@ public interface BatchItemRepository extends BaseFullAuditedRepository<BatchItem
               AND bs.deleted = false
               AND b.deleted = false
             ORDER BY bi.expiry_date ASC """,
-            nativeQuery = true)
-    List<BatchItem> findAvailableByProductAndStoreOrdered(Long productId, Long storeId);
+      nativeQuery = true)
+  List<BatchItem> findAvailableByProductAndStoreOrdered(Long productId, Long storeId);
 
-    @Query(value = """
+  @Query(
+      value =
+          """
     SELECT COALESCE(SUM(bi.original_qty) - SUM(COALESCE(sa_sum.sold_qty, 0)), 0) AS available
     FROM batch_item bi
     JOIN batch b ON b.id = bi.batch_id
@@ -53,6 +60,8 @@ public interface BatchItemRepository extends BaseFullAuditedRepository<BatchItem
       AND bi.deleted = false
       AND bs.deleted = false
       AND b.deleted = false
-    """, nativeQuery = true)
-    Long getTotalAvailableQtyForProductInStore(@Param("productId") Long productId, @Param("storeId") Long storeId);
+    """,
+      nativeQuery = true)
+  Long getTotalAvailableQtyForProductInStore(
+      @Param("productId") Long productId, @Param("storeId") Long storeId);
 }

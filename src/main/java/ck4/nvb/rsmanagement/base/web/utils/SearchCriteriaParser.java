@@ -11,15 +11,16 @@ import java.util.regex.Pattern;
 public class SearchCriteriaParser {
 
   private static final Pattern pattern =
-          Pattern.compile("([\\p{L}0-9_.-]+?)(:|<>|<|>|<:|>:|~|\\(\\))(.+?),", Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL);
+      Pattern.compile(
+          "([\\p{L}0-9_.-]+?)(:|<>|<|>|<:|>:|~|\\(\\))(.+?),",
+          Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL);
 
   public static List<SearchCriteria> parse(List<String> filter) {
     List<SearchCriteria> criterias = new ArrayList<>();
     if (filter != null) {
       // decode and validate each filter string
-      List<SearchCriteria> collect = filter.parallelStream()
-              .map(SearchCriteriaParser::validateFilterPattern)
-              .toList();
+      List<SearchCriteria> collect =
+          filter.parallelStream().map(SearchCriteriaParser::validateFilterPattern).toList();
       criterias.addAll(collect);
     }
     return criterias;

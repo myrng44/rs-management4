@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 
 @Service("supplierService")
 public class SupplierServiceImpl
-        extends FullAuditedCrudServiceImpl<SupplierDto, Supplier, Long, UserGetDto, Long>
-        implements ISupplierService {
+    extends FullAuditedCrudServiceImpl<SupplierDto, Supplier, Long, UserGetDto, Long>
+    implements ISupplierService {
 
   protected SupplierServiceImpl(SupplierRepository repository) {
     super(repository, Supplier.class);

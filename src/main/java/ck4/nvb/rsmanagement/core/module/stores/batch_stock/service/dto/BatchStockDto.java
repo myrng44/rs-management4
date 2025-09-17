@@ -11,7 +11,7 @@ import org.modelmapper.ModelMapper;
 @Getter
 @Setter
 public class BatchStockDto extends EntityDto<Long>
-        implements CreateInput<BatchStock>, UpdateInput<BatchStock> {
+    implements CreateInput<BatchStock>, UpdateInput<BatchStock> {
 
   private Long batchId;
   private Long storeId;

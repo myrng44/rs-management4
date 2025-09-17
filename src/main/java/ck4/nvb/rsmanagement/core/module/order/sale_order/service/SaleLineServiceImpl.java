@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
 
 @Service("saleLineService")
 public class SaleLineServiceImpl
-        extends FullAuditedCrudServiceImpl<SaleLineGetDto, SaleLine, Long, UserGetDto, Long>
-        implements ISaleLineService {
+    extends FullAuditedCrudServiceImpl<SaleLineGetDto, SaleLine, Long, UserGetDto, Long>
+    implements ISaleLineService {
 
   @Autowired ProductServiceImpl productService;
 
@@ -46,7 +46,7 @@ public class SaleLineServiceImpl
     Product product = productService.getEntity(entity.getProductId());
     // snapshot
     dto.setUnitPrice(
-            product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
+        product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
     dto.setProductId(product.getId());
     dto.setProductName(product.getName());
 
@@ -60,7 +60,7 @@ public class SaleLineServiceImpl
 
   @Override
   public SaleLineGetDto create(CreateInput<SaleLine> createDto, UserGetDto user)
-          throws AppException {
+      throws AppException {
     if (createDto instanceof SaleLineDto) {
       Product product = productService.getEntity(((SaleLineDto) createDto).getProductId());
       ((SaleLineDto) createDto).setUnitPrice(product.getUnitPrice());
@@ -85,36 +85,42 @@ public class SaleLineServiceImpl
 
   @Override
   public List<ProductGetDto.WithSales> getMostSoldProductsLastDay(int days, int noProducts)
-          throws AppException {
+      throws AppException {
     LocalDateTime end = LocalDateTime.now();
     LocalDateTime start = end.minusDays(days);
 
-    List<Map<String, Object>> results = getRepository().findMostSoldProductsOfIntervalWithQty(start, end, noProducts);
-
+    List<Map<String, Object>> results =
+        getRepository().findMostSoldProductsOfIntervalWithQty(start, end, noProducts);
 
     return getWithSales(results);
   }
 
   private List<ProductGetDto.WithSales> getWithSales(List<Map<String, Object>> results) {
     return results.stream()
-            .map(row -> new ProductGetDto.WithSales(
+        .map(
+            row ->
+                new ProductGetDto.WithSales(
                     ((Number) row.get("id")).longValue(),
                     (String) row.get("sku"),
                     (String) row.get("name"),
                     (String) row.get("description"),
                     ((Number) row.get("unitPrice")).intValue(),
-                    row.get("categoryId") != null ? ((Number) row.get("categoryId")).longValue() : null,
-                    ((Number) row.get("totalQuantitySold")).longValue()
-            ))
-            .toList();
+                    row.get("categoryId") != null
+                        ? ((Number) row.get("categoryId")).longValue()
+                        : null,
+                    ((Number) row.get("totalQuantitySold")).longValue()))
+        .toList();
   }
 
   @Override
-  public List<ProductGetDto.WithSales> getMostSoldProductsLastDayOfAStore(int days, int noProducts, Long storeId) {
+  public List<ProductGetDto.WithSales> getMostSoldProductsLastDayOfAStore(
+      int days, int noProducts, Long storeId) {
     LocalDateTime end = LocalDateTime.now();
     LocalDateTime start = end.minusDays(days);
 
-    List<Map<String, Object>> results = getRepository().findMostSoldProductsOfIntervalWithQtyOfAStore(start, end, noProducts, storeId);
+    List<Map<String, Object>> results =
+        getRepository()
+            .findMostSoldProductsOfIntervalWithQtyOfAStore(start, end, noProducts, storeId);
 
     return getWithSales(results);
   }

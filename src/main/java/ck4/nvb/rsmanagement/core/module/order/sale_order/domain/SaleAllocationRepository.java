@@ -8,11 +8,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository("saleAllocationRepository")
 public interface SaleAllocationRepository
-        extends BaseFullAuditedRepository<SaleAllocation, Long, Long> {
+    extends BaseFullAuditedRepository<SaleAllocation, Long, Long> {
 
   /** Find all allocations for a specific order */
   @Query(
-          """
+      """
         SELECT sa
         FROM SaleAllocation sa
         JOIN SaleLine sl ON sa.saleLineId = sl.id
@@ -26,11 +26,13 @@ public interface SaleAllocationRepository
   /**
    * Sum sold_qty for a specific batch_item.
    *
-   * We can't rely on sale_allocation.batch_item_id (not present in new schema),
-   * so we join sale_allocation -> sale_line -> batch_stock -> batch -> batch_item
-   * and match the target batch_item.id.
+   * <p>We can't rely on sale_allocation.batch_item_id (not present in new schema), so we join
+   * sale_allocation -> sale_line -> batch_stock -> batch -> batch_item and match the target
+   * batch_item.id.
    */
-  @Query(value = """
+  @Query(
+      value =
+          """
     SELECT COALESCE(SUM(sa.sold_qty), 0)
     FROM sale_allocation sa
     JOIN sale_line sl ON sa.sale_line_id = sl.id
@@ -41,14 +43,17 @@ public interface SaleAllocationRepository
       AND sa.deleted = false
       AND sl.deleted = false
       AND bi.deleted = false
-    """, nativeQuery = true)
+    """,
+      nativeQuery = true)
   Integer sumSoldQtyByBatchItemId(@Param("batchItemId") Long batchItemId);
 
   /**
-   * Sum sold_qty for a given batch_stock and product.
-   * Join through sale_line to ensure allocation belongs to the product.
+   * Sum sold_qty for a given batch_stock and product. Join through sale_line to ensure allocation
+   * belongs to the product.
    */
-  @Query(value = """
+  @Query(
+      value =
+          """
     SELECT COALESCE(SUM(sa.sold_qty), 0)
     FROM sale_allocation sa
     JOIN sale_line sl ON sa.sale_line_id = sl.id
@@ -60,7 +65,8 @@ public interface SaleAllocationRepository
       AND sa.deleted = false
       AND sl.deleted = false
       AND bi.deleted = false
-    """, nativeQuery = true)
-  Integer sumSoldQtyByBatchStockAndProduct(@Param("batchStockId") Long batchStockId,
-                                           @Param("productId") Long productId);
+    """,
+      nativeQuery = true)
+  Integer sumSoldQtyByBatchStockAndProduct(
+      @Param("batchStockId") Long batchStockId, @Param("productId") Long productId);
 }

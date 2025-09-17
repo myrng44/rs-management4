@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 @Repository("voucherRedemptionRepository")
 public interface VoucherRedemptionRepository
     extends BaseFullAuditedRepository<VoucherRedemption, Long, Long> {
-    long countByVoucherIdAndCustomerId(Long voucherId, Long customerId);
-
+  long countByVoucherIdAndCustomerId(Long voucherId, Long customerId);
 }

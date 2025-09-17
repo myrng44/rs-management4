@@ -11,12 +11,11 @@ import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductUpdateDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+import java.util.List;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/products")
@@ -61,16 +60,21 @@ public class ProductController
 
   @GetMapping
   @Override
-  @RequirePermission(value= {"PRODUCT_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
-  public ResponseEntity<ApiResponse<PageResponse<ProductGetDto>>> getList(Authentication auth, List<String> query, String sort, int offset, int limit) {
+  @RequirePermission(
+      value = {"PRODUCT_ROLE", "FULL_ROLE"},
+      logic = RequirePermission.LogicType.ANY)
+  public ResponseEntity<ApiResponse<PageResponse<ProductGetDto>>> getList(
+      Authentication auth, List<String> query, String sort, int offset, int limit) {
     return super.getList(auth, query, sort, offset, limit);
   }
 
   @Override
   @PostMapping
-  @RequirePermission(value= {"PRODUCT_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
-  public ResponseEntity<ApiResponse<ProductGetDto>> create
-          (Authentication auth, @RequestBody ProductCreateDto productCreateDto) {
+  @RequirePermission(
+      value = {"PRODUCT_ROLE", "FULL_ROLE"},
+      logic = RequirePermission.LogicType.ANY)
+  public ResponseEntity<ApiResponse<ProductGetDto>> create(
+      Authentication auth, @RequestBody ProductCreateDto productCreateDto) {
     return super.create(auth, productCreateDto);
   }
 }

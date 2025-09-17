@@ -7,15 +7,15 @@ import org.springframework.stereotype.Repository;
 @Repository("productRepository")
 public interface ProductRepository extends BaseFullAuditedRepository<Product, Long, Long> {
   @Query(
-          value =
-                  """
+      value =
+          """
             SELECT qty_available
             FROM batch_stock
             WHERE product_id = :productId
               AND store_id = :storeId
               AND deleted = false;
         """,
-          nativeQuery = true)
+      nativeQuery = true)
   int remainQuantity(Long productId, Long storeId);
 
   int countProductsByDeletedIsFalse();

@@ -8,14 +8,13 @@ import ck4.nvb.rsmanagement.core.module.stores.batch.service.IBatchService;
 import ck4.nvb.rsmanagement.core.module.stores.batch.service.dto.BatchDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/batch")
@@ -26,8 +25,8 @@ public class BatchController
     super(batchCrudService);
   }
 
-  @Autowired
-  private IBatchService batchService;
+  @Autowired private IBatchService batchService;
+
   @Override
   public UserGetDto extractUser(Authentication auth) {
     if (auth == null || !auth.isAuthenticated()) {
@@ -49,18 +48,23 @@ public class BatchController
     return null;
   }
 
-    @Override
-    @PostMapping
-    @RequirePermission(value = {"BATCH_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
-    public ResponseEntity<ApiResponse<BatchDto>> create(Authentication auth, @RequestBody BatchDto batchDto) {
-      return super.create(auth, batchDto);
-    }
+  @Override
+  @PostMapping
+  @RequirePermission(
+      value = {"BATCH_ROLE", "FULL_ROLE"},
+      logic = RequirePermission.LogicType.ANY)
+  public ResponseEntity<ApiResponse<BatchDto>> create(
+      Authentication auth, @RequestBody BatchDto batchDto) {
+    return super.create(auth, batchDto);
+  }
 
   @GetMapping("/by-product")
-  @RequirePermission(value = {"BATCH_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
+  @RequirePermission(
+      value = {"BATCH_ROLE", "FULL_ROLE"},
+      logic = RequirePermission.LogicType.ANY)
   public ResponseEntity<ApiResponse<List<BatchDto>>> getByProduct(
-          @RequestParam(name = "productId", required = false) String productId,
-          @RequestParam(name = "productIds", required = false) String productIds) {
+      @RequestParam(name = "productId", required = false) String productId,
+      @RequestParam(name = "productIds", required = false) String productIds) {
 
     if (productId != null) {
       try {
@@ -68,13 +72,15 @@ public class BatchController
         List<BatchDto> list = batchService.findByProductId(id);
         return ResponseEntity.ok(ApiResponse.success(list));
       } catch (NumberFormatException e) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "productId không hợp lệ: " + productId));
+        return ResponseEntity.badRequest()
+            .body(ApiResponse.error(400, "productId không hợp lệ: " + productId));
       }
     }
 
     if (productIds != null && !productIds.trim().isEmpty()) {
       try {
-        List<Long> ids = Arrays.stream(productIds.split(","))
+        List<Long> ids =
+            Arrays.stream(productIds.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .map(Long::valueOf)
@@ -86,10 +92,12 @@ public class BatchController
 
         return ResponseEntity.ok(ApiResponse.success(list));
       } catch (NumberFormatException e) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(400, "productIds chứa giá trị không hợp lệ: " + productIds));
+        return ResponseEntity.badRequest()
+            .body(ApiResponse.error(400, "productIds chứa giá trị không hợp lệ: " + productIds));
       }
     }
 
-    return ResponseEntity.badRequest().body(ApiResponse.error(400,"productId hoặc productIds là bắt buộc"));
+    return ResponseEntity.badRequest()
+        .body(ApiResponse.error(400, "productId hoặc productIds là bắt buộc"));
   }
 }

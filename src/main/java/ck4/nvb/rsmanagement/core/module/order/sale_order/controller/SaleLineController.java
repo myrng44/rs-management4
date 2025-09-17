@@ -45,5 +45,4 @@ public class SaleLineController
     }
     return null;
   }
-
 }

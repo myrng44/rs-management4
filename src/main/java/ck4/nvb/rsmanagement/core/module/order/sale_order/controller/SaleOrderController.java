@@ -55,7 +55,6 @@ public class SaleOrderController
       return userGetDto;
     }
 
-
     if (principal instanceof UserGetDto) {
       return (UserGetDto) principal;
     }
@@ -66,7 +65,8 @@ public class SaleOrderController
   public ResponseEntity<ApiResponse<List<ProductGetDto.WithSales>>> getMostSoldProductsLastDay(
       Authentication auth, @RequestParam int days, @RequestParam int noProducts) {
     UserGetDto user = extractUser(auth);
-    List<ProductGetDto.WithSales> products = saleLineService.getMostSoldProductsLastDay(days, noProducts);
+    List<ProductGetDto.WithSales> products =
+        saleLineService.getMostSoldProductsLastDayOfAStore(days, noProducts, user.getStoreId());
     return ResponseEntity.ok(ApiResponse.success(products));
   }
 
@@ -85,34 +85,34 @@ public class SaleOrderController
                 .build());
   }
 
-
   @DeleteMapping("/{orderId}")
   @Override
-  public ResponseEntity<ApiResponse<Void>> delete(Authentication auth, @PathVariable String orderId) {
+  public ResponseEntity<ApiResponse<Void>> delete(
+      Authentication auth, @PathVariable String orderId) {
     return super.delete(auth, orderId);
   }
 
   @GetMapping
   @Override
   public ResponseEntity<ApiResponse<PageResponse<SaleOrderGetFullDto>>> getList(
-          Authentication auth,
-          @RequestParam(required = false, name = "query") List<String> query,
-          @RequestParam(required = false, name = "sort") String sort,
-          @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
-          @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
+      Authentication auth,
+      @RequestParam(required = false, name = "query") List<String> query,
+      @RequestParam(required = false, name = "sort") String sort,
+      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
+      @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
     return super.getList(auth, query, sort, offset, limit);
   }
 
   @GetMapping("/{orderId}")
   @Override
   public ResponseEntity<ApiResponse<SaleOrderGetFullDto>> getById(
-          Authentication auth, @PathVariable String orderId) {
+      Authentication auth, @PathVariable String orderId) {
     return super.getById(auth, orderId);
   }
 
   @Override
   public ResponseEntity<ApiResponse<PageResponse<SaleOrderGetFullDto>>> getList(
-          Authentication auth, FilterInput request) {
+      Authentication auth, FilterInput request) {
     return super.getList(auth, request);
   }
 }

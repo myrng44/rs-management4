@@ -10,12 +10,11 @@ import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.PaymentMetho
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.service.dto.PaymentMethodDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/payment-method")
@@ -60,54 +59,58 @@ public class PaymentMethodController
   @PostMapping
   @Override
   public ResponseEntity<ApiResponse<PaymentMethodDto>> create(
-          Authentication auth, @RequestBody PaymentMethodDto entity) {
+      Authentication auth, @RequestBody PaymentMethodDto entity) {
     return super.create(auth, entity);
   }
 
   @PutMapping("/{paymentMethodId}")
   @Override
   public ResponseEntity<ApiResponse<PaymentMethodDto>> update(
-          Authentication auth,
-          @PathVariable Long paymentMethodId,
-          @RequestBody PaymentMethodDto entity) {
+      Authentication auth,
+      @PathVariable Long paymentMethodId,
+      @RequestBody PaymentMethodDto entity) {
     return super.update(auth, paymentMethodId, entity);
   }
 
   @DeleteMapping("/{paymentMethodId}")
   @Override
-  public ResponseEntity<ApiResponse<Void>> delete(Authentication auth, @PathVariable Long paymentMethodId) {
+  public ResponseEntity<ApiResponse<Void>> delete(
+      Authentication auth, @PathVariable Long paymentMethodId) {
     return super.delete(auth, paymentMethodId);
   }
 
   @GetMapping
   @Override
   public ResponseEntity<ApiResponse<PageResponse<PaymentMethodDto>>> getList(
-          Authentication auth,
-          @RequestParam(required = false, name = "query") List<String> query,
-          @RequestParam(required = false, name = "sort") String sort,
-          @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
-          @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
+      Authentication auth,
+      @RequestParam(required = false, name = "query") List<String> query,
+      @RequestParam(required = false, name = "sort") String sort,
+      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
+      @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
     return super.getList(auth, query, sort, offset, limit);
   }
 
   @GetMapping("/{paymentMethodId}")
   @Override
   public ResponseEntity<ApiResponse<PaymentMethodDto>> getById(
-          Authentication auth, @PathVariable Long paymentMethodId) {
+      Authentication auth, @PathVariable Long paymentMethodId) {
     return super.getById(auth, paymentMethodId);
   }
 
   @Override
-  public ResponseEntity<ApiResponse<PageResponse<PaymentMethodDto>>> getList(Authentication auth, FilterInput request) {
+  public ResponseEntity<ApiResponse<PageResponse<PaymentMethodDto>>> getList(
+      Authentication auth, FilterInput request) {
     return super.getList(auth, request);
   }
 
-//  @GetMapping("/usage")
-//  public ResponseEntity<ApiResponse<PageResponse<PaymentMethodGetDto.WithUsageStats>>> getUsageStats(Authentication auth, @RequestParam int days) {
-//    UserGetDto user = extractUser(auth);
-//
-//    List<PaymentMethodGetDto.WithUsageStats> output = service.getUsageStatsOfInterval(days);
-//
-//    return APIResponseBuilder.successList(output, 0, output.size(), output.size(), "get usage stats successfully");
-//  }
+  //  @GetMapping("/usage")
+  //  public ResponseEntity<ApiResponse<PageResponse<PaymentMethodGetDto.WithUsageStats>>>
+  // getUsageStats(Authentication auth, @RequestParam int days) {
+  //    UserGetDto user = extractUser(auth);
+  //
+  //    List<PaymentMethodGetDto.WithUsageStats> output = service.getUsageStatsOfInterval(days);
+  //
+  //    return APIResponseBuilder.successList(output, 0, output.size(), output.size(), "get usage
+  // stats successfully");
+  //  }
 }

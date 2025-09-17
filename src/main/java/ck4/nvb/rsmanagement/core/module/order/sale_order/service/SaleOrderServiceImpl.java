@@ -15,7 +15,6 @@ import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrderReposit
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.*;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.Voucher;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.VoucherRepository;
-import ck4.nvb.rsmanagement.core.module.stores.batch.domain.Batch;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchItem;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchItemRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchRepository;
@@ -23,10 +22,10 @@ import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStockRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,8 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("orderService")
 @Transactional
 public class SaleOrderServiceImpl
-        extends FullAuditedCrudServiceImpl<SaleOrderGetFullDto, SaleOrder, String, UserGetDto, Long>
-        implements ISaleOrderService {
+    extends FullAuditedCrudServiceImpl<SaleOrderGetFullDto, SaleOrder, String, UserGetDto, Long>
+    implements ISaleOrderService {
 
   protected SaleOrderServiceImpl(SaleOrderRepository repository) {
     super(repository, SaleOrder.class);
@@ -69,8 +68,8 @@ public class SaleOrderServiceImpl
     }
 
     List<SaleLineGetDto> lines =
-            saleLineService.getAll(
-                    List.of(new SearchCriteria("saleOrderId", SearchOperator.EQUALS, entity.getId())));
+        saleLineService.getAll(
+            List.of(new SearchCriteria("saleOrderId", SearchOperator.EQUALS, entity.getId())));
     orderDto.setSaleLines(lines);
 
     orderDto.setStoreId(entity.getStoreId());
@@ -90,7 +89,7 @@ public class SaleOrderServiceImpl
 
   @Override
   public SaleOrderGetFullDto create(CreateInput<SaleOrder> createDto, UserGetDto user)
-          throws AppException {
+      throws AppException {
     if (createDto instanceof SaleOrderCreateDto) {
       return create((SaleOrderCreateDto) createDto, user);
     }
@@ -98,7 +97,7 @@ public class SaleOrderServiceImpl
   }
 
   public SaleOrderGetFullDto create(SaleOrderCreateDto createDto, UserGetDto user)
-          throws AppException {
+      throws AppException {
     super.checkCreatePermission(createDto, user);
 
     // check inventory availability first
@@ -118,13 +117,14 @@ public class SaleOrderServiceImpl
     }
     for (SaleLineDto saleLineDto : createDto.getLines()) {
       finalPrice +=
-              productRepository
-                      .findFirstByIdAndDeletedIsFalse(saleLineDto.getProductId())
-                      .getUnitPrice()
-                      * saleLineDto.getQtyOrdered();
+          productRepository
+                  .findFirstByIdAndDeletedIsFalse(saleLineDto.getProductId())
+                  .getUnitPrice()
+              * saleLineDto.getQtyOrdered();
     }
     if (createDto.getVoucherCode() != null) {
-      Voucher voucher = voucherRepository.findFirstByCodeAndDeletedFalse(createDto.getVoucherCode());
+      Voucher voucher =
+          voucherRepository.findFirstByCodeAndDeletedFalse(createDto.getVoucherCode());
       saleOrder.setVoucherId(voucher.getId());
       Integer discount = 0;
       if (voucher.getDiscountPer() > 0) {
@@ -137,11 +137,11 @@ public class SaleOrderServiceImpl
     saleOrder.setFinalPrice(finalPrice);
     saleOrder = getRepository().save(saleOrder);
     getLogger()
-            .info(
-                    "Created order id {} by user {}: {}",
-                    saleOrder.getId(),
-                    saleOrder.getCreatorId(),
-                    saleOrder);
+        .info(
+            "Created order id {} by user {}: {}",
+            saleOrder.getId(),
+            saleOrder.getCreatorId(),
+            saleOrder);
 
     for (SaleLineDto saleLineDto : createDto.getLines()) {
       saleLineDto.setSaleOrderId(saleOrder.getId());
@@ -149,31 +149,30 @@ public class SaleOrderServiceImpl
 
       // allocate inventory or this line
       allocateInventoryForSaleLine(
-              createdLine.getId(),
-              saleLineDto.getProductId(),
-              saleLineDto.getQtyOrdered(),
-              user);
+          createdLine.getId(), saleLineDto.getProductId(), saleLineDto.getQtyOrdered(), user);
     }
 
     return mapToEntityDto(saleOrder);
   }
 
   /** validate if there's enough inventory available for all products in the order */
-  private void validateInventoryAvailability(SaleOrderCreateDto createDto, UserGetDto user) throws AppException {
+  private void validateInventoryAvailability(SaleOrderCreateDto createDto, UserGetDto user)
+      throws AppException {
     for (SaleLineDto lineDto : createDto.getLines()) {
       Long availableQty = getTotalAvailableQuantity(lineDto.getProductId(), user);
       if (availableQty < lineDto.getQtyOrdered()) {
         throw new AppException(
-                String.format(
-                        "Insufficient inventory for product ID %d. Required: %d, Available: %d",
-                        lineDto.getProductId(), lineDto.getQtyOrdered(), availableQty));
+            String.format(
+                "Insufficient inventory for product ID %d. Required: %d, Available: %d",
+                lineDto.getProductId(), lineDto.getQtyOrdered(), availableQty));
       }
     }
   }
 
   /** get total available quantity for a product in a specific store */
   private Long getTotalAvailableQuantity(Long productId, UserGetDto user) throws AppException {
-    List<BatchItem> batchItems = batchItemRepository.findAvailableByProductAndStoreOrdered(productId, user.getStoreId());
+    List<BatchItem> batchItems =
+        batchItemRepository.findAvailableByProductAndStoreOrdered(productId, user.getStoreId());
     long totalAvailable = 0L;
 
     for (BatchItem batchItem : batchItems) {
@@ -186,46 +185,107 @@ public class SaleOrderServiceImpl
     return totalAvailable;
   }
 
-  /**
-   * Get total sold quantity for a specific product from a specific batch_stock
-   */
-//  private Integer getSoldQuantityForBatchItem(Long batchStockId, Long productId) {
-//    // This would need a custom repository method or query
-//    // For now, using a simple approach - you might want to optimize this with a custom query
-//    return saleAllocationService.getTotalSoldQuantityByBatchStockAndProduct(batchStockId, productId);
-//  }
+  /** Get total sold quantity for a specific product from a specific batch_stock */
+  private Integer getSoldQuantityForBatchItem(Long batchStockId, Long productId) {
+    // This would need a custom repository method or query
+    // For now, using a simple approach - you might want to optimize this with a custom query
+    return saleAllocationService.getTotalSoldQuantityByBatchStockAndProduct(
+        batchStockId, productId);
+  }
 
   /** allocate inventory for a sale line using FIFO strategy */
   private void allocateInventoryForSaleLine(
-          Long saleLineId, Long productId, Integer qtyNeeded, UserGetDto user)
-          throws AppException {
-    List<BatchItem> availableBatchItems = batchItemRepository.findAvailableByProductAndStoreOrdered(productId, user.getStoreId());
+      Long saleLineId, Long productId, Integer qtyNeeded, UserGetDto user) throws AppException {
+    List<BatchItem> availableBatchItems =
+        batchItemRepository.findAvailableByProductAndStoreOrdered(productId, user.getStoreId());
 
     int remaining = qtyNeeded;
     for (BatchItem bi : availableBatchItems) {
       if (remaining <= 0) break;
 
       int original = bi.getOriginalQty() == null ? 0 : bi.getOriginalQty();
-      int sold = saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId()) == null ? 0 : saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId());
+      int sold =
+          saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId()) == null
+              ? 0
+              : saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId());
       int avail = Math.max(0, original - sold);
       if (avail <= 0) continue;
 
       int allocateQty = Math.min(remaining, avail);
 
+      // --- NEW: resolve batchStockId for this batchItem ---
+      Long batchStockId = null;
+      // try to find BatchStock that matches this batchItem's batchId and the storeId
+      try {
+        // best practice: add repository method like
+        // batchStockRepository.findFirstByBatchIdAndStoreId(bi.getBatchId(), user.getStoreId())
+        // but if it's not available, fallback to filtering all batch stocks
+        Optional<BatchStock> bsOpt =
+            batchStockRepository.findAll().stream()
+                .filter(
+                    bs ->
+                        bs != null
+                            && bs.getBatchId() != null
+                            && bs.getBatchId().equals(bi.getBatchId())
+                            && bs.getStoreId() != null
+                            && bs.getStoreId().equals(user.getStoreId()))
+                .findFirst();
+        if (bsOpt.isPresent()) {
+          batchStockId = bsOpt.get().getId();
+        } else {
+          // try matching by batchId only (less strict)
+          bsOpt =
+              batchStockRepository.findAll().stream()
+                  .filter(
+                      bs ->
+                          bs != null
+                              && bs.getBatchId() != null
+                              && bs.getBatchId().equals(bi.getBatchId()))
+                  .findFirst();
+          if (bsOpt.isPresent()) batchStockId = bsOpt.get().getId();
+        }
+      } catch (Exception ex) {
+        // repository call failed unexpectedly
+        throw new AppException(
+            "Failed to resolve batchStock for batchItem " + bi.getId() + ": " + ex.getMessage());
+      }
+
+      if (batchStockId == null) {
+        // fail fast: avoid inserting allocation with null batch_stock_id
+        throw new AppException(
+            "Cannot allocate inventory: batch_stock not found for batchItem "
+                + bi.getId()
+                + " (batchId="
+                + bi.getBatchId()
+                + ", storeId="
+                + user.getStoreId()
+                + "). Please ensure batch_stock exists.");
+      }
+
+      // Create allocation DTO with batchStockId included
       SaleAllocationDto alloc = new SaleAllocationDto();
       alloc.setSaleLineId(saleLineId);
       alloc.setBatchItemId(bi.getId());
+      alloc.setBatchStockId(batchStockId); // <<< important: fill batchStockId
       alloc.setSoldQty(allocateQty);
       alloc.setUnitCostSnap(bi.getImportPrice());
       saleAllocationService.create(alloc, user);
 
       remaining -= allocateQty;
-      getLogger().info("Allocated {} units from batch_item {} for sale line {}", allocateQty, bi.getId(), saleLineId);
+      getLogger()
+          .info(
+              "Allocated {} units from batch_item {} (batch_stock {}) for sale line {}",
+              allocateQty,
+              bi.getId(),
+              batchStockId,
+              saleLineId);
     }
 
     if (remaining > 0) {
       throw new AppException(
-              String.format("Unable to fully allocate inventory for product %d. Missing %d units", productId, remaining));
+          String.format(
+              "Unable to fully allocate inventory for product %d. Missing %d units",
+              productId, remaining));
     }
   }
 
@@ -236,13 +296,13 @@ public class SaleOrderServiceImpl
     keys.put("storeId", List.of(SearchOperator.EQUALS));
     keys.put("voucherId", List.of(SearchOperator.EQUALS));
     keys.put(
-            "finalPrice",
-            List.of(
-                    SearchOperator.EQUALS,
-                    SearchOperator.LESS_THAN,
-                    SearchOperator.GREATER_THAN,
-                    SearchOperator.GREATER_THAN_OR_EQUAL,
-                    SearchOperator.LESS_THAN_OR_EQUAL));
+        "finalPrice",
+        List.of(
+            SearchOperator.EQUALS,
+            SearchOperator.LESS_THAN,
+            SearchOperator.GREATER_THAN,
+            SearchOperator.GREATER_THAN_OR_EQUAL,
+            SearchOperator.LESS_THAN_OR_EQUAL));
     return keys;
   }
 
@@ -254,39 +314,35 @@ public class SaleOrderServiceImpl
   }
 
   /** STATS METHODS */
-
   public Long getAllStoreRevenueBetween(LocalDateTime from, LocalDateTime to) throws AppException {
     return getRepository().sumTotalFinalPriceBetween(from, to);
   }
 
-  public Long getAStoreRevenueBetween(LocalDateTime from, LocalDateTime to, Long storeId) throws AppException {
-    return getRepository().sumTotalFinalPriceOfAStoreBetween(
-            from,
-            to,
-            storeId
-    );
+  public Long getAStoreRevenueBetween(LocalDateTime from, LocalDateTime to, Long storeId)
+      throws AppException {
+    return getRepository().sumTotalFinalPriceOfAStoreBetween(from, to, storeId);
   }
 
-  public int getAllStoreNumberOfOrderBetWeen(LocalDateTime from, LocalDateTime to) throws AppException {
+  public int getAllStoreNumberOfOrderBetWeen(LocalDateTime from, LocalDateTime to)
+      throws AppException {
     return getRepository().countOrdersByCreatedTimeBetween(from, to);
   }
 
-  public int getAStoreNumberOfOrderBetween(LocalDateTime from, LocalDateTime to, Long storeId) throws AppException {
-    return getRepository().countSaleOrdersByCreatedTimeBetweenAndStoreId(
-            from,
-            to,
-            storeId
-    );
+  public int getAStoreNumberOfOrderBetween(LocalDateTime from, LocalDateTime to, Long storeId)
+      throws AppException {
+    return getRepository().countSaleOrdersByCreatedTimeBetweenAndStoreId(from, to, storeId);
   }
 
-  public Long getAverageValuePerOrderBetWeen(LocalDateTime from, LocalDateTime to) throws AppException {
+  public Long getAverageValuePerOrderBetWeen(LocalDateTime from, LocalDateTime to)
+      throws AppException {
     long revenue = getRepository().sumTotalFinalPriceBetween(from, to);
     int noOrders = getRepository().countOrdersByCreatedTimeBetween(from, to);
 
     return revenue / noOrders;
   }
 
-  public Long getAverageValuePerOrderOfAStoreBetween(LocalDateTime from, LocalDateTime to, Long storeId) {
+  public Long getAverageValuePerOrderOfAStoreBetween(
+      LocalDateTime from, LocalDateTime to, Long storeId) {
     long revenue = getRepository().sumTotalFinalPriceOfAStoreBetween(from, to, storeId);
     int noOrders = getRepository().countSaleOrdersByCreatedTimeBetweenAndStoreId(from, to, storeId);
     return revenue / noOrders;

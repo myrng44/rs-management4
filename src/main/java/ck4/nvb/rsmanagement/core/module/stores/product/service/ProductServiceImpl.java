@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 
 @Service("productService")
 public class ProductServiceImpl
-        extends FullAuditedCrudServiceImpl<ProductGetDto, Product, Long, UserGetDto, Long>
-        implements IProductService {
+    extends FullAuditedCrudServiceImpl<ProductGetDto, Product, Long, UserGetDto, Long>
+    implements IProductService {
 
   protected ProductServiceImpl(ProductRepository repository) {
     super(repository, Product.class);

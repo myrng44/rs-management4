@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service("importLogService")
 public class BatchStockServiceImpl
-        extends FullAuditedCrudServiceImpl<BatchStockDto, BatchStock, Long, UserGetDto, Long> {
+    extends FullAuditedCrudServiceImpl<BatchStockDto, BatchStock, Long, UserGetDto, Long> {
 
   protected BatchStockServiceImpl(BatchStockRepository repository) {
     super(repository, BatchStock.class);
@@ -36,19 +36,19 @@ public class BatchStockServiceImpl
     keys.put("fromStock", List.of(SearchOperator.EQUALS));
     keys.put("toStore", List.of(SearchOperator.EQUALS));
     keys.put(
-            "startDate",
-            List.of(
-                    SearchOperator.EQUALS,
-                    SearchOperator.GREATER_THAN,
-                    SearchOperator.LESS_THAN,
-                    SearchOperator.BETWEEN));
+        "startDate",
+        List.of(
+            SearchOperator.EQUALS,
+            SearchOperator.GREATER_THAN,
+            SearchOperator.LESS_THAN,
+            SearchOperator.BETWEEN));
     keys.put(
-            "deliveryDate",
-            List.of(
-                    SearchOperator.EQUALS,
-                    SearchOperator.LESS_THAN,
-                    SearchOperator.GREATER_THAN,
-                    SearchOperator.BETWEEN));
+        "deliveryDate",
+        List.of(
+            SearchOperator.EQUALS,
+            SearchOperator.LESS_THAN,
+            SearchOperator.GREATER_THAN,
+            SearchOperator.BETWEEN));
     keys.put("status", List.of(SearchOperator.EQUALS));
     return keys;
   }

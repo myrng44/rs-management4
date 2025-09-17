@@ -15,7 +15,7 @@ import org.modelmapper.ModelMapper;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SaleAllocationDto extends EntityDto<Long>
-        implements CreateInput<SaleAllocation>, UpdateInput<SaleAllocation> {
+    implements CreateInput<SaleAllocation>, UpdateInput<SaleAllocation> {
   private Long saleLineId;
   private Long batchItemId;
   private Long batchStockId;

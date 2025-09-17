@@ -9,12 +9,11 @@ import ck4.nvb.rsmanagement.core.module.stores.supplier.service.SupplierServiceI
 import ck4.nvb.rsmanagement.core.module.stores.supplier.service.dto.SupplierDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/suppliers")
@@ -47,42 +46,46 @@ public class SupplierController
 
   @PostMapping
   @Override
-  public ResponseEntity<ApiResponse<SupplierDto>> create(Authentication auth, @RequestBody SupplierDto entity) {
+  public ResponseEntity<ApiResponse<SupplierDto>> create(
+      Authentication auth, @RequestBody SupplierDto entity) {
     return super.create(auth, entity);
   }
 
   @PutMapping("/{supplierId}")
   @Override
   public ResponseEntity<ApiResponse<SupplierDto>> update(
-          Authentication auth, @PathVariable Long supplierId, @RequestBody SupplierDto entity) {
+      Authentication auth, @PathVariable Long supplierId, @RequestBody SupplierDto entity) {
     return super.update(auth, supplierId, entity);
   }
 
   @DeleteMapping("/{supplierId}")
   @Override
-  public ResponseEntity<ApiResponse<Void>> delete(Authentication auth, @PathVariable Long supplierId) {
+  public ResponseEntity<ApiResponse<Void>> delete(
+      Authentication auth, @PathVariable Long supplierId) {
     return super.delete(auth, supplierId);
   }
 
   @GetMapping
   @Override
   public ResponseEntity<ApiResponse<PageResponse<SupplierDto>>> getList(
-          Authentication auth,
-          @RequestParam(required = false, name = "query") List<String> query,
-          @RequestParam(required = false, name = "sort") String sort,
-          @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
-          @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
+      Authentication auth,
+      @RequestParam(required = false, name = "query") List<String> query,
+      @RequestParam(required = false, name = "sort") String sort,
+      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
+      @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
     return super.getList(auth, query, sort, offset, limit);
   }
 
   @GetMapping("/{supplierId}")
   @Override
-  public ResponseEntity<ApiResponse<SupplierDto>> getById(Authentication auth, @PathVariable Long supplierId) {
+  public ResponseEntity<ApiResponse<SupplierDto>> getById(
+      Authentication auth, @PathVariable Long supplierId) {
     return super.getById(auth, supplierId);
   }
 
   @Override
-  public ResponseEntity<ApiResponse<PageResponse<SupplierDto>>> getList(Authentication auth, FilterInput request) {
+  public ResponseEntity<ApiResponse<PageResponse<SupplierDto>>> getList(
+      Authentication auth, FilterInput request) {
     return super.getList(auth, request);
   }
 }

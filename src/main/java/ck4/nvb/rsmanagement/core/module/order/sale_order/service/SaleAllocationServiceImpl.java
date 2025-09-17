@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 @Service("saleAllocationService")
 public class SaleAllocationServiceImpl
-        extends FullAuditedCrudServiceImpl<SaleAllocationDto, SaleAllocation, Long, UserGetDto, Long>
-        implements ISaleAllocationService {
+    extends FullAuditedCrudServiceImpl<SaleAllocationDto, SaleAllocation, Long, UserGetDto, Long>
+    implements ISaleAllocationService {
 
   protected SaleAllocationServiceImpl(SaleAllocationRepository repository) {
     super(repository, SaleAllocation.class);

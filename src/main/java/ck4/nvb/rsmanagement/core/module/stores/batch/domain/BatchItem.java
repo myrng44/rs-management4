@@ -4,12 +4,11 @@ import ck4.nvb.rsmanagement.base.domain.entity.FullAuditedSerialIdEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -39,5 +38,4 @@ public class BatchItem extends FullAuditedSerialIdEntity {
 
   @Column(name = "expiry_date", nullable = false)
   private LocalDateTime expiryDate;
-
 }

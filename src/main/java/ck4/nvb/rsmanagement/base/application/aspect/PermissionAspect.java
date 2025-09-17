@@ -20,50 +20,50 @@ public class PermissionAspect {
 
   private final AuthService authService;
 
-    @Around("@annotation(requirePermission)")
-    public Object checkPermission(ProceedingJoinPoint joinPoint, RequirePermission requirePermission)
-            throws Throwable {
-        Long currentUserId = getCurrentUserId();
+  @Around("@annotation(requirePermission)")
+  public Object checkPermission(ProceedingJoinPoint joinPoint, RequirePermission requirePermission)
+      throws Throwable {
+    Long currentUserId = getCurrentUserId();
 
-        if (currentUserId == null) {
-            throw new RuntimeException("User not authenticated");
-        }
-
-        String[] requiredPermissions = requirePermission.value();
-        RequirePermission.LogicType logic = requirePermission.logic();
-
-        boolean hasAccess = checkPermissions(currentUserId, requiredPermissions, logic);
-
-        if (!hasAccess) {
-            String permissionStr = String.join(
-                    logic == RequirePermission.LogicType.ALL ? " AND " : " OR ",
-                    requiredPermissions
-            );
-            throw new RuntimeException("Access denied. Required permission: " + permissionStr);
-        }
-
-        return joinPoint.proceed();
+    if (currentUserId == null) {
+      throw new RuntimeException("User not authenticated");
     }
 
-    private boolean checkPermissions(Long userId, String[] permissions, RequirePermission.LogicType logic) {
-        if (logic == RequirePermission.LogicType.ALL) {
-            // ALL logic: User phải có tất cả permissions
-            for (String permission : permissions) {
-                if (!authService.hasPermission(userId, permission)) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            // ANY logic: User chỉ cần có ít nhất 1 permission
-            for (String permission : permissions) {
-                if (authService.hasPermission(userId, permission)) {
-                    return true;
-                }
-            }
-            return false;
-        }
+    String[] requiredPermissions = requirePermission.value();
+    RequirePermission.LogicType logic = requirePermission.logic();
+
+    boolean hasAccess = checkPermissions(currentUserId, requiredPermissions, logic);
+
+    if (!hasAccess) {
+      String permissionStr =
+          String.join(
+              logic == RequirePermission.LogicType.ALL ? " AND " : " OR ", requiredPermissions);
+      throw new RuntimeException("Access denied. Required permission: " + permissionStr);
     }
+
+    return joinPoint.proceed();
+  }
+
+  private boolean checkPermissions(
+      Long userId, String[] permissions, RequirePermission.LogicType logic) {
+    if (logic == RequirePermission.LogicType.ALL) {
+      // ALL logic: User phải có tất cả permissions
+      for (String permission : permissions) {
+        if (!authService.hasPermission(userId, permission)) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      // ANY logic: User chỉ cần có ít nhất 1 permission
+      for (String permission : permissions) {
+        if (authService.hasPermission(userId, permission)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
 
   private Long getCurrentUserId() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();

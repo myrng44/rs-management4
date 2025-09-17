@@ -23,16 +23,16 @@ public class DashboardServiceImpl implements DashboardService {
     int totalProducts = getProductRepository().countProductsByDeletedIsFalse();
 
     int totalOrders =
-            getOrderRepository()
-                    .countOrdersByCreatedTimeBetween(
-                            LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay());
+        getOrderRepository()
+            .countOrdersByCreatedTimeBetween(
+                LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay());
     long monthlyRevenue =
-            Optional.ofNullable(
-                            getOrderRepository()
-                                    .sumTotalFinalPriceBetween(
-                                            LocalDate.now().withDayOfMonth(1).atStartOfDay(),
-                                            LocalDate.now().plusMonths(1).withDayOfMonth(1).atStartOfDay()))
-                    .orElse(0L);
+        Optional.ofNullable(
+                getOrderRepository()
+                    .sumTotalFinalPriceBetween(
+                        LocalDate.now().withDayOfMonth(1).atStartOfDay(),
+                        LocalDate.now().plusMonths(1).withDayOfMonth(1).atStartOfDay()))
+            .orElse(0L);
 
     int totalCustomers = getCustomerRepository().countCustomerByDeletedIsFalse();
 

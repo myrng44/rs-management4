@@ -50,8 +50,11 @@ public class CustomerController
 
   @Override
   @PostMapping
-  @RequirePermission(value = {"CUSTOMER_ROLE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
-  public ResponseEntity<ApiResponse<CustomerDto>> create (Authentication auth, @RequestBody CustomerDto customerDto) {
+  @RequirePermission(
+      value = {"CUSTOMER_ROLE", "FULL_ROLE"},
+      logic = RequirePermission.LogicType.ANY)
+  public ResponseEntity<ApiResponse<CustomerDto>> create(
+      Authentication auth, @RequestBody CustomerDto customerDto) {
     return super.create(auth, customerDto);
   }
 }
