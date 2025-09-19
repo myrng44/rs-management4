@@ -1,88 +1,32 @@
 package ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain;
 
 import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
-import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockGetDto;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository("importLogRepository")
 public interface BatchStockRepository extends BaseFullAuditedRepository<BatchStock, Long, Long> {
+
   @Query(
       value =
           """
-        SELECT bs.*
+        SELECT b.batch_code as batchCode,
+                spl.name as supplierName,
+                bi.original_qty as originalQty,
+                bi.remain_qty as remainQty,
+                bi.import_price as importPrice,
+                bi.manufacture_date as manufactureDate,
+                bi.expiry_date as expiryDate
         FROM batch_stock bs
-        WHERE bs.store_id = :storeId
-          AND bs.status = :status
-          AND bs.deleted = false
+        JOIN batch b ON bs.batch_id = b.id
+        JOIN batch_item bi ON bi.batch_id = b.id
+        JOIN product p ON p.id = bi.product_id
+        JOIN supplier spl ON spl.id = bi.supplier_id
+        WHERE p.id = :productId
+            AND bs.store_id = :storeId
     """,
       nativeQuery = true)
-  List<BatchStock> findByStoreIdAndStatusAndDeletedIsFalse(
-      @Param("storeId") Long storeId, @Param("status") String status);
-
-  // tìm batch_stock theo batchId + storeId (giữ, dùng nơi khác)
-  @Query(
-      value =
-          """
-        SELECT *
-        FROM batch_stock bs
-        WHERE bs.batch_id = :batchId
-          AND bs.store_id = :storeId
-          AND bs.deleted = false
-        """,
-      nativeQuery = true)
-  BatchStock findByBatchIdAndStoreId(
-      @Param("batchId") Long batchId, @Param("storeId") Long storeId);
-
-  /** Find available batch stock infos for a product in a store, order by expiry date (FIFO) */
-  @Query(
-      value =
-          """
-    SELECT p.name as productName,
-            bs.qty_total as qtyTotal,
-            bs.qty_available as qtyAvailable,
-            bs.qty_reversed as qtyReversed,
-            b.batch_code as batchCode,
-            spl.name as supplierName,
-            b.import_price as importedPrice,
-            b.manufacture_date as manufactureDate,
-            b.expiry_date as expiryDate
-    FROM batch_stock bs
-    JOIN batch b ON bs.batch_id = b.id
-    JOIN product p ON p.id = b.product_id
-    JOIN supplier spl ON spl.id = b.supplier_id
-    WHERE b.product_id = :productId
-        AND bs.store_id = :storeId
-        AND bs.status = 'ACTIVE'
-        AND bs.deleted = false
-        AND b.deleted = false
-        AND bs.qty_available > 0
-    ORDER BY b.expiry_date ASC
-    """,
-      nativeQuery = true)
-  List<BatchStockGetDto> findAvailableBatchInfoByProductAndStore(
-      @Param("productId") Long productId, @Param("storeId") Long storeId);
-
-  // Validate trước khi insert sale_allocation
-  @Query(
-      value =
-          """
-            SELECT COUNT(1)
-            FROM batch_stock bs
-                     JOIN batch_item bi ON bi.batch_id = bs.batch_id
-                     JOIN sale_line sl ON sl.id = :saleLineId
-                     JOIN sale_order so ON so.id = sl.sale_order_id
-            WHERE bi.id = :batchItemId
-              AND bs.store_id = so.store_id
-              AND bs.status = 'ACTIVE'
-              AND bs.deleted = false
-              AND bi.deleted = false
-              AND sl.deleted = false
-              AND so.deleted = false
-            """,
-      nativeQuery = true)
-  int validateSaleAllocation(
-      @Param("saleLineId") long saleLineId, @Param("batchItemId") long batchItemId);
+  List<Map<String, Object>> inventoryListOfAProductInStore(Long productId, Long storeId);
 }

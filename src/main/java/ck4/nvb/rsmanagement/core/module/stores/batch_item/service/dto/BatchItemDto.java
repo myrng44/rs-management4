@@ -72,4 +72,24 @@ public class BatchItemDto extends EntityDto<Long>
           batchItemDto.getExpiryDate());
     }
   }
+
+  public record WithProductStatusInfo(
+      String batchCode,
+      String supplierName,
+      Integer originalQty,
+      Integer remainQty,
+      Integer importPrice,
+      LocalDateTime manufactureDate,
+      LocalDateTime expiryDate) {
+    public WithProductStatusInfo(BatchItemDto batchItemDto, String batchCode, String supplierName) {
+      this(
+          batchCode,
+          supplierName,
+          batchItemDto.getOriginalQty(),
+          batchItemDto.getRemainQty(),
+          batchItemDto.getImportPrice(),
+          batchItemDto.getManufactureDate(),
+          batchItemDto.getExpiryDate());
+    }
+  }
 }

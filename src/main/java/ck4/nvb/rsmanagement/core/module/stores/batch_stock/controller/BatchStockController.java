@@ -8,7 +8,7 @@ import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponseBuilder;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.BatchStockServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockDto;
-import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockGetDto;
+import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.ProductInventoryDto;
 import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
@@ -95,17 +95,17 @@ public class BatchStockController
 
   @GetMapping("/products/{productId}")
   @RequiredPermission(PermissionCode.MANAGE_STORE_SETTINGS)
-  public APIListResponse<List<BatchStockGetDto>> getAllBatchStocksInfoByProduct(
+  public APIResponse<ProductInventoryDto> getAllBatchesInfoByProduct(
       Authentication auth, @PathVariable Long productId) {
-    UserGetDto userGetDto = extractUser(auth);
-    List<BatchStockGetDto> output =
-        batchStockService.getAllBatchByProduct(productId, userGetDto.getStoreId());
+    UserGetDto user = extractUser(auth);
+    ProductInventoryDto output =
+        batchStockService.getProductInventory(productId, user.getStoreId());
     getLogger()
         .debug(
             "GET /batch-stocks/products/{} called by userId={}, storeId={}",
             productId,
-            userGetDto != null ? userGetDto.getId() : null,
-            userGetDto.getStoreId());
-    return APIResponseBuilder.successList(output, 0, 10, output.size(), "listed successfully");
+            user != null ? user.getId() : null,
+            user.getStoreId());
+    return APIResponseBuilder.success(output, "executed successfully");
   }
 }
