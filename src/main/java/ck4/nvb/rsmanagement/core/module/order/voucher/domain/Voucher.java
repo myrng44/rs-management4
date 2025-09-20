@@ -22,7 +22,7 @@ public class Voucher extends FullAuditedSerialIdEntity {
   private String code;
 
   @Column(name = "description")
-  private String desc;
+  private String description;
 
   @Column(name = "discount_per")
   private Integer discountPer;

@@ -9,14 +9,13 @@ public interface ProductRepository extends BaseFullAuditedRepository<Product, Lo
   @Query(
       value =
           """
-    SELECT qty_available
-    FROM batch_stock
-    WHERE product_id = :productId
-      AND store_id = :storeId
-      AND deleted = false;
+    SELECT SUM(COALESCE(bi.remain_qty, 0))
+    FROM batch_stock bs
+    JOIN batch b ON bs.batch_id=b.id
+    JOIN batch_item bi ON bi.batch_id=b.id
+    WHERE bi.product_id = :productId
+      AND bs.store_id = :storeId
 """,
       nativeQuery = true)
-  int remainQuantity(Long productId, Long storeId);
-
-  long countProductsByDeletedIsFalse();
+  Integer remainQuantity(Long productId, Long storeId);
 }

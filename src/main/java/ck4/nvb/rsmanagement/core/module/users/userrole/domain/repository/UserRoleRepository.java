@@ -14,6 +14,8 @@ public interface UserRoleRepository extends BaseFullAuditedRepository<UserRole, 
 
   List<UserRole> findByUserIdAndStoreId(Long userId, Long storeId);
 
+  List<UserRole> findAllByRoleId(Long roleId);
+
   @Query(
       value =
           """
@@ -25,10 +27,6 @@ public interface UserRoleRepository extends BaseFullAuditedRepository<UserRole, 
   Set<Long> findRoleIdsByUserIdAndStoreId(Long userId, Long storeId);
 
   Set<Long> findStoreIdsByUserId(Long userId);
-
-  void deleteByUserIdAndRoleIdAndStoreId(Long userId, Long roleId, Long storeId);
-
-  List<UserRole> findByUserIdAndRoleId(Long userId, Long roleId);
 
   @Query(
       value =

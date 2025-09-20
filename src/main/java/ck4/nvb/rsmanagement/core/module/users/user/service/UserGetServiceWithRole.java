@@ -18,6 +18,8 @@ public interface UserGetServiceWithRole {
   /** Get user by ID with primary role */
   UserRoleDto get(Long userId) throws AppException;
 
+  List<UserRoleDto> getAllByRoleId(Long roleId) throws AppException;
+
   /** Get user by username with primary role */
   UserRoleDto getByUsername(String username) throws AppException;
 

@@ -51,6 +51,7 @@ public class ProductController
       UserGetDto userGetDto = new UserGetDto();
       userGetDto.setId(userRoleDto.getUserId());
       userGetDto.setUserName(userRoleDto.getUserName());
+      userGetDto.setStoreId(userRoleDto.getStoreId());
       return userGetDto;
     }
     return null;

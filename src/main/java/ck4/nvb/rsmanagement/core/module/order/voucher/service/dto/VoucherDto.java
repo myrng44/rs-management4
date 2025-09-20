@@ -16,7 +16,7 @@ import org.modelmapper.ModelMapper;
 public class VoucherDto extends EntityDto<Long>
     implements CreateInput<Voucher>, UpdateInput<Voucher> {
   private String code;
-  private String desc;
+  private String description;
   private Integer discountPer;
   private Integer discountVal;
   private LocalDateTime validFrom;
@@ -41,8 +41,8 @@ public class VoucherDto extends EntityDto<Long>
       entity.setCode(code);
       isModified = true;
     }
-    if (!desc.equals(entity.getDesc())) {
-      entity.setDesc(desc);
+    if (!description.equals(entity.getDescription())) {
+      entity.setDescription(description);
       isModified = true;
     }
     if (!discountPer.equals(entity.getDiscountPer())) {

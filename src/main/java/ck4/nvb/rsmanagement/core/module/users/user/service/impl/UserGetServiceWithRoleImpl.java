@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,8 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
   private final RolePermissionRepository rolePermissionRepository;
   private final PermissionRepository permissionRepository;
   private final CommonPasswordEncoder passwordEncoder;
+
+  @Autowired private ModelMapper modelMapper;
 
   @Override
   @Transactional(readOnly = true)
@@ -57,6 +61,12 @@ public class UserGetServiceWithRoleImpl implements UserGetServiceWithRole {
     User user =
         userRepository.findById(userId).orElseThrow(() -> new AppException("User not found"));
     return getPrimaryUserRole(user);
+  }
+
+  @Override
+  public List<UserRoleDto> getAllByRoleId(Long roleId) throws AppException {
+    return userRoleRepository.findAllByRoleId(roleId).stream()
+            .map(userRole -> modelMapper.map(userRole, UserRoleDto.class)).toList();
   }
 
   @Override

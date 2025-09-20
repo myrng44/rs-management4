@@ -222,29 +222,27 @@ public class PredicateBase<T> {
   private BooleanExpression getDateTimePredicate(
       String key, SearchOperator operator, String value, PathBuilder<?> entityPath)
       throws Exception {
-    DatePath<LocalDateTime> path = entityPath.getDate(key, LocalDateTime.class);
+    DateTimePath<LocalDateTime> path = entityPath.getDateTime(key, LocalDateTime.class);
     if (value.contains(",")) {
-      List<LocalDate> dateTimeValues =
-          Stream.of(value.split(",")).map(LocalDate::parse).collect(Collectors.toList());
+      List<LocalDateTime> dateTimeValues =
+          Stream.of(value.split(",")).map(LocalDateTime::parse).collect(Collectors.toList());
       return switch (operator) {
         case EQUALS ->
             path.in(
-                dateTimeValues.parallelStream()
-                    .map(LocalDate::atStartOfDay)
-                    .collect(Collectors.toList()));
+                dateTimeValues);
         case BETWEEN ->
             path.between(
-                dateTimeValues.get(0).atStartOfDay(), dateTimeValues.get(1).atTime(LocalTime.MAX));
+                dateTimeValues.get(0), dateTimeValues.get(1));
         default -> null;
       };
     } else {
-      LocalDate dateValue = LocalDate.parse(value);
+      LocalDateTime dateTimeValue = LocalDateTime.parse(value);
       return switch (operator) {
-        case EQUALS -> path.between(dateValue.atStartOfDay(), dateValue.atTime(LocalTime.MAX));
-        case GREATER_THAN -> path.gt(dateValue.atTime(LocalTime.MAX));
-        case LESS_THAN -> path.lt(dateValue.atStartOfDay());
-        case GREATER_THAN_OR_EQUAL -> path.goe(dateValue.atStartOfDay());
-        case LESS_THAN_OR_EQUAL -> path.loe(dateValue.atTime(LocalTime.MAX));
+        case EQUALS -> path.eq(dateTimeValue);
+        case GREATER_THAN -> path.gt(dateTimeValue);
+        case LESS_THAN -> path.lt(dateTimeValue);
+        case GREATER_THAN_OR_EQUAL -> path.goe(dateTimeValue);
+        case LESS_THAN_OR_EQUAL -> path.loe(dateTimeValue);
         default -> null;
       };
     }

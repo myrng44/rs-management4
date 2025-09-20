@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/${rs.api.main.baseUrl}/payment-method")
 public class PaymentMethodController
     extends AuditedAPICrudMethod<
-        PaymentMethodDto,
+        PaymentMethodGetDto,
         PaymentMethod,
         Long,
         UserGetDto,
@@ -28,11 +28,12 @@ public class PaymentMethodController
         PaymentMethodDto,
         PaymentMethodDto> {
 
+  @Autowired private IPaymentService service;
+
   public PaymentMethodController(IPaymentService service) {
     super(service);
   }
 
-  @Autowired private IPaymentService service;
 
   @Override
   public UserGetDto extractUser(Authentication auth) {
@@ -51,7 +52,6 @@ public class PaymentMethodController
       userGetDto.setId(userRoleDto.getUserId());
       userGetDto.setUserName(userRoleDto.getUserName());
       userGetDto.setStoreId(userRoleDto.getStoreId());
-      userGetDto.setRoleName(userRoleDto.getRoleName());
       return userGetDto;
     }
     return null;
@@ -59,14 +59,14 @@ public class PaymentMethodController
 
   @PostMapping
   @Override
-  public APIResponse<PaymentMethodDto> create(
+  public APIResponse<PaymentMethodGetDto> create(
       Authentication auth, @RequestBody PaymentMethodDto entity) {
     return super.create(auth, entity);
   }
 
   @PutMapping("/{paymentMethodId}")
   @Override
-  public APIResponse<PaymentMethodDto> update(
+  public APIResponse<PaymentMethodGetDto> update(
       Authentication auth,
       @PathVariable Long paymentMethodId,
       @RequestBody PaymentMethodDto entity) {
@@ -81,7 +81,7 @@ public class PaymentMethodController
 
   @GetMapping
   @Override
-  public APIListResponse<List<PaymentMethodDto>> getList(
+  public APIListResponse<List<PaymentMethodGetDto>> getList(
       Authentication auth,
       @RequestParam(required = false, name = "query") List<String> query,
       @RequestParam(required = false, name = "sort") String sort,
@@ -92,13 +92,13 @@ public class PaymentMethodController
 
   @GetMapping("/{paymentMethodId}")
   @Override
-  public APIResponse<PaymentMethodDto> getById(
+  public APIResponse<PaymentMethodGetDto> getById(
       Authentication auth, @PathVariable Long paymentMethodId) {
     return super.getById(auth, paymentMethodId);
   }
 
   @Override
-  public APIListResponse<List<PaymentMethodDto>> getList(Authentication auth, FilterInput request) {
+  public APIListResponse<List<PaymentMethodGetDto>> getList(Authentication auth, FilterInput request) {
     return super.getList(auth, request);
   }
 

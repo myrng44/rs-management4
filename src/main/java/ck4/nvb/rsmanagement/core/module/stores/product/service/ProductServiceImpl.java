@@ -60,6 +60,7 @@ public class ProductServiceImpl
    */
   @Override
   public int getRemainQuantity(long productId, long storeId) {
-    return getRepository().remainQuantity(productId, storeId);
+    Integer remainQty = getRepository().remainQuantity(productId, storeId);
+    return remainQty != null ? remainQty : 0;
   }
 }

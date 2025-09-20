@@ -8,6 +8,8 @@ import ck4.nvb.rsmanagement.base.web.utils.SearchCriteria;
 import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.order.customer.domain.Customer;
 import ck4.nvb.rsmanagement.core.module.order.customer.domain.CustomerRepository;
+import ck4.nvb.rsmanagement.core.module.order.customer.service.ICustomerService;
+import ck4.nvb.rsmanagement.core.module.order.customer.service.dto.CustomerDto;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.domain.PaymentMethod;
 import ck4.nvb.rsmanagement.core.module.order.paymentmethod.domain.PaymentMethodRepository;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
@@ -21,10 +23,14 @@ import ck4.nvb.rsmanagement.core.module.stores.batch_item.service.dto.BatchItemD
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStockRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,9 +56,12 @@ public class SaleOrderServiceImpl
   @Autowired private ISaleLineService saleLineService;
   @Autowired private ISaleAllocationService saleAllocationService;
   @Autowired private ProductRepository productRepository;
-  @Autowired private BatchRepository batchRepository;
-  @Autowired private BatchStockRepository batchStockRepository;
   @Autowired private IBatchItemService batchItemService;
+  @Autowired private ICustomerService customerService;
+  @Autowired
+  ModelMapper modelMapper;
+  @Autowired
+  private Clock clock;
 
   @Override
   public SaleOrderGetFullDto mapToEntityDto(SaleOrder entity) {
@@ -105,7 +114,7 @@ public class SaleOrderServiceImpl
     SaleOrder saleOrder = createDto.mapToEntity();
     saleOrder.setStoreId(user.getStoreId());
     saleOrder.setCreatorId(user.getId());
-    saleOrder.setCreatedTime(LocalDateTime.now());
+    saleOrder.setCreatedTime(LocalDateTime.now(clock));
     saleOrder.setNew(true);
     saleOrder.setUpdaterID(user.getId());
     saleOrder.setUpdatedTime(saleOrder.getCreatedTime());
@@ -127,10 +136,16 @@ public class SaleOrderServiceImpl
       Integer discount = 0;
       if (voucher.getDiscountPer() > 0) {
         discount = (finalPrice * voucher.getDiscountPer()) / 100;
-      } else if (voucher.getDiscountVal() != null) {
+      } else if (voucher.getDiscountVal() > 0) {
         discount = voucher.getDiscountVal();
       }
-      finalPrice -= discount;
+      finalPrice = (finalPrice - discount) >= 0 ? finalPrice - discount : 0;
+    }
+
+    if (createDto.getCustomerId() != null) {
+      CustomerDto updatePoint = customerService.get(createDto.getCustomerId());
+      updatePoint.setPoint(updatePoint.getPoint() + (int)(0.005 * finalPrice));
+      customerService.update(updatePoint.getId(), updatePoint, user);
     }
     saleOrder.setFinalPrice(finalPrice);
     saleOrder = getRepository().save(saleOrder);
@@ -149,6 +164,8 @@ public class SaleOrderServiceImpl
       allocateInventoryForSaleLine(
           createdLine.getId(), saleLineDto.getProductId(), saleLineDto.getQtyOrdered(), user);
     }
+
+
 
     return mapToEntityDto(saleOrder);
   }

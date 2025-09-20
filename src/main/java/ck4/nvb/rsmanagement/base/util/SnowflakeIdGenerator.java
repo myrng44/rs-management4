@@ -33,7 +33,7 @@ public class SnowflakeIdGenerator {
   public synchronized long nextId() {
     long timestamp = timeGen();
     if (timestamp < lastTimestamp) {
-      throw new RuntimeException("Clock moved backwards.");
+      throw new RuntimeException("ClockConfig moved backwards.");
     }
 
     if (lastTimestamp == timestamp) {

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service("voucherService")
 public class VoucherCrudServiceImpl
-    extends FullAuditedCrudServiceImpl<VoucherDto, Voucher, Long, UserGetDto, Long> {
+    extends FullAuditedCrudServiceImpl<VoucherDto, Voucher, Long, UserGetDto, Long> implements IVoucherService {
   protected VoucherCrudServiceImpl(VoucherRepository repository) {
     super(repository, Voucher.class);
   }
@@ -34,7 +34,7 @@ public class VoucherCrudServiceImpl
     Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
     keys.put("code", List.of(SearchOperator.EQUALS));
     keys.put(
-        "discountPercent",
+        "discountPer",
         List.of(
             SearchOperator.EQUALS,
             SearchOperator.GREATER_THAN,
@@ -43,7 +43,7 @@ public class VoucherCrudServiceImpl
             SearchOperator.LESS_THAN_OR_EQUAL,
             SearchOperator.GREATER_THAN_OR_EQUAL));
     keys.put(
-        "discountValue",
+        "discountVal",
         List.of(
             SearchOperator.EQUALS,
             SearchOperator.LESS_THAN,
@@ -51,8 +51,8 @@ public class VoucherCrudServiceImpl
             SearchOperator.GREATER_THAN,
             SearchOperator.LESS_THAN_OR_EQUAL,
             SearchOperator.GREATER_THAN_OR_EQUAL));
-    keys.put("startTime", List.of(SearchOperator.BETWEEN));
-    keys.put("expirationTime", List.of(SearchOperator.BETWEEN));
+    keys.put("validFrom", List.of(SearchOperator.BETWEEN, SearchOperator.LESS_THAN_OR_EQUAL));
+    keys.put("validTo", List.of(SearchOperator.BETWEEN, SearchOperator.GREATER_THAN_OR_EQUAL));
     return keys;
   }
 
@@ -64,4 +64,6 @@ public class VoucherCrudServiceImpl
     keys.add("discountValue");
     return keys;
   }
+
+
 }

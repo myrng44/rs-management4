@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service("paymentMethodService")
 public class PaymentMethodServiceImpl
-    extends FullAuditedCrudServiceImpl<PaymentMethodDto, PaymentMethod, Long, UserGetDto, Long>
+    extends FullAuditedCrudServiceImpl<PaymentMethodGetDto, PaymentMethod, Long, UserGetDto, Long>
     implements IPaymentService {
 
   protected PaymentMethodServiceImpl(PaymentMethodRepository paymentMethodRepository) {
@@ -29,8 +29,8 @@ public class PaymentMethodServiceImpl
   }
 
   @Override
-  public PaymentMethodDto mapToEntityDto(PaymentMethod entity) {
-    return new ModelMapper().map(entity, PaymentMethodDto.class);
+  public PaymentMethodGetDto mapToEntityDto(PaymentMethod entity) {
+    return new ModelMapper().map(entity, PaymentMethodGetDto.class);
   }
 
   @Override
