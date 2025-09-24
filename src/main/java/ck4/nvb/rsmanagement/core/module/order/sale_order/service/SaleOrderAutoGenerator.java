@@ -345,14 +345,14 @@ public class SaleOrderAutoGenerator {
     }
   }
 
-  // ---------------- next-day (historical) generator ----------------
+  // ----------------for future generator ----------------
   @Scheduled(cron = "${order.generator.daily-cron}")
-  public void scheduledGenerateForNextDay() {
-    try {
-      LocalDate tomorrow = LocalDate.now().plusDays(1);
-      generateOrdersForDate(tomorrow);
-    } catch (Exception ex) {
-      ex.printStackTrace();
+  public void scheduledGenerateForNextWeek() {
+    LocalDate startDate = LocalDate.now().plusDays(1);
+    LocalDate endDate = startDate.plusWeeks(1);
+
+    for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+      generateOrdersForDate(date);
     }
   }
 

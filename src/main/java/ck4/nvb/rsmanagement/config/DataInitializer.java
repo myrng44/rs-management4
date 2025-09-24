@@ -37,40 +37,59 @@ public class DataInitializer implements CommandLineRunner {
       Permission userRead = createPermission("USER_READ", "Read user information");
       Permission userWrite = createPermission("USER_WRITE", "Create and update users");
       Permission userDelete = createPermission("USER_DELETE", "Delete users");
+
       Permission roleRead = createPermission("ROLE_READ", "Read roles");
       Permission roleWrite = createPermission("ROLE_WRITE", "Create and update roles");
+
       Permission fullRole = createPermission("FULL_ROLE", "Full admin access");
-      Permission productRole = createPermission("PRODUCT_ROLE", "Read product roles");
+
+      Permission productRoleRead = createPermission("PRODUCT_READ", "Read product roles");
+      Permission productRoleWrite =  createPermission("PRODUCT_WRITE", "Create and update product roles");
+      Permission productRoleDelete = createPermission("PRODUCT_DELETE", "Delete product roles");
+      Permission proudctFullRole = createPermission("PRODUCT_FULL_ROLE", "Full admin access");
+
       Permission batchRole = createPermission("BATCH_ROLE", "Read batch roles");
+
       Permission categoryRole = createPermission("CATEGORY_ROLE", "Read category roles");
+
       Permission storeRole = createPermission("STORE_ROLE", "Read store roles");
+
       Permission supplierRole = createPermission("SUPPLIER_ROLE", "Read supplier roles");
+
       Permission transferRole = createPermission("TRANSFER_ROLE", "Read transfer roles");
+
+
       Permission batchStockRole = createPermission("BATCH_STOCK_ROLE", "Read batch stock roles");
+
       Permission customerRole = createPermission("CUSTOMER_ROLE", "Read customer roles");
+
       Permission paymentRole = createPermission("PAYMENT_ROLE", "Read payment roles");
-      Permission orderRole = createPermission("ORDER_ROLE", "Read order roles");
+
+      Permission orderRoleRead = createPermission("ORDER_READ", "Read order roles");
+      Permission orderRoleWrite = createPermission("ORDER_WRITE", "Write order roles");
+      Permission orderRoleDelete = createPermission("ORDER_DELETE", "Delete order roles");
+      Permission orderFullRole  = createPermission("ORDER_FULL_ROLE", "Read order roles");
+
       Permission voucherRole = createPermission("VOUCHER_ROLE", "Read voucher roles");
 
       // Create roles
       Role adminRole = createRole("ADMIN", "System Administrator");
       Role managerRole = createRole("MANAGER", "Store Manager");
       Role employeeRole = createRole("EMPLOYEE", "Store Employee");
-      Role client = createRole("CLIENT", "Store Client");
 
       // Assign permissions to roles
       assignPermissionsToRole(
           adminRole,
           Arrays.asList(
-              userRead, userWrite, userDelete, roleRead, roleWrite, productRole, fullRole));
+              fullRole));
       assignPermissionsToRole(
-          managerRole, Arrays.asList(userRead, userWrite, roleRead, roleWrite, productRole));
-      assignPermissionsToRole(employeeRole, Arrays.asList(userRead, roleRead));
+          managerRole, Arrays.asList(userRead, userWrite, roleRead, roleWrite, storeRole, proudctFullRole, orderFullRole));
+      assignPermissionsToRole(employeeRole, Arrays.asList(userRead, roleRead, productRoleRead, orderRoleRead, orderRoleWrite));
 
       // Create users
       User admin =
           createUser(
-              "admin",
+              "vietanh",
               "password123",
               "System Admin",
               "admin@circlek.com",
@@ -78,7 +97,7 @@ public class DataInitializer implements CommandLineRunner {
               1967119892788416522L);
       User manager =
           createUser(
-              "manager1",
+              "vietand",
               "password123",
               "Store Manager",
               "manager1@circlek.com",
@@ -86,7 +105,7 @@ public class DataInitializer implements CommandLineRunner {
               1967119892788416523L);
       User employee =
           createUser(
-              "employee1",
+              "vietend",
               "password123",
               "Store Employee",
               "employee1@circlek.com",

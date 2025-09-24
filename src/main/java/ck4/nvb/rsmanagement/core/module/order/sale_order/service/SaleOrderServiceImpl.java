@@ -13,6 +13,7 @@ import ck4.nvb.rsmanagement.core.module.order.paymentmethod.domain.PaymentMethod
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrderRepository;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.*;
+import ck4.nvb.rsmanagement.core.module.order.salereturn.domain.SaleReturnRepository;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.Voucher;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.VoucherRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchItem;
@@ -21,12 +22,18 @@ import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStockRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
+import ck4.nvb.rsmanagement.core.module.stores.store.service.dto.AllStoresRevenueResponse;
+import ck4.nvb.rsmanagement.core.module.stores.store.service.dto.RevenuePoint;
+import ck4.nvb.rsmanagement.core.module.stores.store.service.dto.RevenueSeriesResponse;
+import ck4.nvb.rsmanagement.core.module.stores.store.service.dto.StoreRevenueSeries;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +62,7 @@ public class SaleOrderServiceImpl
   @Autowired private BatchRepository batchRepository;
   @Autowired private BatchStockRepository batchStockRepository;
   @Autowired private BatchItemRepository batchItemRepository;
+  @Autowired private SaleReturnRepository saleReturnRepository;
 
   @Override
   public SaleOrderGetFullDto mapToEntityDto(SaleOrder entity) {
@@ -313,38 +321,206 @@ public class SaleOrderServiceImpl
     return keys;
   }
 
-  /** STATS METHODS */
-  public Long getAllStoreRevenueBetween(LocalDateTime from, LocalDateTime to) throws AppException {
-    return getRepository().sumTotalFinalPriceBetween(from, to);
+  // ---------- helpers to compute time ranges ----------
+  private LocalDateTime startOfDay(LocalDate date) {
+    return date.atStartOfDay();
   }
 
+  private LocalDateTime startOfNextDay(LocalDate date) {
+    return date.plusDays(1).atStartOfDay();
+  }
+
+  private LocalDateTime startOfWeek(LocalDate date) {
+    // tuần bắt đầu từ thứ Hai; nếu bạn muốn CN bắt đầu thì dùng previousOrSame(SUNDAY)
+    LocalDate monday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    return monday.atStartOfDay();
+  }
+
+  private LocalDateTime startOfNextWeek(LocalDate date) {
+    return startOfWeek(date).plusDays(7);
+  }
+
+  private LocalDateTime startOfMonth(LocalDate date) {
+    return date.withDayOfMonth(1).atStartOfDay();
+  }
+
+  private LocalDateTime startOfNextMonth(LocalDate date) {
+    return date.withDayOfMonth(1).plusMonths(1).atStartOfDay();
+  }
+
+  // ---------- public methods to get revenue ----------
+
+  // gross revenue for one store between from..to
   public Long getAStoreRevenueBetween(LocalDateTime from, LocalDateTime to, Long storeId)
-      throws AppException {
-    return getRepository().sumTotalFinalPriceOfAStoreBetween(from, to, storeId);
+          throws AppException {
+    Long revenue = getRepository().sumTotalFinalPriceOfAStoreBetween(from, to, storeId);
+    return revenue == null ? 0L : revenue;
   }
 
-  public int getAllStoreNumberOfOrderBetWeen(LocalDateTime from, LocalDateTime to)
-      throws AppException {
-    return getRepository().countOrdersByCreatedTimeBetween(from, to);
+  // net revenue (orders - returns) for one store between from..to (if saleReturnRepository available)
+  public Long getAStoreNetRevenueBetween(LocalDateTime from, LocalDateTime to, Long storeId)
+          throws AppException {
+    Long orders = getRepository().sumTotalFinalPriceOfAStoreBetween(from, to, storeId);
+    orders = orders == null ? 0L : orders;
+    Long returns = 0L;
+    try {
+      if (saleReturnRepository != null) {
+        returns =
+                saleReturnRepository.sumTotalReturnAmountOfAStoreBetween(from, to, storeId);
+        returns = returns == null ? 0L : returns;
+      }
+    } catch (Exception ex) {
+      // nếu repo không có hoặc lỗi, mặc định returns = 0
+      returns = 0L;
+    }
+    return orders - returns;
   }
 
-  public int getAStoreNumberOfOrderBetween(LocalDateTime from, LocalDateTime to, Long storeId)
-      throws AppException {
-    return getRepository().countSaleOrdersByCreatedTimeBetweenAndStoreId(from, to, storeId);
+  // convenience API: revenue for a store on a day
+  public Long getAStoreRevenueForDay(LocalDate date, Long storeId) throws AppException {
+    LocalDateTime from = startOfDay(date);
+    LocalDateTime to = startOfNextDay(date);
+    return getAStoreRevenueBetween(from, to, storeId);
   }
 
-  public Long getAverageValuePerOrderBetWeen(LocalDateTime from, LocalDateTime to)
-      throws AppException {
-    long revenue = getRepository().sumTotalFinalPriceBetween(from, to);
-    int noOrders = getRepository().countOrdersByCreatedTimeBetween(from, to);
-
-    return revenue / noOrders;
+  public Long getAStoreNetRevenueForDay(LocalDate date, Long storeId) throws AppException {
+    LocalDateTime from = startOfDay(date);
+    LocalDateTime to = startOfNextDay(date);
+    return getAStoreNetRevenueBetween(from, to, storeId);
   }
 
-  public Long getAverageValuePerOrderOfAStoreBetween(
-      LocalDateTime from, LocalDateTime to, Long storeId) {
-    long revenue = getRepository().sumTotalFinalPriceOfAStoreBetween(from, to, storeId);
-    int noOrders = getRepository().countSaleOrdersByCreatedTimeBetweenAndStoreId(from, to, storeId);
-    return revenue / noOrders;
+  // revenue for a store in the week containing date
+  public Long getAStoreRevenueForWeek(LocalDate date, Long storeId) throws AppException {
+    LocalDateTime from = startOfWeek(date);
+    LocalDateTime to = startOfNextWeek(date);
+    return getAStoreRevenueBetween(from, to, storeId);
+  }
+
+  public Long getAStoreNetRevenueForWeek(LocalDate date, Long storeId) throws AppException {
+    LocalDateTime from = startOfWeek(date);
+    LocalDateTime to = startOfNextWeek(date);
+    return getAStoreNetRevenueBetween(from, to, storeId);
+  }
+
+  // revenue for a store in the month containing date
+  public Long getAStoreRevenueForMonth(LocalDate date, Long storeId) throws AppException {
+    LocalDateTime from = startOfMonth(date);
+    LocalDateTime to = startOfNextMonth(date);
+    return getAStoreRevenueBetween(from, to, storeId);
+  }
+
+  public Long getAStoreNetRevenueForMonth(LocalDate date, Long storeId) throws AppException {
+    LocalDateTime from = startOfMonth(date);
+    LocalDateTime to = startOfNextMonth(date);
+    return getAStoreNetRevenueBetween(from, to, storeId);
+  }
+
+  // ---------- series method ----------
+  public RevenueSeriesResponse getAStoreRevenueSeries(Long storeId, int days) throws AppException {
+    if (days <= 0) days = 30;
+    LocalDate today = LocalDate.now();
+    LocalDate fromDate = today.minusDays(days - 1);
+    LocalDateTime from = fromDate.atStartOfDay();
+    LocalDateTime to = startOfNextDay(today);
+
+    List<Object[]> rows = getRepository().sumDailyRevenueOfAStoreBetween(from, to, storeId);
+
+    Map<LocalDate, Long> map = new HashMap<>();
+    if (rows != null) {
+      for (Object[] r : rows) {
+        if (r == null || r.length < 2) continue;
+        java.sql.Date sqlDate = (java.sql.Date) r[0];
+        Long rev = r[1] == null ? 0L : ((Number) r[1]).longValue();
+        map.put(sqlDate.toLocalDate(), rev);
+      }
+    }
+
+    List<RevenuePoint> series = new ArrayList<>();
+    for (int i = 0; i < days; i++) {
+      LocalDate d = fromDate.plusDays(i);
+      Long rev = map.getOrDefault(d, 0L);
+      series.add(new RevenuePoint(d.toString(), rev));
+    }
+
+    Long dayTotal = 0L;
+    Long weekTotal = 0L;
+    Long monthTotal = 0L;
+    try {
+      dayTotal = getAStoreRevenueForDay(today, storeId);
+    } catch (Exception e) { dayTotal = 0L; }
+    try {
+      weekTotal = getAStoreRevenueForWeek(today, storeId);
+    } catch (Exception e) { weekTotal = 0L; }
+    try {
+      monthTotal = getAStoreRevenueForMonth(today, storeId);
+    } catch (Exception e) { monthTotal = 0L; }
+
+    return new RevenueSeriesResponse(series, dayTotal, weekTotal, monthTotal);
+  }
+
+
+  public AllStoresRevenueResponse getAllStoresRevenueSeries(int days) throws AppException {
+    if (days <= 0) days = 30;
+    LocalDate today = LocalDate.now();
+    LocalDate fromDate = today.minusDays(days - 1);
+    LocalDateTime from = fromDate.atStartOfDay();
+    LocalDateTime to = startOfNextDay(today); // exclusive
+
+    List<Object[]> rows = getRepository().sumDailyRevenueAllStoresBetween(from, to);
+
+    // map storeId -> storeName
+    Map<Long, String> storeNames = new HashMap<>();
+    Map<Long, Map<LocalDate, Long>> tmp = new HashMap<>();
+
+    if (rows != null) {
+      for (Object[] r : rows) {
+        if (r == null || r.length < 4) continue;
+        // r[0] = store_id, r[1] = store_name, r[2] = day, r[3] = revenue
+        Long storeId = r[0] == null ? null : ((Number) r[0]).longValue();
+        String storeName = r[1] == null ? ("Store " + storeId) : r[1].toString();
+        java.sql.Date sqlDate = (java.sql.Date) r[2];
+        Long rev = r[3] == null ? 0L : ((Number) r[3]).longValue();
+
+        if (storeId == null) continue;
+        storeNames.put(storeId, storeName);
+        tmp.computeIfAbsent(storeId, k -> new HashMap<>()).put(sqlDate.toLocalDate(), rev);
+      }
+    }
+
+    List<StoreRevenueSeries> stores = new ArrayList<>();
+    for (Map.Entry<Long, Map<LocalDate, Long>> e : tmp.entrySet()) {
+      Long storeId = e.getKey();
+      Map<LocalDate, Long> map = e.getValue();
+      List<RevenuePoint> series = new ArrayList<>();
+      for (int i = 0; i < days; i++) {
+        LocalDate d = fromDate.plusDays(i);
+        Long r = map.getOrDefault(d, 0L);
+        series.add(new RevenuePoint(d.toString(), r));
+      }
+      stores.add(new StoreRevenueSeries(storeId, storeNames.get(storeId), series));
+    }
+
+    // Các tổng (toàn hệ thống) cho today / week / month
+    Long dayTotal = 0L, weekTotal = 0L, monthTotal = 0L;
+    try {
+      dayTotal = getRepository().sumTotalFinalPriceBetween(startOfDay(today), startOfNextDay(today));
+      dayTotal = dayTotal == null ? 0L : dayTotal;
+    } catch (Exception ex) { dayTotal = 0L; }
+
+    try {
+      LocalDateTime weekFrom = startOfWeek(today);
+      LocalDateTime weekTo = startOfNextWeek(today);
+      weekTotal = getRepository().sumTotalFinalPriceBetween(weekFrom, weekTo);
+      weekTotal = weekTotal == null ? 0L : weekTotal;
+    } catch (Exception ex) { weekTotal = 0L; }
+
+    try {
+      LocalDateTime monthFrom = startOfMonth(today);
+      LocalDateTime monthTo = startOfNextMonth(today);
+      monthTotal = getRepository().sumTotalFinalPriceBetween(monthFrom, monthTo);
+      monthTotal = monthTotal == null ? 0L : monthTotal;
+    } catch (Exception ex) { monthTotal = 0L; }
+
+    return new AllStoresRevenueResponse(stores, dayTotal, weekTotal, monthTotal, fromDate.toString(), today.toString());
   }
 }

@@ -61,7 +61,7 @@ public class ProductController
   @GetMapping
   @Override
   @RequirePermission(
-      value = {"PRODUCT_ROLE", "FULL_ROLE"},
+      value = {"PRODUCT_READ", "FULL_ROLE"},
       logic = RequirePermission.LogicType.ANY)
   public ResponseEntity<ApiResponse<PageResponse<ProductGetDto>>> getList(
       Authentication auth, List<String> query, String sort, int offset, int limit) {
@@ -71,7 +71,7 @@ public class ProductController
   @Override
   @PostMapping
   @RequirePermission(
-      value = {"PRODUCT_ROLE", "FULL_ROLE"},
+      value = {"PRODUCT_WRITE", "FULL_ROLE"},
       logic = RequirePermission.LogicType.ANY)
   public ResponseEntity<ApiResponse<ProductGetDto>> create(
       Authentication auth, @RequestBody ProductCreateDto productCreateDto) {

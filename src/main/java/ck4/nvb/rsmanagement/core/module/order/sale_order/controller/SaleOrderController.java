@@ -1,5 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.controller;
 
+import ck4.nvb.rsmanagement.base.application.annotation.RequirePermission;
 import ck4.nvb.rsmanagement.base.application.dto.FilterInput;
 import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
@@ -71,6 +72,7 @@ public class SaleOrderController
   }
 
   @PostMapping
+  @RequirePermission(value = {"ORDER_WRTTE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
   @Override
   public ResponseEntity<ApiResponse<SaleOrderGetFullDto>> create(
       Authentication auth, @RequestBody SaleOrderCreateDto entity) {
@@ -86,6 +88,7 @@ public class SaleOrderController
   }
 
   @DeleteMapping("/{orderId}")
+  @RequirePermission(value = {"ORDER_DELETED", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
   @Override
   public ResponseEntity<ApiResponse<Void>> delete(
       Authentication auth, @PathVariable String orderId) {
