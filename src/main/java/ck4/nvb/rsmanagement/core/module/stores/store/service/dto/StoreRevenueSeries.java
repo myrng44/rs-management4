@@ -1,4 +1,3 @@
-// file: ck4.nvb.rsmanagement.core.module.stores.store.service.dto.StoreRevenueSeries.java
 package ck4.nvb.rsmanagement.core.module.stores.store.service.dto;
 
 import java.util.List;
@@ -16,12 +15,27 @@ public class StoreRevenueSeries {
     this.series = series;
   }
 
-  public Long getStoreId() { return storeId; }
-  public void setStoreId(Long storeId) { this.storeId = storeId; }
+  public Long getStoreId() {
+    return storeId;
+  }
 
-  public String getStoreName() { return storeName; }
-  public void setStoreName(String storeName) { this.storeName = storeName; }
+  public void setStoreId(Long storeId) {
+    this.storeId = storeId;
+  }
 
-  public List<RevenuePoint> getSeries() { return series; }
-  public void setSeries(List<RevenuePoint> series) { this.series = series; }
+  public String getStoreName() {
+    return storeName;
+  }
+
+  public void setStoreName(String storeName) {
+    this.storeName = storeName;
+  }
+
+  public List<RevenuePoint> getSeries() {
+    return series;
+  }
+
+  public void setSeries(List<RevenuePoint> series) {
+    this.series = series;
+  }
 }

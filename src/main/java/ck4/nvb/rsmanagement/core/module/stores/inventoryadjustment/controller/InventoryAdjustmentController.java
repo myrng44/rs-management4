@@ -45,9 +45,4 @@ public class InventoryAdjustmentController
     return null;
   }
 
-  //  @PostMapping("/filtered")
-  //  public PagedResultDto<InventoryAdjustmentDto> getList(
-  //      Authentication auth, @RequestBody InventoryAdjustmentFilterInputDto request) {
-  //    return super.getList(auth, request);
-  //  }
 }

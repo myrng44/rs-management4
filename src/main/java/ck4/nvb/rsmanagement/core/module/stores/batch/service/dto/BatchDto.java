@@ -5,6 +5,8 @@ import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.Batch;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
@@ -14,13 +16,13 @@ import org.modelmapper.ModelMapper;
 public class BatchDto extends EntityDto<Long> implements CreateInput<Batch>, UpdateInput<Batch> {
   private String batchCode;
 
-  // giữ các field dùng để hiển thị/tiện ích từ batch_item
   private Long supplierId;
   private Integer importedPrice;
   private Integer originalQty;
   private LocalDateTime manufactureDate;
   private LocalDateTime expiryDate;
-  private LocalDateTime arrivalDate; // nếu bạn vẫn cần arrival
+  private LocalDateTime arrivalDate;
+  private List<BatchItemCreateDto> items;
 
   @Override
   public Batch mapToEntity() {
@@ -29,7 +31,6 @@ public class BatchDto extends EntityDto<Long> implements CreateInput<Batch>, Upd
 
   @Override
   public boolean mapToEntity(Batch entity) {
-    // implement if needed
     return false;
   }
 }

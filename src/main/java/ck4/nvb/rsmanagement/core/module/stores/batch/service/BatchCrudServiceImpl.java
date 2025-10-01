@@ -1,5 +1,6 @@
 package ck4.nvb.rsmanagement.core.module.stores.batch.service;
 
+import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
 import ck4.nvb.rsmanagement.base.application.service.FullAuditedCrudServiceImpl;
 import ck4.nvb.rsmanagement.base.web.utils.SearchOperator;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.Batch;
@@ -7,11 +8,16 @@ import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchItem;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchItemRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.BatchRepository;
 import ck4.nvb.rsmanagement.core.module.stores.batch.service.dto.BatchDto;
+import ck4.nvb.rsmanagement.core.module.stores.batch.service.dto.BatchItemCreateDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,4 +136,34 @@ public class BatchCrudServiceImpl
     }
     return dto;
   }
+
+  @Override
+  @Transactional
+  public BatchDto create(CreateInput<Batch> input, UserGetDto user) {
+    if (input instanceof BatchDto) {
+      BatchDto batchDto = (BatchDto) input;
+      BatchDto created = super.create(input, user);
+
+      if (batchDto.getItems() != null && !batchDto.getItems().isEmpty()) {
+        List<BatchItem> toSave = new ArrayList<>();
+        for (BatchItemCreateDto it : batchDto.getItems()) {
+          BatchItem bi = new BatchItem();
+          bi.setBatchId(created.getId());
+          bi.setProductId(it.getProductId());
+          bi.setSupplierId(it.getSupplierId());
+          bi.setOriginalQty(it.getQty());
+          bi.setImportPrice(it.getImportPrice());
+          bi.setManufactureDate(it.getManufactureDate());
+          bi.setExpiryDate(it.getExpiryDate());
+          toSave.add(bi);
+        }
+        batchItemRepository.saveAll(toSave);
+      }
+
+      return created;
+    }
+
+    return super.create(input, user);
+  }
+
 }

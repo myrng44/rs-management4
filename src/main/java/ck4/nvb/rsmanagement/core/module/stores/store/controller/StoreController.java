@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class StoreController
     extends AuditedCrudController<StoreDto, Store, Long, UserGetDto, Long, StoreDto, StoreDto> {
 
-
-  @Autowired
-  private SaleOrderServiceImpl saleOrderService;
+  @Autowired private SaleOrderServiceImpl saleOrderService;
 
   public StoreController(StoreCrudServiceImpl storeCrudService) {
     super(storeCrudService);
@@ -95,8 +93,7 @@ public class StoreController
 
   @GetMapping("/{storeId}/revenue")
   public ResponseEntity<ApiResponse<Object>> getStoreRevenueSeries(
-          @PathVariable Long storeId,
-          @RequestParam(required = false, defaultValue = "30") int days) {
+      @PathVariable Long storeId, @RequestParam(required = false, defaultValue = "30") int days) {
 
     try {
       Object resp = saleOrderService.getAStoreRevenueSeries(storeId, days);
@@ -104,21 +101,30 @@ public class StoreController
     } catch (Exception ex) {
       ex.printStackTrace();
       return ResponseEntity.status(500)
-              .body(ApiResponse.<Object>builder().code(500).message("Failed to get revenue").data(null).build());
+          .body(
+              ApiResponse.<Object>builder()
+                  .code(500)
+                  .message("Failed to get revenue")
+                  .data(null)
+                  .build());
     }
   }
 
   @GetMapping("/revenue/all")
   public ResponseEntity<ApiResponse<Object>> getAllStoresRevenueSeries(
-          @RequestParam(required = false, defaultValue = "30") int days) {
+      @RequestParam(required = false, defaultValue = "30") int days) {
     try {
       Object resp = saleOrderService.getAllStoresRevenueSeries(days);
       return ResponseEntity.ok(ApiResponse.success(resp));
     } catch (Exception ex) {
       ex.printStackTrace();
       return ResponseEntity.status(500)
-              .body(ApiResponse.<Object>builder().code(500).message("Failed to get all stores revenue").data(null).build());
+          .body(
+              ApiResponse.<Object>builder()
+                  .code(500)
+                  .message("Failed to get all stores revenue")
+                  .data(null)
+                  .build());
     }
   }
-
 }

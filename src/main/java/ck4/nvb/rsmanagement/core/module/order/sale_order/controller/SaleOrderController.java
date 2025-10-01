@@ -72,7 +72,9 @@ public class SaleOrderController
   }
 
   @PostMapping
-  @RequirePermission(value = {"ORDER_WRTTE", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
+  @RequirePermission(
+      value = {"ORDER_WRTTE", "FULL_ROLE"},
+      logic = RequirePermission.LogicType.ANY)
   @Override
   public ResponseEntity<ApiResponse<SaleOrderGetFullDto>> create(
       Authentication auth, @RequestBody SaleOrderCreateDto entity) {
@@ -88,7 +90,9 @@ public class SaleOrderController
   }
 
   @DeleteMapping("/{orderId}")
-  @RequirePermission(value = {"ORDER_DELETED", "FULL_ROLE"}, logic = RequirePermission.LogicType.ANY)
+  @RequirePermission(
+      value = {"ORDER_DELETED", "FULL_ROLE"},
+      logic = RequirePermission.LogicType.ANY)
   @Override
   public ResponseEntity<ApiResponse<Void>> delete(
       Authentication auth, @PathVariable String orderId) {

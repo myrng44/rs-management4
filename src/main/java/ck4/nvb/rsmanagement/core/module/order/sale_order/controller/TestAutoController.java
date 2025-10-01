@@ -1,13 +1,13 @@
-//package ck4.nvb.rsmanagement.core.module.order.sale_order.controller;
+// package ck4.nvb.rsmanagement.core.module.order.sale_order.controller;
 //
-//import ck4.nvb.rsmanagement.core.module.order.sale_order.service.SaleOrderAutoGenerator;
-//import java.time.LocalDate;
-//import org.springframework.format.annotation.DateTimeFormat;
-//import org.springframework.web.bind.annotation.*;
+// import ck4.nvb.rsmanagement.core.module.order.sale_order.service.SaleOrderAutoGenerator;
+// import java.time.LocalDate;
+// import org.springframework.format.annotation.DateTimeFormat;
+// import org.springframework.web.bind.annotation.*;
 //
-//@RestController
-//@RequestMapping("/auto/test-orders")
-//public class TestAutoController {
+// @RestController
+// @RequestMapping("/auto/test-orders")
+// public class TestAutoController {
 //
 //  private final SaleOrderAutoGenerator generator;
 //
@@ -17,7 +17,8 @@
 //
 //  @GetMapping("/generate")
 //  public String generate(
-//      @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+//      @RequestParam(value = "date", required = false) @DateTimeFormat(iso =
+// DateTimeFormat.ISO.DATE)
 //          LocalDate date,
 //      @RequestParam(value = "count", required = false) Integer count) {
 //    LocalDate target = (date == null) ? LocalDate.now().plusDays(1) : date;
@@ -39,4 +40,4 @@
 //  private int getDefaultTotal() {
 //    return 10;
 //  }
-//}
+// }

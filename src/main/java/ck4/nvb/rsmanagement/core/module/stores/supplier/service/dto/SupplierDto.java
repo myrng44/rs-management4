@@ -4,6 +4,8 @@ import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.stores.supplier.domain.Supplier;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +20,7 @@ public class SupplierDto extends EntityDto<Long>
 
   private String address;
 
+  @JsonSerialize(using = ToStringSerializer.class)
   private Long locationId;
 
   private String contact;

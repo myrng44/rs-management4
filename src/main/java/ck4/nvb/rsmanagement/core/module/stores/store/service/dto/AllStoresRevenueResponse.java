@@ -1,4 +1,3 @@
-// file: ck4.nvb.rsmanagement.core.module.stores.store.service.dto.AllStoresRevenueResponse.java
 package ck4.nvb.rsmanagement.core.module.stores.store.service.dto;
 
 import java.util.List;
@@ -8,12 +7,18 @@ public class AllStoresRevenueResponse {
   private Long dayTotal;
   private Long weekTotal;
   private Long monthTotal;
-  private String from; // iso date
-  private String to;   // iso date (inclusive)
+  private String from;
+  private String to;
 
   public AllStoresRevenueResponse() {}
 
-  public AllStoresRevenueResponse(List<StoreRevenueSeries> stores, Long dayTotal, Long weekTotal, Long monthTotal, String from, String to) {
+  public AllStoresRevenueResponse(
+      List<StoreRevenueSeries> stores,
+      Long dayTotal,
+      Long weekTotal,
+      Long monthTotal,
+      String from,
+      String to) {
     this.stores = stores;
     this.dayTotal = dayTotal;
     this.weekTotal = weekTotal;
@@ -22,21 +27,51 @@ public class AllStoresRevenueResponse {
     this.to = to;
   }
 
-  public List<StoreRevenueSeries> getStores() { return stores; }
-  public void setStores(List<StoreRevenueSeries> stores) { this.stores = stores; }
+  public List<StoreRevenueSeries> getStores() {
+    return stores;
+  }
 
-  public Long getDayTotal() { return dayTotal; }
-  public void setDayTotal(Long dayTotal) { this.dayTotal = dayTotal; }
+  public void setStores(List<StoreRevenueSeries> stores) {
+    this.stores = stores;
+  }
 
-  public Long getWeekTotal() { return weekTotal; }
-  public void setWeekTotal(Long weekTotal) { this.weekTotal = weekTotal; }
+  public Long getDayTotal() {
+    return dayTotal;
+  }
 
-  public Long getMonthTotal() { return monthTotal; }
-  public void setMonthTotal(Long monthTotal) { this.monthTotal = monthTotal; }
+  public void setDayTotal(Long dayTotal) {
+    this.dayTotal = dayTotal;
+  }
 
-  public String getFrom() { return from; }
-  public void setFrom(String from) { this.from = from; }
+  public Long getWeekTotal() {
+    return weekTotal;
+  }
 
-  public String getTo() { return to; }
-  public void setTo(String to) { this.to = to; }
+  public void setWeekTotal(Long weekTotal) {
+    this.weekTotal = weekTotal;
+  }
+
+  public Long getMonthTotal() {
+    return monthTotal;
+  }
+
+  public void setMonthTotal(Long monthTotal) {
+    this.monthTotal = monthTotal;
+  }
+
+  public String getFrom() {
+    return from;
+  }
+
+  public void setFrom(String from) {
+    this.from = from;
+  }
+
+  public String getTo() {
+    return to;
+  }
+
+  public void setTo(String to) {
+    this.to = to;
+  }
 }

@@ -6,14 +6,14 @@ import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.BatchStockServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockDto;
+import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/batch-stocks")
@@ -55,4 +55,19 @@ public class BatchStockController
       Authentication auth, @RequestBody BatchStockDto batchStockDto) {
     return super.create(auth, batchStockDto);
   }
+
+  @GetMapping("/available")
+  public ResponseEntity<ApiResponse<List<BatchStockGetDto>>> getAvailable(
+          @RequestParam("productId") Long productId, @RequestParam("storeId") Long storeId) {
+    List<BatchStockGetDto> list = ((BatchStockServiceImpl) getService()).getAvailableBatchInfoByProductAndStore(productId, storeId);
+    return ResponseEntity.ok(ApiResponse.success(list));
+  }
+
+  @GetMapping("/available-total")
+  public ResponseEntity<ApiResponse<Long>> getAvailableTotal(
+          @RequestParam("productId") Long productId, @RequestParam("storeId") Long storeId) {
+    Long total = ((BatchStockServiceImpl) getService()).getTotalAvailableQuantityByProductAndStore(productId, storeId);
+    return ResponseEntity.ok(ApiResponse.success(total));
+  }
+
 }

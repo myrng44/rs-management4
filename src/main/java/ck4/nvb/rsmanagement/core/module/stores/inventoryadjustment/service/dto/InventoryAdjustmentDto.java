@@ -4,15 +4,19 @@ import ck4.nvb.rsmanagement.base.application.dto.CreateInput;
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
 import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.stores.inventoryadjustment.domain.InventoryAdjustment;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
+
+import java.util.Objects;
 
 @Getter
 @Setter
 public class InventoryAdjustmentDto extends EntityDto<Long>
     implements CreateInput<InventoryAdjustment>, UpdateInput<InventoryAdjustment> {
-
+  @JsonSerialize(using = ToStringSerializer.class)
   private Long batchStockId;
 
   private Integer changeQuantity;
@@ -27,22 +31,19 @@ public class InventoryAdjustmentDto extends EntityDto<Long>
   @Override
   public boolean mapToEntity(InventoryAdjustment entity) {
     boolean isModified = false;
-
-    if (batchStockId != entity.getBatchStockId()) {
+    if (!Objects.equals(batchStockId, entity.getBatchStockId())) {
       entity.setBatchStockId(batchStockId);
       isModified = true;
     }
-
-    if (changeQuantity != entity.getChangeQuantity()) {
+    if (!Objects.equals(changeQuantity, entity.getChangeQuantity())) {
       entity.setChangeQuantity(changeQuantity);
       isModified = true;
     }
-
-    if (reason != entity.getReason()) {
+    if (!Objects.equals(reason, entity.getReason())) {
       entity.setReason(reason);
       isModified = true;
     }
-
     return isModified;
   }
+
 }

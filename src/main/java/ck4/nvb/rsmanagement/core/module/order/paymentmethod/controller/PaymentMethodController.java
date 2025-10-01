@@ -65,7 +65,9 @@ public class PaymentMethodController
   }
 
   @PutMapping("/{paymentMethodId}")
-  @RequirePermission(value = {"PAYTMENT_ROLE", "FULL_ROlLE"}, logic = RequirePermission.LogicType.ANY)
+  @RequirePermission(
+      value = {"PAYTMENT_ROLE", "FULL_ROlLE"},
+      logic = RequirePermission.LogicType.ANY)
   @Override
   public ResponseEntity<ApiResponse<PaymentMethodDto>> update(
       Authentication auth,
@@ -75,7 +77,9 @@ public class PaymentMethodController
   }
 
   @DeleteMapping("/{paymentMethodId}")
-  @RequirePermission(value = {"PAYTMENT_ROLE", "FULL_ROlLE"}, logic = RequirePermission.LogicType.ANY)
+  @RequirePermission(
+      value = {"PAYTMENT_ROLE", "FULL_ROlLE"},
+      logic = RequirePermission.LogicType.ANY)
   @Override
   public ResponseEntity<ApiResponse<Void>> delete(
       Authentication auth, @PathVariable Long paymentMethodId) {

@@ -59,9 +59,9 @@ public class BatchController
   }
 
   @GetMapping("/by-product")
-//  @RequirePermission(
-//      value = {"BATCH_ROLE", "FULL_ROLE"},
-//      logic = RequirePermission.LogicType.ANY)
+    @RequirePermission(
+        value = {"BATCH_ROLE", "FULL_ROLE"},
+        logic = RequirePermission.LogicType.ANY)
   public ResponseEntity<ApiResponse<List<BatchDto>>> getByProduct(
       @RequestParam(name = "productId", required = false) String productId,
       @RequestParam(name = "productIds", required = false) String productIds) {

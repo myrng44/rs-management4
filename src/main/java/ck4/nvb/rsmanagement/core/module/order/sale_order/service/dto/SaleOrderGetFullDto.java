@@ -1,6 +1,9 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto;
 
 import java.util.List;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +17,7 @@ public class SaleOrderGetFullDto extends BaseSaleOrderDto {
 
   private String customerName;
 
+  @JsonSerialize(using = ToStringSerializer.class)
   private Long storeId;
 
   private String voucherCode;

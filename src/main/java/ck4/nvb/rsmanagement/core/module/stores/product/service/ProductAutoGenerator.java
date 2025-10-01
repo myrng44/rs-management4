@@ -1,11 +1,10 @@
 package ck4.nvb.rsmanagement.core.module.stores.product.service;
 
-import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
-import ck4.nvb.rsmanagement.core.module.stores.product.service.IProductService;
-import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductCreateDto;
-import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.stores.category.domain.Category;
 import ck4.nvb.rsmanagement.core.module.stores.category.domain.CategoryRepository;
+import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
+import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductCreateDto;
+import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +13,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Service("productAutoGenerator")
-@ConditionalOnProperty(name = "product.generator.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(
+    name = "product.generator.enabled",
+    havingValue = "true",
+    matchIfMissing = false)
 public class ProductAutoGenerator {
 
   private final IProductService productService;
@@ -41,7 +42,8 @@ public class ProductAutoGenerator {
   }
 
   // realistic template from your python map
-  private static final Map<String, CategorySpec> PRODUCT_CATEGORIES_REALISTIC = new LinkedHashMap<>();
+  private static final Map<String, CategorySpec> PRODUCT_CATEGORIES_REALISTIC =
+      new LinkedHashMap<>();
 
   static {
     PRODUCT_CATEGORIES_REALISTIC.put(
@@ -146,8 +148,8 @@ public class ProductAutoGenerator {
   }
 
   /**
-   * Create missing categories from PRODUCT_CATEGORIES_REALISTIC into DB.
-   * Uses simple name match (trimmed). Transactional to persist categories.
+   * Create missing categories from PRODUCT_CATEGORIES_REALISTIC into DB. Uses simple name match
+   * (trimmed). Transactional to persist categories.
    */
   @Transactional
   protected void ensureCategoriesExist() {
@@ -258,12 +260,18 @@ public class ProductAutoGenerator {
           created = true;
         } catch (Exception ex) {
           System.err.println(
-              "Attempt " + attempts + " failed to create product (sku=" + sku + "): " + ex.getMessage());
+              "Attempt "
+                  + attempts
+                  + " failed to create product (sku="
+                  + sku
+                  + "): "
+                  + ex.getMessage());
         }
       }
 
       if (!created) {
-        System.err.println("Giving up creating product " + baseName + " after " + attempts + " attempts.");
+        System.err.println(
+            "Giving up creating product " + baseName + " after " + attempts + " attempts.");
       }
     } catch (Exception e) {
       e.printStackTrace();

@@ -6,6 +6,9 @@ import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.stores.transfer.domain.StoreTransfer;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +20,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StoreTransferDto extends EntityDto<Long>
     implements CreateInput<StoreTransfer>, UpdateInput<StoreTransfer> {
+  @JsonSerialize(using = ToStringSerializer.class)
   private Long fromStoreId;
+  @JsonSerialize(using = ToStringSerializer.class)
   private Long toStoreId;
   List<StoreTransferItemDto> items;
   private LocalDateTime transferDate;

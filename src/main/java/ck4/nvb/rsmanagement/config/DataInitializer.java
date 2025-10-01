@@ -44,7 +44,8 @@ public class DataInitializer implements CommandLineRunner {
       Permission fullRole = createPermission("FULL_ROLE", "Full admin access");
 
       Permission productRoleRead = createPermission("PRODUCT_READ", "Read product roles");
-      Permission productRoleWrite =  createPermission("PRODUCT_WRITE", "Create and update product roles");
+      Permission productRoleWrite =
+          createPermission("PRODUCT_WRITE", "Create and update product roles");
       Permission productRoleDelete = createPermission("PRODUCT_DELETE", "Delete product roles");
       Permission proudctFullRole = createPermission("PRODUCT_FULL_ROLE", "Full admin access");
 
@@ -58,7 +59,6 @@ public class DataInitializer implements CommandLineRunner {
 
       Permission transferRole = createPermission("TRANSFER_ROLE", "Read transfer roles");
 
-
       Permission batchStockRole = createPermission("BATCH_STOCK_ROLE", "Read batch stock roles");
 
       Permission customerRole = createPermission("CUSTOMER_ROLE", "Read customer roles");
@@ -68,7 +68,7 @@ public class DataInitializer implements CommandLineRunner {
       Permission orderRoleRead = createPermission("ORDER_READ", "Read order roles");
       Permission orderRoleWrite = createPermission("ORDER_WRITE", "Write order roles");
       Permission orderRoleDelete = createPermission("ORDER_DELETE", "Delete order roles");
-      Permission orderFullRole  = createPermission("ORDER_FULL_ROLE", "Read order roles");
+      Permission orderFullRole = createPermission("ORDER_FULL_ROLE", "Read order roles");
 
       Permission voucherRole = createPermission("VOUCHER_ROLE", "Read voucher roles");
 
@@ -78,13 +78,14 @@ public class DataInitializer implements CommandLineRunner {
       Role employeeRole = createRole("EMPLOYEE", "Store Employee");
 
       // Assign permissions to roles
+      assignPermissionsToRole(adminRole, Arrays.asList(fullRole));
       assignPermissionsToRole(
-          adminRole,
+          managerRole,
           Arrays.asList(
-              fullRole));
+              userRead, userWrite, roleRead, roleWrite, storeRole, proudctFullRole, orderFullRole));
       assignPermissionsToRole(
-          managerRole, Arrays.asList(userRead, userWrite, roleRead, roleWrite, storeRole, proudctFullRole, orderFullRole));
-      assignPermissionsToRole(employeeRole, Arrays.asList(userRead, roleRead, productRoleRead, orderRoleRead, orderRoleWrite));
+          employeeRole,
+          Arrays.asList(userRead, roleRead, productRoleRead, orderRoleRead, orderRoleWrite));
 
       // Create users
       User admin =
