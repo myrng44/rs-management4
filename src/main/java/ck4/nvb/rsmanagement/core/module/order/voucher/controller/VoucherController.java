@@ -5,7 +5,7 @@ import ck4.nvb.rsmanagement.base.web.controller.api.method.AuditedAPICrudMethod;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIListResponse;
 import ck4.nvb.rsmanagement.base.web.controller.api.response.APIResponse;
 import ck4.nvb.rsmanagement.core.module.order.voucher.domain.Voucher;
-import ck4.nvb.rsmanagement.core.module.order.voucher.service.VoucherCrudServiceImpl;
+import ck4.nvb.rsmanagement.core.module.order.voucher.service.VoucherServiceImpl;
 import ck4.nvb.rsmanagement.core.module.order.voucher.service.dto.VoucherDto;
 import ck4.nvb.rsmanagement.core.module.users.permission.domain.entity.PermissionCode;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
@@ -23,7 +23,7 @@ public class VoucherController
         VoucherDto, Voucher, Long, UserGetDto, Long, VoucherDto, VoucherDto> {
 
   @Autowired
-  public VoucherController(VoucherCrudServiceImpl voucherCrudService) {
+  public VoucherController(VoucherServiceImpl voucherCrudService) {
     super(voucherCrudService);
   }
 

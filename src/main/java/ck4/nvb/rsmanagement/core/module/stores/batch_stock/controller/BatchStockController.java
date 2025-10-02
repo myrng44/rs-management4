@@ -93,19 +93,29 @@ public class BatchStockController
     return super.getList(auth, request);
   }
 
-  @GetMapping("/products/{productId}")
+  @GetMapping("/{storeId}/inventory")
+  public APIListResponse<List<ProductInventoryDto>> getAllProductsInventory(Authentication auth, @PathVariable Long storeId) {
+    UserGetDto user = extractUser(auth);
+    List<ProductInventoryDto> allInventory = batchStockService.getAllProductsInventory(storeId);
+
+    getLogger()
+            .debug("GET /batch-stocks/{}/inventory", storeId);
+    return APIResponseBuilder.successList(allInventory, 0, allInventory.size(), allInventory.size(), "Get all inventory success.");
+  }
+
+  @GetMapping("/{storeId}/inventory/{productId}")
   @RequiredPermission(PermissionCode.MANAGE_STORE_SETTINGS)
   public APIResponse<ProductInventoryDto> getAllBatchesInfoByProduct(
-      Authentication auth, @PathVariable Long productId) {
+      Authentication auth, @PathVariable Long storeId, @PathVariable Long productId) {
     UserGetDto user = extractUser(auth);
     ProductInventoryDto output =
-        batchStockService.getProductInventory(productId, user.getStoreId());
+        batchStockService.getProductInventory(productId, storeId);
     getLogger()
         .debug(
-            "GET /batch-stocks/products/{} called by userId={}, storeId={}",
+            "GET /batch-stocks/{}/inventory/{} called by userId={}",
+            storeId,
             productId,
-            user != null ? user.getId() : null,
-            user.getStoreId());
+            user != null ? user.getId() : null);
     return APIResponseBuilder.success(output, "executed successfully");
   }
 }

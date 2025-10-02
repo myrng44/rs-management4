@@ -45,7 +45,7 @@ public class CustomerCrudServiceImpl
             SearchOperator.LESS_THAN,
             SearchOperator.LESS_THAN_OR_EQUAL,
             SearchOperator.GREATER_THAN,
-            SearchOperator.GREATER_THAN_OR_EQUAL));
+            SearchOperator.GREATER_THAN_OR_EQUAL, SearchOperator.BETWEEN));
     return keys;
   }
 

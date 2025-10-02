@@ -6,7 +6,11 @@ import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStoc
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.ProductInventoryDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 
+import java.util.List;
+
 public interface IBatchStockService
     extends FullAuditedCrudService<BatchStockDto, BatchStock, Long, UserGetDto, Long> {
   ProductInventoryDto getProductInventory(Long productId, Long storeId);
+
+  List<ProductInventoryDto> getAllProductsInventory(Long storeId);
 }

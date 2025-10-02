@@ -15,7 +15,7 @@ public class DataGenClockConfig {
     public AdjustableClock adjustableClock() {
         // Bắt đầu từ 01/09/2025 00:00
         return new AdjustableClock(
-                LocalDateTime.of(2025, 9, 1, 0, 0, 0)
+                LocalDateTime.of(2025, 8, 26, 6, 0, 0)
                         .toInstant(ZoneOffset.UTC),
                 ZoneId.systemDefault()
         );

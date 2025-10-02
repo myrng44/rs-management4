@@ -11,6 +11,7 @@ import ck4.nvb.rsmanagement.core.module.stores.product.service.IProductService;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,12 +43,16 @@ public class BatchStockServiceImpl
   @Override
   public Map<String, List<SearchOperator>> getSearchableKeys() {
     Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
+    keys.put("batchId", List.of(SearchOperator.EQUALS, SearchOperator.CONTAINS));
+    keys.put("storeId", List.of(SearchOperator.EQUALS));
+    keys.put("status", List.of(SearchOperator.EQUALS));
     return keys;
   }
 
   @Override
   public Set<String> getSortableKeys() {
     Set<String> keys = super.getSortableKeys();
+    keys.add("status");
     return keys;
   }
 
@@ -66,7 +71,7 @@ public class BatchStockServiceImpl
                 row ->
                     new BatchItemDto.WithProductStatusInfo(
                         (String) row.get("batchCode"),
-                        (String) row.get("supploerName"),
+                        (String) row.get("supplierName"),
                         ((Number) row.get("originalQty")).intValue(),
                         ((Number) row.get("remainQty")).intValue(),
                         ((Number) row.get("importPrice")).intValue(),
@@ -80,5 +85,17 @@ public class BatchStockServiceImpl
     productInventoryDto.setBatchItems(batchItems);
     productInventoryDto.setRemainStock(remainQty);
     return productInventoryDto;
+  }
+
+  @Override
+  public List<ProductInventoryDto> getAllProductsInventory(Long storeId) {
+    List<ProductGetDto> products = productService.getAll();
+    List<ProductInventoryDto> allProductsInventory = new ArrayList<>();
+    for (ProductGetDto product : products) {
+      ProductInventoryDto inventoryDto = getProductInventory(product.getId(), storeId);
+      allProductsInventory.add(inventoryDto);
+    }
+
+    return allProductsInventory;
   }
 }

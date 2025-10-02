@@ -255,7 +255,7 @@ public class SaleOrderServiceImpl
             SearchOperator.LESS_THAN,
             SearchOperator.GREATER_THAN,
             SearchOperator.GREATER_THAN_OR_EQUAL,
-            SearchOperator.LESS_THAN_OR_EQUAL));
+            SearchOperator.LESS_THAN_OR_EQUAL, SearchOperator.BETWEEN));
     return keys;
   }
 

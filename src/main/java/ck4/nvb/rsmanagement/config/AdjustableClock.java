@@ -32,6 +32,7 @@ public class AdjustableClock extends Clock {
 
     public void reset(LocalDateTime newDateTime) {
         this.currentInstant = newDateTime.toInstant(zoneId.getRules().getOffset(newDateTime));
+        System.out.println("[CLOCK] Reset to: " + newDateTime + " (instant: " + this.currentInstant + ")");
     }
 
     @Override

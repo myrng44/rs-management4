@@ -39,6 +39,13 @@ public class ProductServiceImpl
     Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
     keys.put("sku", List.of(SearchOperator.CONTAINS, SearchOperator.EQUALS));
     keys.put("name", List.of(SearchOperator.CONTAINS, SearchOperator.EQUALS));
+    keys.put("categoryId", List.of(SearchOperator.EQUALS));
+    keys.put("unitPrice", List.of(SearchOperator.EQUALS,
+            SearchOperator.GREATER_THAN, SearchOperator.LESS_THAN,
+            SearchOperator.GREATER_THAN_OR_EQUAL,
+            SearchOperator.LESS_THAN_OR_EQUAL,
+            SearchOperator.BETWEEN));
+    keys.put("description", List.of(SearchOperator.CONTAINS));
     return keys;
   }
 

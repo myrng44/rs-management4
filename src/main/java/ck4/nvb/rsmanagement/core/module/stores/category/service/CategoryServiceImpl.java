@@ -35,6 +35,7 @@ public class CategoryServiceImpl
   public Map<String, List<SearchOperator>> getSearchableKeys() {
     Map<String, List<SearchOperator>> keys = super.getSearchableKeys();
     keys.put("name", List.of(SearchOperator.EQUALS, SearchOperator.CONTAINS));
+    keys.put("description", List.of(SearchOperator.EQUALS, SearchOperator.CONTAINS));
     return keys;
   }
 

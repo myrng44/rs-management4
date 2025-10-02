@@ -13,9 +13,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service("voucherService")
-public class VoucherCrudServiceImpl
+public class VoucherServiceImpl
     extends FullAuditedCrudServiceImpl<VoucherDto, Voucher, Long, UserGetDto, Long> implements IVoucherService {
-  protected VoucherCrudServiceImpl(VoucherRepository repository) {
+  protected VoucherServiceImpl(VoucherRepository repository) {
     super(repository, Voucher.class);
   }
 

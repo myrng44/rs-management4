@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum SearchOperator {
   EQUALS(":"),
   NOT_IN("<>"),
+  IN("><"),
   NEGATION("!"),
   GREATER_THAN(">"),
   GREATER_THAN_OR_EQUAL(">:"),
@@ -25,6 +26,7 @@ public enum SearchOperator {
       case ":" -> EQUALS;
       case "!" -> NEGATION;
       case "<>" -> NOT_IN;
+      case "><" -> IN;
       case ">" -> GREATER_THAN;
       case "<" -> LESS_THAN;
       case ">:" -> GREATER_THAN_OR_EQUAL;
