@@ -1,0 +1,209 @@
+1. Phân Khúc Khách Hàng Thông Minh (RFM-based Segmentation)
+Phân loại khách hàng
+- VIP (10%): Điểm cao, mua thường xuyên, chi tiêu nhiều
+- Regular (45%): Khách quen, tần suất trung bình
+- Newcomer (25%): Khách mới, điểm thấp
+- Guest (20%): Khách vãng lai, không đăng ký
+Logic RFM nâng cao
+
+Recency: Tính ngày mua gần nhất dựa trên điểm tích lũy
+Frequency: Ước lượng tần suất mua hàng từ lịch sử
+Monetary: Chuẩn hóa giá trị điểm (tanh normalization)
+Composite Score: Kết hợp 3 yếu trên với trọng số 50%-30%-20%
+ 2. Hành Vi Giỏ Hàng Phức Tạp
+Số lượng sản phẩm động (Poisson Distribution)
+
+VIP: λ = 3.5 (trung bình 3-4 items)
+Regular: λ = 2.0
+Newcomer: λ = 1.5
+Guest: λ = 1.2
+
+Điều chỉnh theo ngữ cảnh
+
+Giờ cao điểm: +10-25% items (11h-14h lunch, 17h-21h dinner)
+Ngày lễ: +60% kích thước giỏ hàng
+Cuối tuần: Boost đặc biệt cho snacks
+
+3. Thuật Toán Chọn Sản Phẩm Thông Minh
+Softmax Temperature Sampling
+javatemperature = {
+  0.8  // Giờ cao điểm → tập trung vào món hot
+  0.9  // Chiều tối → cân bằng
+  1.1  // Giờ thấp điểm → khám phá đa dạng
+}
+Scoring đa chiều
+Raw Score = log(1 + historical_qty) 
+            × price_factor 
+            × category_factor 
+            × hour_boost 
+            × seasonal_multiplier
+            × day_of_week_boost
+Price Factor (tâm lý giá)
+
+< 10k: 1.6× (dễ mua)
+10k-30k: 1.3×
+30k-100k: 1.0×
+
+
+100k: 0.6× (cân nhắc kỹ)
+
+
+
+Category Factor (xu hướng danh mục)
+
+Nước uống: 1.6× (tiêu thụ cao nhất)
+Snack: 1.4×
+Coffee: 1.2×
+Trái cây: 1.0×
+
+ 4. Pattern Thời Gian Thực Tế
+Phân bổ theo giờ
+Realtime weights: [1,1,2,3,4,3,2,3,4,3,2,1,2,3,4,3,2,1,1,3,4,3,1,1]
+                   0h         6h        12h       18h       23h
+Hour Boosts cho từng danh mục
+
+Đồ uống: Peak 11h-14h (×1.4 - giờ ăn trưa)
+Coffee: Peak 6h-9h (×1.5 - sáng sớm)
+Snack: Peak 17h-20h (×1.3 - tối về)
+
+Seasonal Multipliers (theo tháng 1-12)
+Drinks:  [1.0→1.2→1.25→1.15] (mùa hè tăng)
+Fruits:  [1.0→1.3→1.25→1.1]  (tháng 8 peak)
+Coffee:  [1.0→1.05→1.1]      (cuối năm tăng)
+ 5. Quản Lý Voucher Thông Minh
+Xác suất sử dụng voucher
+VIP:       35% (thường xuyên)
+Regular:   12%
+Newcomer:  12%
+Guest:      3% (rất hiếm)
+Kiểm tra điều kiện
+
+Thời gian hiệu lực (validFrom → validTo)
+Số lượng còn lại (qtyTotal - qtyRedeemed)
+Đối tượng áp dụng (ALL/VIP/NEW)
+Giới hạn mỗi khách (perCustomerLimit)
+
+ 6. Cross-Selling Logic (Companion Products)
+Xác suất gợi ý sản phẩm kèm
+
+VIP: 45%
+Regular: 30%
+Newcomer: 15%
+Guest: 8%
+
+Quy tắc bổ sung thông minh
+Snack/Bánh → Nước uống (cola, juice)
+Coffee     → Sữa/đường
+Trái cây   → Nước ép
+Fallback: Chọn sản phẩm top score nếu không tìm được combo
+ 7. Quản Lý Tồn Kho An Toàn
+Safety Stock Reserve
+javasafetyStockPct = 5%  // Giữ lại 5% tồn kho
+effectiveAvail = actual - (actual × 5%)
+Inventory-Aware Scoring
+javaif (available <= 0) → score = 0 (loại khỏi lựa chọn)
+else → score × (0.5 + 0.5 × min(1, avail/5))
+Dynamic Allocation
+
+Ưu tiên batch có expiry date gần
+Phân bổ từ nhiều batch nếu cần
+Rollback transaction nếu thiếu hàng
+
+ 8. Cart Abandonment Simulation
+Baseline abandonment rate: 35%
+Điều chỉnh theo segment
+VIP:       -15% (20% abandon)
+Guest:     +15% (50% abandon)
+High value: +5% (đơn >500k → do dự nhiều hơn)
+Kết quả: Không lưu đơn, chỉ log → phản ánh thực tế bỏ giỏ
+ 9. Quantity Sampling Thông Minh
+Đồ uống có pack
+Lốc 6:  {1, 1, 2, 2, 2, 6} → 12% chance mua cả lốc
+Lốc 12: Tương tự logic
+VIP:    +0-2 items random
+Snacks
+Base: {1, 1, 2, 2, 3}
+VIP:  +0-2 bonus items
+High-value items (>200k)
+Qty = 1 (hầu như luôn mua lẻ)
+Cheap items (<10k)
+Poisson(λ=2) → có thể mua 3-5 items
+ 10. Payment Method Selection
+Weighted distribution per segment
+VIP:       [10, 30, 30, 20, 10] → ưa thẻ/ví
+Regular:   [40, 25, 20, 10,  5] → balanced
+Newcomer:  [50, 20, 15, 10,  5] → nhiều cash
+Guest:     [70, 15, 10,  3,  2] → chủ yếu cash
+ 11. Historical Data Integration
+Top-selling analysis (60 ngày gần nhất)
+sqlSELECT product_id, SUM(qty) as totalQuantitySold
+FROM sale_lines
+WHERE created_time BETWEEN now()-60days AND now()
+  AND store_id = ?
+GROUP BY product_id
+ORDER BY totalQuantitySold DESC
+LIMIT 50
+Score boost từ history
+javabase = 1.0 + log(1 + historicalQty)
+ 12. Tính Ngẫu Nhiên Có Kiểm Soát
+ThreadLocalRandom thay vì Random
+
+Thread-safe
+Performance tốt hơn
+Phân phối đồng đều
+
+Gaussian sampling cho qty
+javaqty = max(1, round(1.5 + N(0, 1.2)))
+Weighted random selection
+
+Softmax normalization
+Cumulative probability
+Binary search-like selection
+
+ 13. Multi-Store Support
+Store weighting
+javaweight[i] = max(1, 25 - i×3)
+→ Store đầu có trọng số cao nhất (25)
+→ Giảm dần cho stores sau
+ 14. Configuration-Driven
+Application properties
+propertiesorder.generator.enabled=true
+order.generator.daily-total=100
+order.generator.max-realtime-orders=6
+order.generator.enable-rfm=true
+order.generator.enable-abandonment=true
+order.generator.safety-stock-pct=0.05
+order.generator.interval=300000  # 5 phút
+order.generator.daily-cron=0 0 2 * * ?  # 2h sáng
+
+
+
+
+Batch : Estimated Time of Arrival
+Lên lịch quét: chạy theo cron (mặc định 30 phút) — scheduledReplenishmentScan().
+
+Tập sản phẩm & store: lấy toàn bộ Product và danh sách store_id từ batch_stock (những cửa hàng hiện có).
+
+Xây danh sách ưu tiên: tạo các cặp (store, product) và sắp xếp theo available (từ batch_itemRepository.getTotalAvailableQtyForProductInStore) tăng dần → xử lý những hàng ít trước.
+
+Với mỗi cặp gọi checkAndReplenish(storeId, productId):
+
+đọc available hiện tại (tổng original_qty - sold).
+
+đọc incoming = tổng original_qty của batch đang IN_TRANSIT.
+
+ước lượng cầu trung bình hàng ngày (avgDaily) và stddevDaily từ lịch sử bán 30 ngày (SQL aggregate theo sale_line + sale_order).
+
+tính reorder point (ROP) bằng công thức (xem phần Công thức).
+
+nếu available + incoming > ROP → skip (không đặt).
+
+ngược lại, tính desired = lượng cần để bao phủ (lead time + targetCoverDays) × avgDaily, tối thiểu minOrderQty.
+
+toOrder = desired - (available + incoming) → làm tròn theo pack (roundToPackSize).
+
+chọn supplier heuristically (lịch sử cung cấp hoặc random).
+
+tạo Batch, BatchItem, BatchStock với status = IN_TRANSIT; lưu ETA bằng batch_stock.updated_at = now + leadDays.
+
+Kích hoạt lô đến nơi: job activateIncomingBatches() chạy thường xuyên, tìm IN_TRANSIT với updated_at <= now() và chuyển status -> ACTIVE (và cập nhật updated_at = now()).

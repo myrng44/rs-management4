@@ -1,9 +1,8 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

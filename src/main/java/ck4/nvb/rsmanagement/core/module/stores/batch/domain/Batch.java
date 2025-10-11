@@ -17,6 +17,6 @@ import lombok.Setter;
 @Table(name = "batch")
 public class Batch extends FullAuditedSerialIdEntity {
 
-  @Column(name = "batch_code", nullable = false, length = 50)
+  @Column(name = "batch_code", nullable = false)
   private String batchCode;
 }

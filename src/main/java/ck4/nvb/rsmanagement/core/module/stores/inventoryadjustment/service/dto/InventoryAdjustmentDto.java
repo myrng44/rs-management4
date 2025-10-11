@@ -6,11 +6,10 @@ import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.stores.inventoryadjustment.domain.InventoryAdjustment;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
-
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -45,5 +44,4 @@ public class InventoryAdjustmentDto extends EntityDto<Long>
     }
     return isModified;
   }
-
 }

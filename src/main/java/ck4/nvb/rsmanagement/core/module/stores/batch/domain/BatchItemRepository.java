@@ -1,7 +1,9 @@
 package ck4.nvb.rsmanagement.core.module.stores.batch.domain;
 
 import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
+import jakarta.persistence.LockModeType;
 import java.util.List;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -19,6 +21,10 @@ public interface BatchItemRepository extends BaseFullAuditedRepository<BatchItem
   List<BatchItem> findByBatchIdAndProductId(Long batchId, Long productId);
 
   List<BatchItem> findByBatchIdAndProductIdAndDeletedIsFalse(Long batchId, Long productId);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("SELECT bi FROM BatchItem bi WHERE bi.id = :id")
+  BatchItem findByIdForUpdate(@Param("id") Long id);
 
   @Query(
       value =

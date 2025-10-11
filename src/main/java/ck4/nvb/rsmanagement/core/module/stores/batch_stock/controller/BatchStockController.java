@@ -9,11 +9,10 @@ import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStoc
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.service.dto.BatchStockGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/batch-stocks")
@@ -58,16 +57,19 @@ public class BatchStockController
 
   @GetMapping("/available")
   public ResponseEntity<ApiResponse<List<BatchStockGetDto>>> getAvailable(
-          @RequestParam("productId") Long productId, @RequestParam("storeId") Long storeId) {
-    List<BatchStockGetDto> list = ((BatchStockServiceImpl) getService()).getAvailableBatchInfoByProductAndStore(productId, storeId);
+      @RequestParam("productId") Long productId, @RequestParam("storeId") Long storeId) {
+    List<BatchStockGetDto> list =
+        ((BatchStockServiceImpl) getService())
+            .getAvailableBatchInfoByProductAndStore(productId, storeId);
     return ResponseEntity.ok(ApiResponse.success(list));
   }
 
   @GetMapping("/available-total")
   public ResponseEntity<ApiResponse<Long>> getAvailableTotal(
-          @RequestParam("productId") Long productId, @RequestParam("storeId") Long storeId) {
-    Long total = ((BatchStockServiceImpl) getService()).getTotalAvailableQuantityByProductAndStore(productId, storeId);
+      @RequestParam("productId") Long productId, @RequestParam("storeId") Long storeId) {
+    Long total =
+        ((BatchStockServiceImpl) getService())
+            .getTotalAvailableQuantityByProductAndStore(productId, storeId);
     return ResponseEntity.ok(ApiResponse.success(total));
   }
-
 }

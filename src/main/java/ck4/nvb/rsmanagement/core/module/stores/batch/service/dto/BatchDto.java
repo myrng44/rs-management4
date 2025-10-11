@@ -6,7 +6,6 @@ import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.stores.batch.domain.Batch;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;

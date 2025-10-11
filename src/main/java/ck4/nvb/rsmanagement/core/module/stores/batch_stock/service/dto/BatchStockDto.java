@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class BatchStockDto extends EntityDto<Long>
@@ -17,10 +19,14 @@ public class BatchStockDto extends EntityDto<Long>
 
   @JsonSerialize(using = ToStringSerializer.class)
   private Long batchId;
+
   @JsonSerialize(using = ToStringSerializer.class)
   private Long storeId;
+
   private String status;
   private Integer version;
+  private LocalDateTime etaAt;
+
 
   @Override
   public BatchStock mapToEntity() {

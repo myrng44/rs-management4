@@ -20,6 +20,7 @@ public class StoreTransferItemDto extends EntityDto<Long>
     implements CreateInput<StoreTransferItem>, UpdateInput<StoreTransferItem> {
   @JsonSerialize(using = ToStringSerializer.class)
   private Long transferId;
+
   @JsonSerialize(using = ToStringSerializer.class)
   private Long batchStockId;
 

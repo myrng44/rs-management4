@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,4 +29,7 @@ public class BatchStock extends FullAuditedSerialIdEntity {
 
   @Column(name = "version")
   private Integer version;
+
+  @Column(name = "eta_at")
+  private LocalDateTime etaAt;
 }

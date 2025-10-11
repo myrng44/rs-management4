@@ -90,4 +90,23 @@ public interface SaleOrderRepository extends BaseFullAuditedRepository<SaleOrder
       nativeQuery = true)
   List<Object[]> sumDailyRevenueAllStoresBetween(
       @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+  // --- RFM helpers (real DB queries) ---
+  @Query(
+      value =
+          "SELECT CASE WHEN MAX(so.created_at) IS NULL THEN NULL ELSE EXTRACT(DAY FROM (NOW() - MAX(so.created_at))) END FROM sale_order so WHERE so.customer_id = :customerId AND so.deleted = false",
+      nativeQuery = true)
+  Integer getDaysSinceLastOrder(@Param("customerId") Long customerId);
+
+  @Query(
+      value =
+          "SELECT COUNT(*) FROM sale_order so WHERE so.customer_id = :customerId AND so.created_at >= (NOW() - INTERVAL '12 months') AND so.deleted = false",
+      nativeQuery = true)
+  Integer getOrderCountLast12Months(@Param("customerId") Long customerId);
+
+  @Query(
+      value =
+          "SELECT COALESCE(SUM(so.final_price),0) FROM sale_order so WHERE so.customer_id = :customerId AND so.created_at >= (NOW() - INTERVAL '12 months') AND so.deleted = false",
+      nativeQuery = true)
+  Long getTotalSpentLast12Months(@Param("customerId") Long customerId);
 }

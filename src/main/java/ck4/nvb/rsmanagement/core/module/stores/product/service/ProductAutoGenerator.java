@@ -41,7 +41,6 @@ public class ProductAutoGenerator {
     this.categoryRepository = categoryRepository;
   }
 
-  // realistic template from your python map
   private static final Map<String, CategorySpec> PRODUCT_CATEGORIES_REALISTIC =
       new LinkedHashMap<>();
 

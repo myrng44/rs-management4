@@ -62,7 +62,8 @@ public class BatchStockServiceImpl
     return keys;
   }
 
-  public List<BatchStockGetDto> getAvailableBatchInfoByProductAndStore(Long productId, Long storeId) {
+  public List<BatchStockGetDto> getAvailableBatchInfoByProductAndStore(
+      Long productId, Long storeId) {
     return getRepository().findAvailableBatchInfoByProductAndStore(productId, storeId);
   }
 
@@ -70,5 +71,4 @@ public class BatchStockServiceImpl
     Long t = getRepository().getTotalAvailableQuantityByProductAndStore(productId, storeId);
     return t == null ? 0L : t;
   }
-
 }
