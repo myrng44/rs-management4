@@ -6,6 +6,7 @@ import ck4.nvb.rsmanagement.base.web.controller.AuditedCrudController;
 import ck4.nvb.rsmanagement.base.web.controller.api.ApiResponse;
 import ck4.nvb.rsmanagement.base.web.controller.api.PageResponse;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrderRepository;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleLineService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleOrderService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.*;
@@ -13,8 +14,13 @@ import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -35,6 +41,8 @@ public class SaleOrderController
 
   @Autowired private ISaleLineService saleLineService;
   @Autowired private ModelMapper modelMapper;
+  @Autowired
+  private SaleOrderRepository saleOrderRepository;
 
   public SaleOrderController(ISaleOrderService service) {
     super(service);
@@ -122,4 +130,34 @@ public class SaleOrderController
       Authentication auth, FilterInput request) {
     return super.getList(auth, request);
   }
+
+  @GetMapping("/recent")
+  public ResponseEntity<ApiResponse<List<SaleOrderGetFullDto>>> getRecentOrders(
+          Authentication auth,
+          @RequestParam(name = "limit", required = false, defaultValue = "100") int limit) {
+
+    if (limit <= 0) {
+      limit = 100;
+    }
+
+    UserGetDto user = extractUser(auth);
+
+    Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdTime"));
+
+    List<SaleOrder> orders;
+    if (user != null && user.getStoreId() != null) {
+      orders = saleOrderRepository.findByDeletedFalseAndStoreId(user.getStoreId(), pageable);
+    } else {
+      orders = saleOrderRepository.findByDeletedFalse(pageable);
+    }
+
+    // map entity -> dto
+    List<SaleOrderGetFullDto> items =
+            orders.stream()
+                    .map(o -> modelMapper.map(o, SaleOrderGetFullDto.class))
+                    .collect(Collectors.toList());
+
+    return ResponseEntity.ok(ApiResponse.success(items));
+  }
+
 }

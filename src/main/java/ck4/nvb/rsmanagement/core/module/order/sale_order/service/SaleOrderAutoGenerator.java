@@ -20,7 +20,6 @@ import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStockRepository;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.ProductRepository;
-
 import java.time.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -33,9 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @ConditionalOnProperty(
-        name = "order.generator.enabled",
-        havingValue = "true",
-        matchIfMissing = false)
+    name = "order.generator.enabled",
+    havingValue = "true",
+    matchIfMissing = false)
 public class SaleOrderAutoGenerator {
 
   private final SaleOrderServiceImpl saleOrderService;
@@ -86,17 +85,17 @@ public class SaleOrderAutoGenerator {
   private final Set<MonthDay> simpleHolidays = new HashSet<>();
 
   public SaleOrderAutoGenerator(
-          SaleOrderServiceImpl saleOrderService,
-          ISaleAllocationService saleAllocationService,
-          CustomerRepository customerRepository,
-          ProductRepository productRepository,
-          PaymentMethodRepository paymentMethodRepository,
-          VoucherRepository voucherRepository,
-          BatchStockRepository batchStockRepository,
-          BatchItemRepository batchItemRepository,
-          SaleLineRepository saleLineRepository,
-          SaleOrderRepository saleOrderRepository,
-          SaleAllocationRepository saleAllocationRepository) {
+      SaleOrderServiceImpl saleOrderService,
+      ISaleAllocationService saleAllocationService,
+      CustomerRepository customerRepository,
+      ProductRepository productRepository,
+      PaymentMethodRepository paymentMethodRepository,
+      VoucherRepository voucherRepository,
+      BatchStockRepository batchStockRepository,
+      BatchItemRepository batchItemRepository,
+      SaleLineRepository saleLineRepository,
+      SaleOrderRepository saleOrderRepository,
+      SaleAllocationRepository saleAllocationRepository) {
     this.saleOrderService = saleOrderService;
     this.saleAllocationService = saleAllocationService;
     this.customerRepository = customerRepository;
@@ -111,31 +110,31 @@ public class SaleOrderAutoGenerator {
 
     // init seasonal multipliers (example values) - ideally load from config or DB
     seasonalMultipliers.put(
-            "drink", new double[] {1.0, 1.0, 1.0, 1.0, 1.05, 1.1, 1.2, 1.25, 1.15, 1.05, 1.0, 1.0});
+        "drink", new double[] {1.0, 1.0, 1.0, 1.0, 1.05, 1.1, 1.2, 1.25, 1.15, 1.05, 1.0, 1.0});
     seasonalMultipliers.put(
-            "fruit", new double[] {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.3, 1.25, 1.1, 1.0, 1.0});
+        "fruit", new double[] {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.3, 1.25, 1.1, 1.0, 1.0});
     seasonalMultipliers.put(
-            "snack", new double[] {1.0, 1.0, 1.0, 1.0, 1.0, 1.05, 1.05, 1.05, 1.05, 1.0, 1.0, 1.0});
+        "snack", new double[] {1.0, 1.0, 1.0, 1.0, 1.0, 1.05, 1.05, 1.05, 1.05, 1.0, 1.0, 1.0});
     seasonalMultipliers.put(
-            "coffee", new double[] {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.05, 1.1});
+        "coffee", new double[] {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.05, 1.1});
 
     // hour boosts: 24-length arrays
     hourBoosts.put(
-            "drink",
-            createHourBoostArray(24, 1.0, new int[][] {{11, 13, 14}}, new double[] {1.4})); // lunch
+        "drink",
+        createHourBoostArray(24, 1.0, new int[][] {{11, 13, 14}}, new double[] {1.4})); // lunch
     hourBoosts.put(
-            "coffee", createHourBoostArray(24, 1.0, new int[][] {{6, 9}}, new double[] {1.5}));
+        "coffee", createHourBoostArray(24, 1.0, new int[][] {{6, 9}}, new double[] {1.5}));
     hourBoosts.put(
-            "snack", createHourBoostArray(24, 1.0, new int[][] {{17, 20}}, new double[] {1.3}));
+        "snack", createHourBoostArray(24, 1.0, new int[][] {{17, 20}}, new double[] {1.3}));
 
     dowBoosts.put("weekend_snack", 1.15);
 
-    simpleHolidays.add(MonthDay.of(1,1));
-    simpleHolidays.add(MonthDay.of(12,25));
+    simpleHolidays.add(MonthDay.of(1, 1));
+    simpleHolidays.add(MonthDay.of(12, 25));
   }
 
   private double[] createHourBoostArray(
-          int length, double defaultVal, int[][] ranges, double[] boosts) {
+      int length, double defaultVal, int[][] ranges, double[] boosts) {
     double[] arr = new double[length];
     Arrays.fill(arr, defaultVal);
     for (int i = 0; i < ranges.length; i++) {
@@ -171,7 +170,7 @@ public class SaleOrderAutoGenerator {
       }
       if (!parsed) {
         weights =
-                new int[] {1, 1, 2, 3, 4, 3, 2, 3, 4, 3, 2, 1, 2, 3, 4, 3, 2, 1, 1, 3, 4, 3, 1, 1};
+            new int[] {1, 1, 2, 3, 4, 3, 2, 3, 4, 3, 2, 1, 2, 3, 4, 3, 2, 1, 1, 3, 4, 3, 1, 1};
       }
 
       int currentHour = nowLocal().getHour();
@@ -211,23 +210,23 @@ public class SaleOrderAutoGenerator {
 
     // derive active stores from batch stocks
     List<BatchStock> activeBatchStocks =
-            batchStockRepository.findAll().stream()
-                    .filter(
-                            bs ->
-                                    bs != null
-                                            && bs.getStatus() != null
-                                            && "ACTIVE".equalsIgnoreCase(bs.getStatus()))
-                    .collect(Collectors.toList());
+        batchStockRepository.findAll().stream()
+            .filter(
+                bs ->
+                    bs != null
+                        && bs.getStatus() != null
+                        && "ACTIVE".equalsIgnoreCase(bs.getStatus()))
+            .collect(Collectors.toList());
     if (activeBatchStocks.isEmpty()) {
       System.out.println("Skip: no active batch stocks (no store inventory).");
       return;
     }
 
     List<Long> stores =
-            activeBatchStocks.stream()
-                    .map(BatchStock::getStoreId)
-                    .distinct()
-                    .collect(Collectors.toList());
+        activeBatchStocks.stream()
+            .map(BatchStock::getStoreId)
+            .distinct()
+            .collect(Collectors.toList());
     if (stores.isEmpty()) {
       System.out.println("Skip: no stores found from batch stocks.");
       return;
@@ -277,53 +276,53 @@ public class SaleOrderAutoGenerator {
         break;
     }
     PaymentMethod chosenPayment =
-            weightedChoicePayment(paymentMethodRepository.findAll(), paymentWeights);
+        weightedChoicePayment(paymentMethodRepository.findAll(), paymentWeights);
 
     // voucher decision: stricter for guest
     boolean maybeUseVoucher =
-            ThreadLocalRandom.current().nextDouble()
-                    < (chosenCustomer != null
+        ThreadLocalRandom.current().nextDouble()
+            < (chosenCustomer != null
                     && segments
-                    .getOrDefault("vip", Collections.emptyList())
-                    .contains(chosenCustomer)
-                    ? 0.35
-                    : (chosenSegment.equals("guest") ? 0.03 : 0.12));
+                        .getOrDefault("vip", Collections.emptyList())
+                        .contains(chosenCustomer)
+                ? 0.35
+                : (chosenSegment.equals("guest") ? 0.03 : 0.12));
     Voucher chosenVoucher = null;
     if (maybeUseVoucher && !vouchers.isEmpty()) {
       LocalDateTime nowTime = nowLocal();
       Customer finalChosenCustomer = chosenCustomer;
       List<Voucher> applicable =
-              vouchers.stream()
-                      .filter(
-                              v -> {
-                                if (v == null) return false;
-                                try {
-                                  LocalDateTime from = v.getValidFrom();
-                                  LocalDateTime to = v.getValidTo();
-                                  if (from != null && nowTime.isBefore(from)) return false;
-                                  if (to != null && nowTime.isAfter(to)) return false;
-                                } catch (Exception e) {
-                                }
-                                // check qty availability
-                                if (v.getQtyTotal() != null
-                                        && v.getQtyRedeemed() != null
-                                        && v.getQtyRedeemed() >= v.getQtyTotal()) return false;
-                                // audience type
-                                String aud = v.getAudienceType();
-                                if ("ALL".equalsIgnoreCase(aud)) return true;
-                                if ("VIP".equalsIgnoreCase(aud)
-                                        && finalChosenCustomer != null
-                                        && segments
-                                        .getOrDefault("vip", Collections.emptyList())
-                                        .contains(finalChosenCustomer)) return true;
-                                if ("NEW".equalsIgnoreCase(aud)
-                                        && finalChosenCustomer != null
-                                        && segments
-                                        .getOrDefault("newcomer", Collections.emptyList())
-                                        .contains(finalChosenCustomer)) return true;
-                                return false;
-                              })
-                      .collect(Collectors.toList());
+          vouchers.stream()
+              .filter(
+                  v -> {
+                    if (v == null) return false;
+                    try {
+                      LocalDateTime from = v.getValidFrom();
+                      LocalDateTime to = v.getValidTo();
+                      if (from != null && nowTime.isBefore(from)) return false;
+                      if (to != null && nowTime.isAfter(to)) return false;
+                    } catch (Exception e) {
+                    }
+                    // check qty availability
+                    if (v.getQtyTotal() != null
+                        && v.getQtyRedeemed() != null
+                        && v.getQtyRedeemed() >= v.getQtyTotal()) return false;
+                    // audience type
+                    String aud = v.getAudienceType();
+                    if ("ALL".equalsIgnoreCase(aud)) return true;
+                    if ("VIP".equalsIgnoreCase(aud)
+                        && finalChosenCustomer != null
+                        && segments
+                            .getOrDefault("vip", Collections.emptyList())
+                            .contains(finalChosenCustomer)) return true;
+                    if ("NEW".equalsIgnoreCase(aud)
+                        && finalChosenCustomer != null
+                        && segments
+                            .getOrDefault("newcomer", Collections.emptyList())
+                            .contains(finalChosenCustomer)) return true;
+                    return false;
+                  })
+              .collect(Collectors.toList());
       if (!applicable.isEmpty())
         chosenVoucher = applicable.get(ThreadLocalRandom.current().nextInt(applicable.size()));
     }
@@ -333,29 +332,29 @@ public class SaleOrderAutoGenerator {
 
     // get products available at store (batch items)
     List<BatchStock> storeBs =
-            activeBatchStocks.stream()
-                    .filter(bs -> bs.getStoreId().equals(chosenStoreId))
-                    .collect(Collectors.toList());
+        activeBatchStocks.stream()
+            .filter(bs -> bs.getStoreId().equals(chosenStoreId))
+            .collect(Collectors.toList());
     if (storeBs.isEmpty()) {
       System.out.println("Store has no active batch stocks, skip.");
       return;
     }
     Set<Long> batchIds = storeBs.stream().map(BatchStock::getBatchId).collect(Collectors.toSet());
     List<BatchItem> availableBatchItems =
-            batchItemRepository.findAll().stream()
-                    .filter(bi -> bi != null && batchIds.contains(bi.getBatchId()))
-                    .collect(Collectors.toList());
+        batchItemRepository.findAll().stream()
+            .filter(bi -> bi != null && batchIds.contains(bi.getBatchId()))
+            .collect(Collectors.toList());
     if (availableBatchItems.isEmpty()) {
       System.out.println("No available batch items for chosen store.");
       return;
     }
 
     Set<Long> availableProductIds =
-            availableBatchItems.stream().map(BatchItem::getProductId).collect(Collectors.toSet());
+        availableBatchItems.stream().map(BatchItem::getProductId).collect(Collectors.toSet());
     List<Product> availableProducts =
-            productRepository.findAll().stream()
-                    .filter(p -> p != null && availableProductIds.contains(p.getId()))
-                    .collect(Collectors.toList());
+        productRepository.findAll().stream()
+            .filter(p -> p != null && availableProductIds.contains(p.getId()))
+            .collect(Collectors.toList());
     if (availableProducts.isEmpty()) {
       System.out.println("No available products in chosen store.");
       return;
@@ -374,7 +373,7 @@ public class SaleOrderAutoGenerator {
         else {
           double scale = Math.min(1.0, effectiveAvail / 5.0);
           rawScoreMap.put(
-                  p.getId(), rawScoreMap.getOrDefault(p.getId(), 0.0) * (0.5 + 0.5 * scale));
+              p.getId(), rawScoreMap.getOrDefault(p.getId(), 0.0) * (0.5 + 0.5 * scale));
         }
       }
     }
@@ -399,7 +398,7 @@ public class SaleOrderAutoGenerator {
       Product chosenProduct = weightedChoiceProductWithMask(availableProducts, probs, used);
       if (chosenProduct == null) break;
       long availableQty =
-              computeAvailableQtyForProductInStore(chosenProduct.getId(), chosenStoreId);
+          computeAvailableQtyForProductInStore(chosenProduct.getId(), chosenStoreId);
       if (availableQty <= 0) { // mark used and continue
         for (int i = 0; i < availableProducts.size(); i++)
           if (availableProducts.get(i).getId().equals(chosenProduct.getId())) used[i] = true;
@@ -414,7 +413,7 @@ public class SaleOrderAutoGenerator {
 
       // avoid duplicate
       boolean duplicate =
-              lines.stream().anyMatch(l -> l.getProductId().equals(chosenProduct.getId()));
+          lines.stream().anyMatch(l -> l.getProductId().equals(chosenProduct.getId()));
       if (duplicate) {
         for (int i = 0; i < availableProducts.size(); i++)
           if (availableProducts.get(i).getId().equals(chosenProduct.getId())) used[i] = true;
@@ -434,11 +433,11 @@ public class SaleOrderAutoGenerator {
 
       // companion logic (improved): use heuristics + top-sellers affinity approximation
       if (lines.size() < numLines
-              && ThreadLocalRandom.current().nextDouble()
+          && ThreadLocalRandom.current().nextDouble()
               < companionProbabilityBySegment(chosenSegment)) {
         Optional<Product> companion =
-                findCompanionByCategoryAdvanced(
-                        availableProducts, chosenProduct, used, chosenStoreId, rawScoreMap);
+            findCompanionByCategoryAdvanced(
+                availableProducts, chosenProduct, used, chosenStoreId, rawScoreMap);
         if (companion.isPresent()) {
           Product cpp = companion.get();
           long av2 = computeAvailableQtyForProductInStore(cpp.getId(), chosenStoreId);
@@ -473,12 +472,12 @@ public class SaleOrderAutoGenerator {
     // simulate cart abandonment
     if (enableCartAbandonment && shouldAbandonCart(chosenSegment, preTotal)) {
       System.out.println(
-              "Simulated cart abandonment for a "
-                      + chosenSegment
-                      + " at store "
-                      + chosenStoreId
-                      + " estimated total "
-                      + preTotal);
+          "Simulated cart abandonment for a "
+              + chosenSegment
+              + " at store "
+              + chosenStoreId
+              + " estimated total "
+              + preTotal);
       return; // don't save order
     }
 
@@ -514,12 +513,11 @@ public class SaleOrderAutoGenerator {
 
       try {
         allocateInventoryForSaleLineHistorical(
-                savedLine.getId(), p.getId(), dto.getQtyOrdered(), chosenStoreId, now);
+            savedLine.getId(), p.getId(), dto.getQtyOrdered(), chosenStoreId, now);
       } catch (AppException ex) {
         throw new RuntimeException("Auto-generate allocation failed: " + ex.getMessage(), ex);
       }
     }
-
 
     if (chosenVoucher != null) {
       if (chosenVoucher.getDiscountPer() != null && chosenVoucher.getDiscountPer() > 0) {
@@ -527,22 +525,21 @@ public class SaleOrderAutoGenerator {
       } else if (chosenVoucher.getDiscountVal() != null && chosenVoucher.getDiscountVal() > 0) {
         finalPrice = Math.max(0, finalPrice - chosenVoucher.getDiscountVal());
       }
-
     }
 
     savedOrder.setFinalPrice(finalPrice);
     saleOrderRepository.save(savedOrder);
     System.out.println(
-            "Auto created order id = "
-                    + savedOrder.getId()
-                    + " store="
-                    + chosenStoreId
-                    + " lines="
-                    + lines.size()
-                    + " seg="
-                    + chosenSegment
-                    + " total="
-                    + finalPrice);
+        "Auto created order id = "
+            + savedOrder.getId()
+            + " store="
+            + chosenStoreId
+            + " lines="
+            + lines.size()
+            + " seg="
+            + chosenSegment
+            + " total="
+            + finalPrice);
   }
 
   // ---------------- historical generator (unchanged except improvements) ----------------
@@ -557,22 +554,22 @@ public class SaleOrderAutoGenerator {
   @Transactional
   public void generateOrdersForDate(LocalDateTime targetDate) {
     List<BatchStock> activeBatchStocks =
-            batchStockRepository.findAll().stream()
-                    .filter(
-                            bs ->
-                                    bs != null
-                                            && bs.getStatus() != null
-                                            && "ACTIVE".equalsIgnoreCase(bs.getStatus()))
-                    .collect(Collectors.toList());
+        batchStockRepository.findAll().stream()
+            .filter(
+                bs ->
+                    bs != null
+                        && bs.getStatus() != null
+                        && "ACTIVE".equalsIgnoreCase(bs.getStatus()))
+            .collect(Collectors.toList());
     if (activeBatchStocks.isEmpty()) {
       System.out.println("No active batch stocks -> skip daily generation.");
       return;
     }
     List<Long> stores =
-            activeBatchStocks.stream()
-                    .map(BatchStock::getStoreId)
-                    .distinct()
-                    .collect(Collectors.toList());
+        activeBatchStocks.stream()
+            .map(BatchStock::getStoreId)
+            .distinct()
+            .collect(Collectors.toList());
     if (stores.isEmpty()) {
       System.out.println("No stores found -> skip.");
       return;
@@ -604,17 +601,18 @@ public class SaleOrderAutoGenerator {
         int hour = sampleHourByWeights(hourWeights);
         int minute = ThreadLocalRandom.current().nextInt(0, 60);
         int second = ThreadLocalRandom.current().nextInt(0, 60);
-        LocalDateTime orderTime = LocalDateTime.of(LocalDate.from(targetDate), LocalTime.of(hour, minute, second));
+        LocalDateTime orderTime =
+            LocalDateTime.of(LocalDate.from(targetDate), LocalTime.of(hour, minute, second));
         try {
           createHistoricalOrderForStoreAtTime(storeId, orderTime);
         } catch (Exception ex) {
           System.err.println(
-                  "Failed to create historical order for store "
-                          + storeId
-                          + " at "
-                          + orderTime
-                          + ": "
-                          + ex.getMessage());
+              "Failed to create historical order for store "
+                  + storeId
+                  + " at "
+                  + orderTime
+                  + ": "
+                  + ex.getMessage());
         }
       }
     }
@@ -622,7 +620,7 @@ public class SaleOrderAutoGenerator {
 
   @Transactional
   public void createHistoricalOrderForStoreAtTime(Long storeId, LocalDateTime orderTime)
-          throws AppException {
+      throws AppException {
     List<Customer> customers = customerRepository.findAll();
     Customer chosenCustomer = null;
     if (!customers.isEmpty() && ThreadLocalRandom.current().nextDouble() < 0.7)
@@ -630,35 +628,35 @@ public class SaleOrderAutoGenerator {
 
     List<PaymentMethod> payments = paymentMethodRepository.findAll();
     PaymentMethod chosenPayment =
-            payments.isEmpty()
-                    ? null
-                    : payments.get(ThreadLocalRandom.current().nextInt(payments.size()));
+        payments.isEmpty()
+            ? null
+            : payments.get(ThreadLocalRandom.current().nextInt(payments.size()));
 
     List<BatchStock> storeBs =
-            batchStockRepository.findAll().stream()
-                    .filter(
-                            bs ->
-                                    bs != null
-                                            && bs.getStoreId() != null
-                                            && bs.getStoreId().equals(storeId)
-                                            && "ACTIVE".equalsIgnoreCase(bs.getStatus()))
-                    .collect(Collectors.toList());
+        batchStockRepository.findAll().stream()
+            .filter(
+                bs ->
+                    bs != null
+                        && bs.getStoreId() != null
+                        && bs.getStoreId().equals(storeId)
+                        && "ACTIVE".equalsIgnoreCase(bs.getStatus()))
+            .collect(Collectors.toList());
     if (storeBs.isEmpty()) throw new AppException("No active batch stocks for store " + storeId);
 
     Set<Long> batchIds = storeBs.stream().map(BatchStock::getBatchId).collect(Collectors.toSet());
     List<BatchItem> availableBatchItems =
-            batchItemRepository.findAll().stream()
-                    .filter(bi -> bi != null && batchIds.contains(bi.getBatchId()))
-                    .collect(Collectors.toList());
+        batchItemRepository.findAll().stream()
+            .filter(bi -> bi != null && batchIds.contains(bi.getBatchId()))
+            .collect(Collectors.toList());
     if (availableBatchItems.isEmpty())
       throw new AppException("No batch items available for store " + storeId);
 
     Set<Long> productIds =
-            availableBatchItems.stream().map(BatchItem::getProductId).collect(Collectors.toSet());
+        availableBatchItems.stream().map(BatchItem::getProductId).collect(Collectors.toSet());
     List<Product> availableProducts =
-            productRepository.findAll().stream()
-                    .filter(p -> p != null && productIds.contains(p.getId()))
-                    .collect(Collectors.toList());
+        productRepository.findAll().stream()
+            .filter(p -> p != null && productIds.contains(p.getId()))
+            .collect(Collectors.toList());
     if (availableProducts.isEmpty()) throw new AppException("No products for store " + storeId);
 
     int numLines = sampleNumLines();
@@ -682,8 +680,8 @@ public class SaleOrderAutoGenerator {
       if (avail <= 0) rawScoreMap.put(p.getId(), 0.0);
       else
         rawScoreMap.put(
-                p.getId(),
-                rawScoreMap.getOrDefault(p.getId(), 0.0) * (0.5 + 0.5 * Math.min(1.0, avail / 5.0)));
+            p.getId(),
+            rawScoreMap.getOrDefault(p.getId(), 0.0) * (0.5 + 0.5 * Math.min(1.0, avail / 5.0)));
     }
 
     double[] scores = new double[availableProducts.size()];
@@ -733,29 +731,29 @@ public class SaleOrderAutoGenerator {
     savedOrder.setFinalPrice(finalPrice);
     saleOrderRepository.save(savedOrder);
     System.out.println(
-            "Generated historical order id="
-                    + savedOrder.getId()
-                    + " time="
-                    + orderTime
-                    + " lines="
-                    + createdLines.size());
+        "Generated historical order id="
+            + savedOrder.getId()
+            + " time="
+            + orderTime
+            + " lines="
+            + createdLines.size());
   }
 
   // allocation unchanged but respects safety stock (already used in
   // computeAvailableQtyForProductInStore)
   private void allocateInventoryForSaleLineHistorical(
-          Long saleLineId, Long productId, Integer qtyNeeded, Long storeId, LocalDateTime orderTime)
-          throws AppException {
+      Long saleLineId, Long productId, Integer qtyNeeded, Long storeId, LocalDateTime orderTime)
+      throws AppException {
     List<BatchItem> availableBatchItems =
-            batchItemRepository.findAvailableByProductAndStoreOrdered(productId, storeId);
+        batchItemRepository.findAvailableByProductAndStoreOrdered(productId, storeId);
     int remaining = qtyNeeded;
     for (BatchItem bi : availableBatchItems) {
       if (remaining <= 0) break;
       int original = bi.getOriginalQty() == null ? 0 : bi.getOriginalQty();
       int sold =
-              saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId()) == null
-                      ? 0
-                      : saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId());
+          saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId()) == null
+              ? 0
+              : saleAllocationService.getTotalSoldQuantityByBatchItem(bi.getId());
       int avail = Math.max(0, original - (sold));
       // apply safety stock per batch item
       int safeKeep = (int) Math.ceil(original * safetyStockPct);
@@ -764,28 +762,28 @@ public class SaleOrderAutoGenerator {
       int allocateQty = Math.min(remaining, avail);
 
       Optional<BatchStock> bsOpt =
-              batchStockRepository.findFirstByBatchIdAndStoreId(bi.getBatchId(), storeId);
+          batchStockRepository.findFirstByBatchIdAndStoreId(bi.getBatchId(), storeId);
       Long batchStockId = bsOpt.map(BatchStock::getId).orElse(null);
       if (batchStockId == null) {
         bsOpt =
-                batchStockRepository.findAll().stream()
-                        .filter(
-                                bs ->
-                                        bs != null
-                                                && bs.getBatchId() != null
-                                                && bs.getBatchId().equals(bi.getBatchId()))
-                        .findFirst();
+            batchStockRepository.findAll().stream()
+                .filter(
+                    bs ->
+                        bs != null
+                            && bs.getBatchId() != null
+                            && bs.getBatchId().equals(bi.getBatchId()))
+                .findFirst();
         if (bsOpt.isPresent()) batchStockId = bsOpt.get().getId();
       }
       if (batchStockId == null)
         throw new AppException(
-                "batchStockId not found for batchItem "
-                        + bi.getId()
-                        + " (batchId="
-                        + bi.getBatchId()
-                        + ", storeId="
-                        + storeId
-                        + ")");
+            "batchStockId not found for batchItem "
+                + bi.getId()
+                + " (batchId="
+                + bi.getBatchId()
+                + ", storeId="
+                + storeId
+                + ")");
 
       SaleAllocation alloc = new SaleAllocation();
       alloc.setSaleLineId(saleLineId);
@@ -802,7 +800,7 @@ public class SaleOrderAutoGenerator {
     }
     if (remaining > 0)
       throw new AppException(
-              "Unable to allocate full qty for product " + productId + ", missing " + remaining);
+          "Unable to allocate full qty for product " + productId + ", missing " + remaining);
   }
 
   // ---------- helpers (shared) ----------
@@ -819,9 +817,9 @@ public class SaleOrderAutoGenerator {
       int recencyDays = sampleSyntheticRecencyByPoints(point);
       double freq = sampleSyntheticFrequencyByPoints(point);
       double score =
-              normalizePoints(point) * 0.5
-                      + recencyScore(recencyDays) * 0.3
-                      + Math.min(1.0, freq / 5.0) * 0.2;
+          normalizePoints(point) * 0.5
+              + recencyScore(recencyDays) * 0.3
+              + Math.min(1.0, freq / 5.0) * 0.2;
 
       if (score > 0.75) m.get("vip").add(c);
       else if (point < 60 && recencyDays > 180) m.get("newcomer").add(c);
@@ -854,7 +852,9 @@ public class SaleOrderAutoGenerator {
 
   private int sampleNumLinesAdvanced(String segment, Long storeId) {
     LocalDateTime today = nowLocal();
-    boolean holiday = simpleHolidays.contains(nowLocal().toLocalDate().getMonth() == null ? null : MonthDay.from(nowLocal()));
+    boolean holiday =
+        simpleHolidays.contains(
+            nowLocal().toLocalDate().getMonth() == null ? null : MonthDay.from(nowLocal()));
     int hour = nowLocal().getHour();
     double baseLambda;
     if ("vip".equals(segment)) baseLambda = 3.5;
@@ -906,29 +906,29 @@ public class SaleOrderAutoGenerator {
   }
 
   private Optional<Product> findCompanionByCategoryAdvanced(
-          List<Product> products,
-          Product chosen,
-          boolean[] used,
-          Long storeId,
-          Map<Long, Double> rawScoreMap) {
+      List<Product> products,
+      Product chosen,
+      boolean[] used,
+      Long storeId,
+      Map<Long, Double> rawScoreMap) {
     // prefer complementary: if chosen is snack -> look for drink; if chosen is coffee -> look for
     // milk/cream/sugar
     String chosenText =
-            (chosen.getName() == null ? "" : chosen.getName()).toLowerCase()
-                    + " "
-                    + (chosen.getDescription() == null ? "" : chosen.getDescription()).toLowerCase();
+        (chosen.getName() == null ? "" : chosen.getName()).toLowerCase()
+            + " "
+            + (chosen.getDescription() == null ? "" : chosen.getDescription()).toLowerCase();
     boolean preferDrink =
-            chosenText.contains("snack") || chosenText.contains("bánh") || chosenText.contains("chips");
+        chosenText.contains("snack") || chosenText.contains("bánh") || chosenText.contains("chips");
     List<Integer> candidateIndices = new ArrayList<>();
     for (int i = 0; i < products.size(); i++) {
       if (used[i]) continue;
       Product p = products.get(i);
       String t =
-              (p.getName() == null ? "" : p.getName()).toLowerCase()
-                      + " "
-                      + (p.getDescription() == null ? "" : p.getDescription()).toLowerCase();
+          (p.getName() == null ? "" : p.getName()).toLowerCase()
+              + " "
+              + (p.getDescription() == null ? "" : p.getDescription()).toLowerCase();
       if (preferDrink
-              && (t.contains("nước")
+          && (t.contains("nước")
               || t.contains("cola")
               || t.contains("juice")
               || t.contains("nước ngọt"))) candidateIndices.add(i);
@@ -939,15 +939,15 @@ public class SaleOrderAutoGenerator {
       for (int i = 0; i < products.size(); i++)
         if (!used[i] && !products.get(i).getId().equals(chosen.getId())) indices.add(i);
       indices.sort(
-              (a, b) ->
-                      Double.compare(
-                              rawScoreMap.getOrDefault(products.get(b).getId(), 0.0),
-                              rawScoreMap.getOrDefault(products.get(a).getId(), 0.0)));
+          (a, b) ->
+              Double.compare(
+                  rawScoreMap.getOrDefault(products.get(b).getId(), 0.0),
+                  rawScoreMap.getOrDefault(products.get(a).getId(), 0.0)));
       if (!indices.isEmpty()) candidateIndices.add(indices.get(0));
     }
     if (candidateIndices.isEmpty()) return Optional.empty();
     int chosenIdx =
-            candidateIndices.get(ThreadLocalRandom.current().nextInt(candidateIndices.size()));
+        candidateIndices.get(ThreadLocalRandom.current().nextInt(candidateIndices.size()));
     return Optional.of(products.get(chosenIdx));
   }
 
@@ -958,8 +958,8 @@ public class SaleOrderAutoGenerator {
       LocalDateTime from = to.minusDays(60);
       int numberOfProducts = Math.max(50, products.size());
       List<Map<String, Object>> topSold =
-              saleLineRepository.findMostSoldProductsOfIntervalWithQtyOfAStore(
-                      from, to, numberOfProducts, storeId);
+          saleLineRepository.findMostSoldProductsOfIntervalWithQtyOfAStore(
+              from, to, numberOfProducts, storeId);
       Map<Long, Long> qtyMap = new HashMap<>();
       if (topSold != null) {
         for (Map<String, Object> r : topSold) {
@@ -967,17 +967,17 @@ public class SaleOrderAutoGenerator {
             Object idObj = r.get("id");
             Object qtyObj = r.get("totalQuantitySold");
             Long id =
-                    idObj == null
-                            ? null
-                            : (idObj instanceof Number
-                            ? ((Number) idObj).longValue()
-                            : Long.parseLong(idObj.toString()));
+                idObj == null
+                    ? null
+                    : (idObj instanceof Number
+                        ? ((Number) idObj).longValue()
+                        : Long.parseLong(idObj.toString()));
             Long qty =
-                    qtyObj == null
-                            ? 0L
-                            : (qtyObj instanceof Number
-                            ? ((Number) qtyObj).longValue()
-                            : Long.parseLong(qtyObj.toString()));
+                qtyObj == null
+                    ? 0L
+                    : (qtyObj instanceof Number
+                        ? ((Number) qtyObj).longValue()
+                        : Long.parseLong(qtyObj.toString()));
             if (id != null) qtyMap.put(id, qty);
           } catch (Exception e) {
           }
@@ -999,28 +999,28 @@ public class SaleOrderAutoGenerator {
         else if (up < 100000) priceFactor = 1.0;
         else priceFactor = 0.6;
         String text =
-                (p.getName() == null ? "" : p.getName()).toLowerCase()
-                        + " "
-                        + (p.getDescription() == null ? "" : p.getDescription()).toLowerCase();
+            (p.getName() == null ? "" : p.getName()).toLowerCase()
+                + " "
+                + (p.getDescription() == null ? "" : p.getDescription()).toLowerCase();
         double catFactor = 1.0;
         String key = "other";
         if (text.contains("nước")
-                || text.contains("juice")
-                || text.contains("cola")
-                || text.contains("nước ngọt")
-                || text.contains("water")) {
+            || text.contains("juice")
+            || text.contains("cola")
+            || text.contains("nước ngọt")
+            || text.contains("water")) {
           catFactor = 1.6;
           key = "drink";
         } else if (text.contains("snack")
-                || text.contains("bánh")
-                || text.contains("chips")
-                || text.contains("kẹo")) {
+            || text.contains("bánh")
+            || text.contains("chips")
+            || text.contains("kẹo")) {
           catFactor = 1.4;
           key = "snack";
         } else if (text.contains("trái")
-                || text.contains("hoa quả")
-                || text.contains("cam")
-                || text.contains("táo")) {
+            || text.contains("hoa quả")
+            || text.contains("cam")
+            || text.contains("táo")) {
           catFactor = 1.0;
           key = "fruit";
         } else if (text.contains("cà phê") || text.contains("coffee")) {
@@ -1082,7 +1082,7 @@ public class SaleOrderAutoGenerator {
   }
 
   private Product weightedChoiceProductWithMask(
-          List<Product> products, double[] probs, boolean[] used) {
+      List<Product> products, double[] probs, boolean[] used) {
     if (products == null || products.isEmpty()) return null;
     double total = 0.0;
     for (int i = 0; i < products.size(); i++) if (!used[i]) total += probs[i];
@@ -1151,9 +1151,9 @@ public class SaleOrderAutoGenerator {
     if (p == null) return 1;
     int up = getUnitPriceSafe(p);
     String text =
-            (p.getName() == null ? "" : p.getName()).toLowerCase()
-                    + " "
-                    + (p.getDescription() == null ? "" : p.getDescription()).toLowerCase();
+        (p.getName() == null ? "" : p.getName()).toLowerCase()
+            + " "
+            + (p.getDescription() == null ? "" : p.getDescription()).toLowerCase();
 
     // packs
     List<Integer> packSizes = new ArrayList<>();
@@ -1165,9 +1165,9 @@ public class SaleOrderAutoGenerator {
 
     // beverage behavior
     if (text.contains("nước")
-            || text.contains("cola")
-            || text.contains("juice")
-            || text.contains("water")) {
+        || text.contains("cola")
+        || text.contains("juice")
+        || text.contains("water")) {
       // common purchases: 1,2,6,12 (pack)
       int[] options = {1, 1, 2, 2, 2, 6};
       int pick = options[ThreadLocalRandom.current().nextInt(options.length)];
@@ -1176,17 +1176,17 @@ public class SaleOrderAutoGenerator {
       pick = Math.min((int) available, pick);
       if (segment.equals("vip"))
         pick =
-                Math.min(
-                        (int) Math.max(1, pick + ThreadLocalRandom.current().nextInt(0, 2)),
-                        (int) available);
+            Math.min(
+                (int) Math.max(1, pick + ThreadLocalRandom.current().nextInt(0, 2)),
+                (int) available);
       return Math.max(1, pick);
     }
 
     // snacks: small multiples
     if (text.contains("snack")
-            || text.contains("bánh")
-            || text.contains("chips")
-            || text.contains("kẹo")) {
+        || text.contains("bánh")
+        || text.contains("chips")
+        || text.contains("kẹo")) {
       int[] opts = {1, 1, 2, 2, 3};
       int pick = opts[ThreadLocalRandom.current().nextInt(opts.length)];
       if (segment.equals("vip")) pick += ThreadLocalRandom.current().nextInt(0, 2);
@@ -1240,16 +1240,16 @@ public class SaleOrderAutoGenerator {
   // small helpers
   private <T> T randomFromList(List<T> list) {
     return list == null || list.isEmpty()
-            ? null
-            : list.get(ThreadLocalRandom.current().nextInt(list.size()));
+        ? null
+        : list.get(ThreadLocalRandom.current().nextInt(list.size()));
   }
 
   // voucher suitability basic checks
   private boolean isVoucherSuitable(Voucher v, int orderTotal, Customer c) {
     if (v == null) return false;
     if (v.getQtyTotal() != null
-            && v.getQtyRedeemed() != null
-            && v.getQtyRedeemed() >= v.getQtyTotal()) return false;
+        && v.getQtyRedeemed() != null
+        && v.getQtyRedeemed() >= v.getQtyTotal()) return false;
     // example: if discountVal indicates some threshold logic (not present in entity), skip. This is
     // placeholder.
     if (v.getPerCustomerLimit() != null && v.getPerCustomerLimit() <= 0) return false;

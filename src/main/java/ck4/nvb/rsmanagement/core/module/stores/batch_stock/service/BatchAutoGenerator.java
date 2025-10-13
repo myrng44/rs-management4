@@ -12,11 +12,9 @@ import ck4.nvb.rsmanagement.core.module.stores.supplier.domain.Supplier;
 import ck4.nvb.rsmanagement.core.module.stores.supplier.domain.SupplierRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
-
 import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -66,12 +64,12 @@ public class BatchAutoGenerator {
   private int maxOrderLimit;
 
   public BatchAutoGenerator(
-          BatchRepository batchRepository,
-          BatchItemRepository batchItemRepository,
-          BatchStockRepository batchStockRepository,
-          ProductRepository productRepository,
-          SupplierRepository supplierRepository,
-          JdbcTemplate jdbcTemplate) {
+      BatchRepository batchRepository,
+      BatchItemRepository batchItemRepository,
+      BatchStockRepository batchStockRepository,
+      ProductRepository productRepository,
+      SupplierRepository supplierRepository,
+      JdbcTemplate jdbcTemplate) {
     this.batchRepository = batchRepository;
     this.batchItemRepository = batchItemRepository;
     this.batchStockRepository = batchStockRepository;
@@ -82,8 +80,11 @@ public class BatchAutoGenerator {
 
   @PostConstruct
   public void init() {
-    log.info("BatchAutoGenerator initialized. leadTimeDays={}, minOrderQty={}, targetCoverDays={}",
-            defaultLeadTimeDays, minOrderQty, targetCoverDays);
+    log.info(
+        "BatchAutoGenerator initialized. leadTimeDays={}, minOrderQty={}, targetCoverDays={}",
+        defaultLeadTimeDays,
+        minOrderQty,
+        targetCoverDays);
   }
 
   @Scheduled(cron = "${replenishment.cron}")
@@ -103,7 +104,8 @@ public class BatchAutoGenerator {
       return;
     }
 
-    List<Long> stores = jdbcTemplate.queryForList(
+    List<Long> stores =
+        jdbcTemplate.queryForList(
             "SELECT DISTINCT store_id FROM batch_stock WHERE deleted = false", Long.class);
     if (stores == null || stores.isEmpty()) {
       log.info("No stores discovered in batch_stock; skipping.");
@@ -119,8 +121,12 @@ public class BatchAutoGenerator {
         boolean r = checkAndReplenish(pair.storeId, pair.productId);
         if (r) created++;
       } catch (Exception ex) {
-        log.error("Failed to handle replenishment for store {} product {}: {}",
-                pair.storeId, pair.productId, ex.getMessage(), ex);
+        log.error(
+            "Failed to handle replenishment for store {} product {}: {}",
+            pair.storeId,
+            pair.productId,
+            ex.getMessage(),
+            ex);
       }
     }
 
@@ -131,18 +137,19 @@ public class BatchAutoGenerator {
    * Bulk gather store-product pairs ordered by urgency (lowest available first). This uses two
    * aggregate queries (ACTIVE availability and IN_TRANSIT incoming) and merges results in-memory.
    */
-  private List<StoreProductPair> gatherLowInventoryPairsAggregate(List<Product> products, List<Long> stores) {
+  private List<StoreProductPair> gatherLowInventoryPairsAggregate(
+      List<Product> products, List<Long> stores) {
     Map<String, Long> availableMap = new HashMap<>();
     Map<String, Long> incomingMap = new HashMap<>();
 
     // Availability for ACTIVE batches
     String availSql =
-            "SELECT bs.store_id as store_id, bi.product_id as product_id, COALESCE(SUM(bi.original_qty),0) as available "
-                    + "FROM batch_item bi "
-                    + "JOIN batch b ON b.id = bi.batch_id AND b.deleted = false "
-                    + "JOIN batch_stock bs ON bs.batch_id = b.id AND bs.deleted = false AND bs.status = 'ACTIVE' "
-                    + "WHERE bi.deleted = false "
-                    + "GROUP BY bs.store_id, bi.product_id";
+        "SELECT bs.store_id as store_id, bi.product_id as product_id, COALESCE(SUM(bi.original_qty),0) as available "
+            + "FROM batch_item bi "
+            + "JOIN batch b ON b.id = bi.batch_id AND b.deleted = false "
+            + "JOIN batch_stock bs ON bs.batch_id = b.id AND bs.deleted = false AND bs.status = 'ACTIVE' "
+            + "WHERE bi.deleted = false "
+            + "GROUP BY bs.store_id, bi.product_id";
 
     List<Map<String, Object>> availRows = jdbcTemplate.queryForList(availSql);
     for (Map<String, Object> r : availRows) {
@@ -155,12 +162,12 @@ public class BatchAutoGenerator {
 
     // Incoming for IN_TRANSIT batches
     String incomingSql =
-            "SELECT bs.store_id as store_id, bi.product_id as product_id, COALESCE(SUM(bi.original_qty),0) as incoming "
-                    + "FROM batch_item bi "
-                    + "JOIN batch b ON b.id = bi.batch_id AND b.deleted = false "
-                    + "JOIN batch_stock bs ON bs.batch_id = b.id AND bs.deleted = false AND bs.status = 'IN_TRANSIT' "
-                    + "WHERE bi.deleted = false "
-                    + "GROUP BY bs.store_id, bi.product_id";
+        "SELECT bs.store_id as store_id, bi.product_id as product_id, COALESCE(SUM(bi.original_qty),0) as incoming "
+            + "FROM batch_item bi "
+            + "JOIN batch b ON b.id = bi.batch_id AND b.deleted = false "
+            + "JOIN batch_stock bs ON bs.batch_id = b.id AND bs.deleted = false AND bs.status = 'IN_TRANSIT' "
+            + "WHERE bi.deleted = false "
+            + "GROUP BY bs.store_id, bi.product_id";
 
     List<Map<String, Object>> incRows = jdbcTemplate.queryForList(incomingSql);
     for (Map<String, Object> r : incRows) {
@@ -192,7 +199,10 @@ public class BatchAutoGenerator {
 
   private boolean checkAndReplenish(Long storeId, Long productId) {
     // re-calc to reduce chance of duplicate orders
-    long available = Optional.ofNullable(batchItemRepository.getTotalAvailableQtyForProductInStore(productId, storeId)).orElse(0L);
+    long available =
+        Optional.ofNullable(
+                batchItemRepository.getTotalAvailableQtyForProductInStore(productId, storeId))
+            .orElse(0L);
     long incoming = getIncomingQtyForProductAndStore(productId, storeId);
 
     DemandStats stats = estimateDemand(productId, storeId, 30); // 30 days history
@@ -202,8 +212,15 @@ public class BatchAutoGenerator {
 
     int reorderPoint = computeReorderPoint(avgDaily, stats.stddevDaily, lead, safetyStockDays);
 
-    log.debug("Store {} Product {}: available={}, incoming={}, avgDaily={}, stddev={}, reorderPoint={}",
-            storeId, productId, available, incoming, avgDaily, stats.stddevDaily, reorderPoint);
+    log.debug(
+        "Store {} Product {}: available={}, incoming={}, avgDaily={}, stddev={}, reorderPoint={}",
+        storeId,
+        productId,
+        available,
+        incoming,
+        avgDaily,
+        stats.stddevDaily,
+        reorderPoint);
 
     if (available + incoming > reorderPoint) {
       return false;
@@ -228,14 +245,22 @@ public class BatchAutoGenerator {
     // Quick de-dup: re-check incoming after all calculations to avoid race
     long incomingNow = getIncomingQtyForProductAndStore(productId, storeId);
     if (available + incomingNow > reorderPoint) {
-      log.info("Skipping creation because incoming increased in the meantime for store={} product={}", storeId, productId);
+      log.info(
+          "Skipping creation because incoming increased in the meantime for store={} product={}",
+          storeId,
+          productId);
       return false;
     }
 
     createIncomingBatch(productId, storeId, (int) toOrder, supplierId, lead);
 
-    log.info("Created replenishment for store={} product={} qty={} supplier={} ETA days={}",
-            storeId, productId, toOrder, supplierId, lead);
+    log.info(
+        "Created replenishment for store={} product={} qty={} supplier={} ETA days={}",
+        storeId,
+        productId,
+        toOrder,
+        supplierId,
+        lead);
     return true;
   }
 
@@ -251,12 +276,12 @@ public class BatchAutoGenerator {
     Timestamp sinceTs = Timestamp.valueOf(sinceLdt); // chuyển sang Timestamp cho JDBC
 
     String sql =
-            "SELECT DATE(so.created_at) as d, COALESCE(SUM(sl.qty_ordered),0) as qty " +
-                    "FROM sale_line sl " +
-                    "JOIN sale_order so ON so.id = sl.sale_order_id " +
-                    "WHERE sl.product_id = ? AND so.store_id = ? AND so.created_at >= ? " +
-                    "GROUP BY DATE(so.created_at) " +
-                    "ORDER BY DATE(so.created_at)";
+        "SELECT DATE(so.created_at) as d, COALESCE(SUM(sl.qty_ordered),0) as qty "
+            + "FROM sale_line sl "
+            + "JOIN sale_order so ON so.id = sl.sale_order_id "
+            + "WHERE sl.product_id = ? AND so.store_id = ? AND so.created_at >= ? "
+            + "GROUP BY DATE(so.created_at) "
+            + "ORDER BY DATE(so.created_at)";
 
     List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, productId, storeId, sinceTs);
     if (rows == null || rows.isEmpty()) {
@@ -286,8 +311,8 @@ public class BatchAutoGenerator {
     return new DemandStats(avg, stddev);
   }
 
-
-  private int computeReorderPoint(double avgDaily, double stddevDaily, int leadDays, int safetyDays) {
+  private int computeReorderPoint(
+      double avgDaily, double stddevDaily, int leadDays, int safetyDays) {
     double demandDuringLead = avgDaily * leadDays;
     double sigmaLead = stddevDaily * Math.sqrt(Math.max(1, leadDays));
     double z = 1.65; // target service level (~95%) - could be made configurable
@@ -298,11 +323,11 @@ public class BatchAutoGenerator {
 
   private long getIncomingQtyForProductAndStore(Long productId, Long storeId) {
     String sql =
-            "SELECT COALESCE(SUM(bi.original_qty),0) FROM batch_item bi "
-                    + "JOIN batch b ON b.id = bi.batch_id "
-                    + "JOIN batch_stock bs ON bs.batch_id = b.id "
-                    + "WHERE bi.product_id = ? AND bs.store_id = ? AND bs.status = 'IN_TRANSIT' "
-                    + "AND bi.deleted = false AND bs.deleted = false AND b.deleted = false";
+        "SELECT COALESCE(SUM(bi.original_qty),0) FROM batch_item bi "
+            + "JOIN batch b ON b.id = bi.batch_id "
+            + "JOIN batch_stock bs ON bs.batch_id = b.id "
+            + "WHERE bi.product_id = ? AND bs.store_id = ? AND bs.status = 'IN_TRANSIT' "
+            + "AND bi.deleted = false AND bs.deleted = false AND b.deleted = false";
     Number n = jdbcTemplate.queryForObject(sql, new Object[] {productId, storeId}, Number.class);
     return n == null ? 0L : n.longValue();
   }
@@ -310,10 +335,10 @@ public class BatchAutoGenerator {
   private Long chooseSupplierForProduct(Long productId) {
     // prefer the most recent historical supplier for product (if available)
     List<Long> supplierIds =
-            batchItemRepository.findByProductId(productId).stream()
-                    .map(BatchItem::getSupplierId)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+        batchItemRepository.findByProductId(productId).stream()
+            .map(BatchItem::getSupplierId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     if (!supplierIds.isEmpty()) {
       // pick the most recent supplier in history (last element) to bias towards recent partners
       return supplierIds.get(supplierIds.size() - 1);
@@ -325,7 +350,8 @@ public class BatchAutoGenerator {
   }
 
   @Transactional
-  public void createIncomingBatch(Long productId, Long storeId, int qty, Long supplierId, int leadDays) {
+  public void createIncomingBatch(
+      Long productId, Long storeId, int qty, Long supplierId, int leadDays) {
     LocalDateTime now = LocalDateTime.now();
     String shortUuid = UUID.randomUUID().toString().substring(0, 8);
     String batchCode = "B-" + shortUuidBase64();
@@ -367,12 +393,14 @@ public class BatchAutoGenerator {
   @Transactional
   public void activateIncomingBatches() {
     LocalDateTime now = LocalDateTime.now();
-    String sqlEta = "SELECT bs.id FROM batch_stock bs WHERE bs.status = 'IN_TRANSIT' AND bs.eta_at <= now() AND bs.deleted = false";
+    String sqlEta =
+        "SELECT bs.id FROM batch_stock bs WHERE bs.status = 'IN_TRANSIT' AND bs.eta_at <= now() AND bs.deleted = false";
     List<Long> ids;
     try {
       ids = jdbcTemplate.queryForList(sqlEta, Long.class);
     } catch (Exception ex) {
-      String sql = "SELECT bs.id FROM batch_stock bs WHERE bs.status = 'IN_TRANSIT' AND bs.updated_at <= now() AND bs.deleted = false";
+      String sql =
+          "SELECT bs.id FROM batch_stock bs WHERE bs.status = 'IN_TRANSIT' AND bs.updated_at <= now() AND bs.deleted = false";
       ids = jdbcTemplate.queryForList(sql, Long.class);
     }
     if (ids == null || ids.isEmpty()) return;
@@ -384,7 +412,11 @@ public class BatchAutoGenerator {
         bs.setUpdatedTime(now);
         batchStockRepository.save(bs);
 
-        log.info("Activated incoming batch_stock id={} batch_id={} for store={} (now available)", bs.getId(), bs.getBatchId(), bs.getStoreId());
+        log.info(
+            "Activated incoming batch_stock id={} batch_id={} for store={} (now available)",
+            bs.getId(),
+            bs.getBatchId(),
+            bs.getStoreId());
       } catch (Exception ex) {
         log.error("Failed to activate batch_stock id={}", id, ex);
       }

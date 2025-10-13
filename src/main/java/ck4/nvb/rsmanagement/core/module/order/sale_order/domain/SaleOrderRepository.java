@@ -3,6 +3,8 @@ package ck4.nvb.rsmanagement.core.module.order.sale_order.domain;
 import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -109,4 +111,8 @@ public interface SaleOrderRepository extends BaseFullAuditedRepository<SaleOrder
           "SELECT COALESCE(SUM(so.final_price),0) FROM sale_order so WHERE so.customer_id = :customerId AND so.created_at >= (NOW() - INTERVAL '12 months') AND so.deleted = false",
       nativeQuery = true)
   Long getTotalSpentLast12Months(@Param("customerId") Long customerId);
+
+  List<SaleOrder> findByDeletedFalse(Pageable pageable);
+
+  List<SaleOrder> findByDeletedFalseAndStoreId(Long storeId, Pageable pageable);
 }

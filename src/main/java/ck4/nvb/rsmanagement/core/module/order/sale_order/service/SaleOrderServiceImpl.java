@@ -307,6 +307,13 @@ public class SaleOrderServiceImpl
             SearchOperator.GREATER_THAN,
             SearchOperator.GREATER_THAN_OR_EQUAL,
             SearchOperator.LESS_THAN_OR_EQUAL));
+    keys.put("createdTime",
+            List.of(
+            SearchOperator.EQUALS,
+            SearchOperator.LESS_THAN,
+            SearchOperator.GREATER_THAN,
+            SearchOperator.GREATER_THAN_OR_EQUAL,
+            SearchOperator.LESS_THAN_OR_EQUAL));
     return keys;
   }
 
@@ -314,6 +321,7 @@ public class SaleOrderServiceImpl
   public Set<String> getSortableKeys() {
     Set<String> keys = super.getSortableKeys();
     keys.add("finalPrice");
+    keys.add("createdTime");
     return keys;
   }
 

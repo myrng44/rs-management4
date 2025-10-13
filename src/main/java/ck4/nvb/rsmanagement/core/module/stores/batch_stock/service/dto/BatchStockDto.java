@@ -6,11 +6,10 @@ import ck4.nvb.rsmanagement.base.application.dto.UpdateInput;
 import ck4.nvb.rsmanagement.core.module.stores.batch_stock.domain.BatchStock;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -26,7 +25,6 @@ public class BatchStockDto extends EntityDto<Long>
   private String status;
   private Integer version;
   private LocalDateTime etaAt;
-
 
   @Override
   public BatchStock mapToEntity() {
