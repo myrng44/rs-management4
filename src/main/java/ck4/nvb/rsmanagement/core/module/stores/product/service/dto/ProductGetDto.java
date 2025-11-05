@@ -1,6 +1,8 @@
 package ck4.nvb.rsmanagement.core.module.stores.product.service.dto;
 
 import ck4.nvb.rsmanagement.base.application.dto.EntityDto;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +15,7 @@ public class ProductGetDto extends EntityDto<Long> {
   private String name;
   private String description;
   private Integer unitPrice;
+  @JsonSerialize(using = ToStringSerializer.class)
   private Long categoryId;
 
   // Nested record cho specific use cases
@@ -36,8 +39,6 @@ public class ProductGetDto extends EntityDto<Long> {
           totalQuantitySold);
     }
   }
-
-  // Có thể có thêm các record khác cho các use case khác
   public record WithStock(
       Long id, String sku, String name, Integer unitPrice, Integer remainingStock) {}
 }

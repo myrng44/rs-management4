@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @MappedSuperclass
 public class CreationAuditedGeneratedIdEntity extends GeneratedIdEntity
-    implements CreationAudited<Long> {
+        implements CreationAudited<Long> {
 
   // Fields
   @Column(name = "created_at")

@@ -108,7 +108,6 @@ public class SaleOrderAutoGenerator {
     this.saleOrderRepository = saleOrderRepository;
     this.saleAllocationRepository = saleAllocationRepository;
 
-    // init seasonal multipliers (example values) - ideally load from config or DB
     seasonalMultipliers.put(
         "drink", new double[] {1.0, 1.0, 1.0, 1.0, 1.05, 1.1, 1.2, 1.25, 1.15, 1.05, 1.0, 1.0});
     seasonalMultipliers.put(
@@ -118,7 +117,6 @@ public class SaleOrderAutoGenerator {
     seasonalMultipliers.put(
         "coffee", new double[] {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.05, 1.1});
 
-    // hour boosts: 24-length arrays
     hourBoosts.put(
         "drink",
         createHourBoostArray(24, 1.0, new int[][] {{11, 13, 14}}, new double[] {1.4})); // lunch

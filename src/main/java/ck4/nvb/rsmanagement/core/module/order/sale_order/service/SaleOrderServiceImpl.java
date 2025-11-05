@@ -74,8 +74,8 @@ public class SaleOrderServiceImpl
     }
 
     List<SaleLineGetDto> lines =
-        saleLineService.getAll(
-            List.of(new SearchCriteria("saleOrderId", SearchOperator.EQUALS, entity.getId())));
+            saleLineService.getAll(
+                    List.of(new SearchCriteria("saleOrderId", SearchOperator.EQUALS, entity.getId())));
     orderDto.setSaleLines(lines);
 
     orderDto.setStoreId(entity.getStoreId());
@@ -300,20 +300,21 @@ public class SaleOrderServiceImpl
     keys.put("storeId", List.of(SearchOperator.EQUALS));
     keys.put("voucherId", List.of(SearchOperator.EQUALS));
     keys.put(
-        "finalPrice",
-        List.of(
-            SearchOperator.EQUALS,
-            SearchOperator.LESS_THAN,
-            SearchOperator.GREATER_THAN,
-            SearchOperator.GREATER_THAN_OR_EQUAL,
-            SearchOperator.LESS_THAN_OR_EQUAL));
-    keys.put("createdTime",
+            "finalPrice",
             List.of(
-            SearchOperator.EQUALS,
-            SearchOperator.LESS_THAN,
-            SearchOperator.GREATER_THAN,
-            SearchOperator.GREATER_THAN_OR_EQUAL,
-            SearchOperator.LESS_THAN_OR_EQUAL));
+                    SearchOperator.EQUALS,
+                    SearchOperator.LESS_THAN,
+                    SearchOperator.GREATER_THAN,
+                    SearchOperator.GREATER_THAN_OR_EQUAL,
+                    SearchOperator.LESS_THAN_OR_EQUAL));
+    keys.put(
+            "createdTime",
+            List.of(
+                    SearchOperator.EQUALS,
+                    SearchOperator.LESS_THAN,
+                    SearchOperator.GREATER_THAN,
+                    SearchOperator.GREATER_THAN_OR_EQUAL,
+                    SearchOperator.LESS_THAN_OR_EQUAL));
     return keys;
   }
 
@@ -356,7 +357,7 @@ public class SaleOrderServiceImpl
 
   // gross revenue for one store between from..to
   public Long getAStoreRevenueBetween(LocalDateTime from, LocalDateTime to, Long storeId)
-      throws AppException {
+          throws AppException {
     Long revenue = getRepository().sumTotalFinalPriceOfAStoreBetween(from, to, storeId);
     return revenue == null ? 0L : revenue;
   }
@@ -364,7 +365,7 @@ public class SaleOrderServiceImpl
   // net revenue (orders - returns) for one store between from..to (if saleReturnRepository
   // available)
   public Long getAStoreNetRevenueBetween(LocalDateTime from, LocalDateTime to, Long storeId)
-      throws AppException {
+          throws AppException {
     Long orders = getRepository().sumTotalFinalPriceOfAStoreBetween(from, to, storeId);
     orders = orders == null ? 0L : orders;
     Long returns = 0L;
@@ -513,7 +514,7 @@ public class SaleOrderServiceImpl
     Long dayTotal = 0L, weekTotal = 0L, monthTotal = 0L;
     try {
       dayTotal =
-          getRepository().sumTotalFinalPriceBetween(startOfDay(today), startOfNextDay(today));
+              getRepository().sumTotalFinalPriceBetween(startOfDay(today), startOfNextDay(today));
       dayTotal = dayTotal == null ? 0L : dayTotal;
     } catch (Exception ex) {
       dayTotal = 0L;
@@ -538,6 +539,85 @@ public class SaleOrderServiceImpl
     }
 
     return new AllStoresRevenueResponse(
-        stores, dayTotal, weekTotal, monthTotal, fromDate.toString(), today.toString());
+            stores, dayTotal, weekTotal, monthTotal, fromDate.toString(), today.toString());
   }
+  /**
+   * Trả về doanh thu theo tuần cho một hoặc nhiều cửa hàng trong khoảng start..end.
+   * start/end là LocalDateTime (start inclusive, end exclusive).
+   * Nếu storeIds == null hoặc empty -> trả về cho tất cả cửa hàng (dữ liệu có trong DB).
+   */
+  public List<StoreRevenueSeries> getWeeklyRevenueForStores(
+          LocalDateTime start, LocalDateTime end, List<Long> storeIds) throws AppException {
+
+    LocalDate startDate = start.toLocalDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    LocalDate endDate = end.toLocalDate();
+
+    List<LocalDate> weeks = new ArrayList<>();
+    LocalDate cur = startDate;
+    while (!cur.isAfter(endDate)) {
+      weeks.add(cur);
+      cur = cur.plusWeeks(1);
+    }
+
+    List<Object[]> rows;
+    if (storeIds == null || storeIds.isEmpty()) {
+      rows = getRepository().sumWeeklyRevenueAllStoresBetween(start, end);
+    } else {
+      rows = getRepository().sumWeeklyRevenueForStoresBetween(start, end, storeIds);
+    }
+
+    Map<Long, String> storeNames = new HashMap<>();
+    Map<Long, Map<LocalDate, Long>> tmp = new HashMap<>();
+
+    if (rows != null) {
+      for (Object[] r : rows) {
+        if (r == null || r.length < 4) continue;
+        // r[0] = store_id, r[1] = store_name, r[2] = week_start (java.sql.Date), r[3] = revenue
+        Long storeId = r[0] == null ? null : ((Number) r[0]).longValue();
+        String storeName = r[1] == null ? ("Store " + storeId) : r[1].toString();
+
+        LocalDate weekStart;
+        if (r[2] instanceof java.sql.Date) {
+          weekStart = ((java.sql.Date) r[2]).toLocalDate();
+        } else if (r[2] instanceof java.sql.Timestamp) {
+          weekStart = ((java.sql.Timestamp) r[2]).toLocalDateTime().toLocalDate();
+        } else {
+          weekStart = LocalDate.parse(r[2].toString());
+        }
+
+        Long rev = r[3] == null ? 0L : ((Number) r[3]).longValue();
+
+        if (storeId == null) continue;
+        storeNames.put(storeId, storeName);
+        tmp.computeIfAbsent(storeId, k -> new HashMap<>()).put(weekStart, rev);
+      }
+    }
+
+    List<StoreRevenueSeries> result = new ArrayList<>();
+    for (Map.Entry<Long, Map<LocalDate, Long>> e : tmp.entrySet()) {
+      Long storeId = e.getKey();
+      Map<LocalDate, Long> weekMap = e.getValue();
+      List<RevenuePoint> series = new ArrayList<>();
+      for (LocalDate w : weeks) {
+        Long v = weekMap.getOrDefault(w, 0L);
+        series.add(new RevenuePoint(w.toString(), v));
+      }
+      result.add(new StoreRevenueSeries(storeId, storeNames.get(storeId), series));
+    }
+    if (storeIds != null) {
+      for (Long sid : storeIds) {
+        if (!tmp.containsKey(sid)) {
+          List<RevenuePoint> series = new ArrayList<>();
+          for (LocalDate w : weeks) series.add(new RevenuePoint(w.toString(), 0L));
+          String name = "Store " + sid;
+          result.add(new StoreRevenueSeries(sid, name, series));
+        }
+      }
+    }
+
+    // sắp xếp result theo storeId cho ổn định
+    result.sort(Comparator.comparing(StoreRevenueSeries::getStoreId));
+    return result;
+  }
+
 }

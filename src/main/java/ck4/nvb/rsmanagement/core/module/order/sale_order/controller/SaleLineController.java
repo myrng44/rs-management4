@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/orders/details")
 public class SaleLineController
-    extends AuditedCrudController<
+        extends AuditedCrudController<
         SaleLineGetDto, SaleLine, Long, UserGetDto, Long, SaleLineDto, SaleLineDto> {
 
   @Autowired private ModelMapper modelMapper;

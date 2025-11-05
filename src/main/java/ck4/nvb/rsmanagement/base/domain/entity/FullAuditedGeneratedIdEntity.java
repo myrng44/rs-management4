@@ -8,7 +8,7 @@ import lombok.Generated;
 
 @MappedSuperclass
 public abstract class FullAuditedGeneratedIdEntity extends AuditedGeneratedIdEntity
-    implements FullAudited<Long> {
+        implements FullAudited<Long> {
   // Fields
   @Column(name = "deleted_at")
   private LocalDateTime deletedTime;

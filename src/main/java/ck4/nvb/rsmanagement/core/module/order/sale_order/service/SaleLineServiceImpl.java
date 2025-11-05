@@ -8,14 +8,16 @@ import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleLine;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleLineRepository;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineDto;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.SaleLineGetDto;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.StoreWeekTopProductsDto;
 import ck4.nvb.rsmanagement.core.module.stores.product.domain.Product;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.ProductServiceImpl;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +48,7 @@ public class SaleLineServiceImpl
     Product product = productService.getEntity(entity.getProductId());
     // snapshot
     dto.setUnitPrice(
-        product.getUnitPrice()); // auto get product's unitPrice at the time of transaction
+            product.getUnitPrice());
     dto.setProductId(product.getId());
     dto.setProductName(product.getName());
 
@@ -124,4 +126,57 @@ public class SaleLineServiceImpl
 
     return getWithSales(results);
   }
+
+  @Override
+  public List<StoreWeekTopProductsDto> getTopProductsPerStorePerWeek(
+          LocalDateTime start, LocalDateTime end, int noProducts, List<Long> storeIds) {
+    List<Map<String, Object>> rows;
+    if (storeIds == null || storeIds.isEmpty()) {
+      rows = getRepository().findTopProductsPerStorePerWeek(start, end, noProducts);
+    } else {
+      rows = getRepository().findTopProductsPerStorePerWeekForStores(start, end, noProducts, storeIds);
+    }
+
+    // Map (weekStart, storeId) -> list of products
+    Map<String, List<ProductGetDto.WithSales>> map = new LinkedHashMap<>();
+
+    for (Map<String, Object> row : rows) {
+      // week_start could be java.sql.Date or Timestamp depending on driver
+      LocalDate weekStart;
+      Object ws = row.get("week_start");
+      if (ws instanceof java.sql.Timestamp) {
+        weekStart = ((java.sql.Timestamp) ws).toLocalDateTime().toLocalDate();
+      } else if (ws instanceof java.sql.Date) {
+        weekStart = ((java.sql.Date) ws).toLocalDate();
+      } else {
+        weekStart = LocalDate.parse(ws.toString());
+      }
+
+      Long storeId = ((Number) row.get("store_id")).longValue();
+      Long prodId = ((Number) row.get("id")).longValue();
+      String sku = (String) row.get("sku");
+      String name = (String) row.get("name");
+      String description = (String) row.get("description");
+      int unitPrice = row.get("unitprice") != null
+              ? ((Number) row.get("unitprice")).intValue() : 0;
+      Long categoryId = row.get("categoryid") != null ? ((Number) row.get("categoryid")).longValue() : null;
+      long totalQty = row.get("totalquantitysold") != null ? ((Number) row.get("totalquantitysold")).longValue() : 0L;
+
+      ProductGetDto.WithSales p = new ProductGetDto.WithSales(prodId, sku, name, description, unitPrice, categoryId, totalQty);
+
+      String key = weekStart.toString() + "|" + storeId;
+      map.computeIfAbsent(key, k -> new ArrayList<>()).add(p);
+    }
+
+    List<StoreWeekTopProductsDto> result = new ArrayList<>();
+    for (Map.Entry<String, List<ProductGetDto.WithSales>> e : map.entrySet()) {
+      String[] parts = e.getKey().split("\\|");
+      LocalDate weekStart = LocalDate.parse(parts[0]);
+      Long storeId = Long.parseLong(parts[1]);
+      LocalDate weekEnd = weekStart.plusDays(6);
+      result.add(new StoreWeekTopProductsDto(storeId, weekStart, weekEnd, e.getValue()));
+    }
+    return result;
+  }
+
 }

@@ -13,7 +13,7 @@ import org.modelmapper.ModelMapper;
 @Setter
 @NoArgsConstructor
 public class SaleLineDto extends EntityDto<Long>
-    implements CreateInput<SaleLine>, UpdateInput<SaleLine> {
+        implements CreateInput<SaleLine>, UpdateInput<SaleLine> {
 
   private String saleOrderId;
   private Long productId;

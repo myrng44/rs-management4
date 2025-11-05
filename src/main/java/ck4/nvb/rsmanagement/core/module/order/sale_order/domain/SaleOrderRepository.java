@@ -1,10 +1,10 @@
 package ck4.nvb.rsmanagement.core.module.order.sale_order.domain;
 
 import ck4.nvb.rsmanagement.base.domain.repository.BaseFullAuditedRepository;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -111,8 +111,68 @@ public interface SaleOrderRepository extends BaseFullAuditedRepository<SaleOrder
           "SELECT COALESCE(SUM(so.final_price),0) FROM sale_order so WHERE so.customer_id = :customerId AND so.created_at >= (NOW() - INTERVAL '12 months') AND so.deleted = false",
       nativeQuery = true)
   Long getTotalSpentLast12Months(@Param("customerId") Long customerId);
+//
+  @Query(
+          value =
+                  """
+              SELECT so.store_id AS store_id,
+                     s.name AS store_name,
+                     DATE_SUB(DATE(so.created_at), INTERVAL WEEKDAY(so.created_at) DAY) AS week_start,
+                     COALESCE(SUM(so.final_price), 0) AS revenue
+              FROM sale_order so
+              JOIN store s ON so.store_id = s.id
+              WHERE so.deleted = false
+                AND so.created_at >= :from
+                AND so.created_at < :to
+              GROUP BY so.store_id, s.name, week_start
+              ORDER BY so.store_id, week_start
+            """,
+          nativeQuery = true)
+  List<Object[]> sumWeeklyRevenueAllStoresBetween(
+          @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 
-  List<SaleOrder> findByDeletedFalse(Pageable pageable);
+  @Query(
+          value =
+                  """
+              SELECT so.store_id AS store_id,
+                     s.name AS store_name,
+                     DATE_SUB(DATE(so.created_at), INTERVAL WEEKDAY(so.created_at) DAY) AS week_start,
+                     COALESCE(SUM(so.final_price), 0) AS revenue
+              FROM sale_order so
+              JOIN store s ON so.store_id = s.id
+              WHERE so.deleted = false
+                AND so.created_at >= :from
+                AND so.created_at < :to
+                AND so.store_id = :storeId
+              GROUP BY so.store_id, s.name, week_start
+              ORDER BY week_start
+            """,
+          nativeQuery = true)
+  List<Object[]> sumWeeklyRevenueOfAStoreBetween(
+          @Param("from") LocalDateTime from,
+          @Param("to") LocalDateTime to,
+          @Param("storeId") Long storeId);
 
-  List<SaleOrder> findByDeletedFalseAndStoreId(Long storeId, Pageable pageable);
+  @Query(
+          value =
+                  """
+              SELECT so.store_id AS store_id,
+                     s.name AS store_name,
+                     DATE_SUB(DATE(so.created_at), INTERVAL WEEKDAY(so.created_at) DAY) AS week_start,
+                     COALESCE(SUM(so.final_price), 0) AS revenue
+              FROM sale_order so
+              JOIN store s ON so.store_id = s.id
+              WHERE so.deleted = false
+                AND so.created_at >= :from
+                AND so.created_at < :to
+                AND so.store_id IN (:storeIds)
+              GROUP BY so.store_id, s.name, week_start
+              ORDER BY so.store_id, week_start
+            """,
+          nativeQuery = true)
+  List<Object[]> sumWeeklyRevenueForStoresBetween(
+          @Param("from") LocalDateTime from,
+          @Param("to") LocalDateTime to,
+          @Param("storeIds") List<Long> storeIds);
+
 }

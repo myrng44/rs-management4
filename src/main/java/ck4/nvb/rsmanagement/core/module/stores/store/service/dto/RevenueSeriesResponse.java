@@ -1,6 +1,9 @@
 package ck4.nvb.rsmanagement.core.module.stores.store.service.dto;
 
+import lombok.Data;
+
 import java.util.List;
+@Data
 
 public class RevenueSeriesResponse {
   private List<RevenuePoint> series;
@@ -14,38 +17,6 @@ public class RevenueSeriesResponse {
     this.series = series;
     this.day = day;
     this.week = week;
-    this.month = month;
-  }
-
-  public List<RevenuePoint> getSeries() {
-    return series;
-  }
-
-  public void setSeries(List<RevenuePoint> series) {
-    this.series = series;
-  }
-
-  public Long getDay() {
-    return day;
-  }
-
-  public void setDay(Long day) {
-    this.day = day;
-  }
-
-  public Long getWeek() {
-    return week;
-  }
-
-  public void setWeek(Long week) {
-    this.week = week;
-  }
-
-  public Long getMonth() {
-    return month;
-  }
-
-  public void setMonth(Long month) {
     this.month = month;
   }
 }

@@ -9,14 +9,16 @@ import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("productService")
 public class ProductServiceImpl
-    extends FullAuditedCrudServiceImpl<ProductGetDto, Product, Long, UserGetDto, Long>
-    implements IProductService {
+        extends FullAuditedCrudServiceImpl<ProductGetDto, Product, Long, UserGetDto, Long>
+        implements IProductService {
 
   protected ProductServiceImpl(ProductRepository repository) {
     super(repository, Product.class);
@@ -49,7 +51,6 @@ public class ProductServiceImpl
     keys.add("name");
     keys.add("categoryId");
     keys.add("unitPrice");
-
     return keys;
   }
 
@@ -61,5 +62,18 @@ public class ProductServiceImpl
   @Override
   public int getRemainQuantity(long productId, long storeId) {
     return getRepository().remainQuantity(productId, storeId);
+  }
+
+  // MỚI: trả về tất cả product của một store (đã map thành DTO)
+  @Transactional(readOnly = true)
+  public List<ProductGetDto> getAllProductsOfAStore(Long storeId) {
+    List<Product> products = getRepository().findAllByStoreViaBatches(storeId);
+    return products.stream().map(this::mapToEntityDto).collect(Collectors.toList());
+  }
+
+  // TÙY CHỌN: nhẹ hơn nếu bạn chỉ cần ids (dùng trong coldProducts để filter)
+  @Transactional(readOnly = true)
+  public List<Long> getAllProductIdsOfAStore(Long storeId) {
+    return getRepository().findProductIdsByStoreViaBatches(storeId);
   }
 }

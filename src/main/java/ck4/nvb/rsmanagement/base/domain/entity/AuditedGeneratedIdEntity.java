@@ -8,7 +8,7 @@ import lombok.Generated;
 
 @MappedSuperclass
 public abstract class AuditedGeneratedIdEntity extends CreationAuditedGeneratedIdEntity
-    implements Audited<Long> {
+        implements Audited<Long> {
   // Fields
   @Column(name = "updated_at")
   private LocalDateTime lastUpdatedTime;

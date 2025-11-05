@@ -9,13 +9,20 @@ import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrder;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.domain.SaleOrderRepository;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleLineService;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.ISaleOrderService;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.SaleLineServiceImpl;
+import ck4.nvb.rsmanagement.core.module.order.sale_order.service.SaleOrderServiceImpl;
 import ck4.nvb.rsmanagement.core.module.order.sale_order.service.dto.*;
 import ck4.nvb.rsmanagement.core.module.stores.product.service.dto.ProductGetDto;
+import ck4.nvb.rsmanagement.core.module.stores.store.service.dto.StoreRevenueSeries;
 import ck4.nvb.rsmanagement.core.module.users.user.service.dto.UserGetDto;
 import ck4.nvb.rsmanagement.core.module.users.userrole.service.dto.UserRoleDto;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -28,7 +35,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/${rs.api.main.baseUrl}/orders")
-@CrossOrigin(origins = "http://localhost:5173")
 public class SaleOrderController
     extends AuditedCrudController<
         SaleOrderGetFullDto,
@@ -53,31 +59,50 @@ public class SaleOrderController
     if (auth == null || !auth.isAuthenticated()) {
       return null;
     }
+
     Object principal = auth.getPrincipal();
+    if (principal instanceof UserGetDto) {
+      return (UserGetDto) principal;
+    }
 
     if (principal instanceof UserRoleDto) {
       UserRoleDto userRoleDto = (UserRoleDto) principal;
       UserGetDto userGetDto = new UserGetDto();
       userGetDto.setId(userRoleDto.getUserId());
-      userGetDto.setStoreId(userRoleDto.getStoreId());
       userGetDto.setUserName(userRoleDto.getUserName());
       return userGetDto;
-    }
-
-    if (principal instanceof UserGetDto) {
-      return (UserGetDto) principal;
     }
     return null;
   }
 
   @GetMapping("/most")
   public ResponseEntity<ApiResponse<List<ProductGetDto.WithSales>>> getMostSoldProductsLastDay(
-      Authentication auth, @RequestParam int days, @RequestParam int noProducts) {
+      Authentication auth, @RequestParam int days , @RequestParam int noProducts, @RequestParam long storeId) {
     UserGetDto user = extractUser(auth);
     List<ProductGetDto.WithSales> products =
-        saleLineService.getMostSoldProductsLastDayOfAStore(days, noProducts, user.getStoreId());
+        saleLineService.getMostSoldProductsLastDayOfAStore(days, noProducts, storeId);
     return ResponseEntity.ok(ApiResponse.success(products));
   }
+
+  @GetMapping("/most-by-week-stores")
+  public ResponseEntity<ApiResponse<List<StoreWeekTopProductsDto>>> getTopProductsPerStorePerWeek(
+          Authentication auth,
+          @RequestParam String start,
+          @RequestParam String end,
+          @RequestParam int noProducts,
+          @RequestParam(required = false) List<Long> storeIds) {
+
+    UserGetDto user = extractUser(auth);
+
+    LocalDateTime startDt = LocalDate.parse(start).atStartOfDay();
+    LocalDateTime endDt = LocalDate.parse(end).atTime(LocalTime.MAX);
+
+    List<StoreWeekTopProductsDto> payload =
+            saleLineService.getTopProductsPerStorePerWeek(startDt, endDt, noProducts, storeIds);
+
+    return ResponseEntity.ok(ApiResponse.success(payload));
+  }
+
 
   @PostMapping
   @RequirePermission(
@@ -110,11 +135,11 @@ public class SaleOrderController
   @GetMapping
   @Override
   public ResponseEntity<ApiResponse<PageResponse<SaleOrderGetFullDto>>> getList(
-      Authentication auth,
-      @RequestParam(required = false, name = "query") List<String> query,
-      @RequestParam(required = false, name = "sort") String sort,
-      @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
-      @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
+          Authentication auth,
+          @RequestParam(required = false, name = "query") List<String> query,
+          @RequestParam(required = false, name = "sort") String sort,
+          @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
+          @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
     return super.getList(auth, query, sort, offset, limit);
   }
 
@@ -131,33 +156,52 @@ public class SaleOrderController
     return super.getList(auth, request);
   }
 
-  @GetMapping("/recent")
-  public ResponseEntity<ApiResponse<List<SaleOrderGetFullDto>>> getRecentOrders(
+  @GetMapping("/revenue/weeks")
+  public ResponseEntity<ApiResponse<List<StoreRevenueSeries>>> getWeeklyRevenueForStores(
           Authentication auth,
-          @RequestParam(name = "limit", required = false, defaultValue = "100") int limit) {
-
-    if (limit <= 0) {
-      limit = 100;
-    }
+          @RequestParam String start, // yyyy-MM-dd
+          @RequestParam String end,   // yyyy-MM-dd
+          @RequestParam(required = false) List<Long> storeIds) {
 
     UserGetDto user = extractUser(auth);
 
-    Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdTime"));
+    LocalDateTime startDt = LocalDate.parse(start).atStartOfDay();
+    LocalDateTime endDt = LocalDate.parse(end).atTime(LocalTime.MAX);
 
-    List<SaleOrder> orders;
-    if (user != null && user.getStoreId() != null) {
-      orders = saleOrderRepository.findByDeletedFalseAndStoreId(user.getStoreId(), pageable);
-    } else {
-      orders = saleOrderRepository.findByDeletedFalse(pageable);
+    try {
+      List<StoreRevenueSeries> payload =
+              ((SaleOrderServiceImpl) getService()).getWeeklyRevenueForStores(startDt, endDt, storeIds);
+      return ResponseEntity.ok(ApiResponse.success(payload));
+    } catch (Exception ex) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(ApiResponse.<List<StoreRevenueSeries>>builder()
+                      .code(500)
+                      .message("Failed to compute weekly revenue: " + ex.getMessage())
+                      .data(null)
+                      .build());
+    }
+  }
+
+  @GetMapping("/today")
+  public ResponseEntity<ApiResponse<PageResponse<SaleOrderGetFullDto>>> getTodaysOrders(
+          Authentication auth,
+          @RequestParam(required = false) Long storeId,
+          @RequestParam(required = false, name = "sort") String sort,
+          @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
+          @RequestParam(required = false, name = "limit", defaultValue = "20") int limit) {
+
+    LocalDate today = LocalDate.now();
+    LocalDateTime from = today.atStartOfDay();
+    LocalDateTime to = today.plusDays(1).atStartOfDay();
+
+    List<String> query = new ArrayList<>();
+    query.add("createdTime>=" + from.toString());
+    query.add("createdTime<" + to.toString());
+    if (storeId != null) {
+      query.add("storeId=" + storeId);
     }
 
-    // map entity -> dto
-    List<SaleOrderGetFullDto> items =
-            orders.stream()
-                    .map(o -> modelMapper.map(o, SaleOrderGetFullDto.class))
-                    .collect(Collectors.toList());
-
-    return ResponseEntity.ok(ApiResponse.success(items));
+    return getList(auth, query, sort, offset, limit);
   }
 
 }
