@@ -12,10 +12,10 @@
 | **👥 Khách Hàng** | Quản lý thông tin, lịch sử mua hàng | 👤 |
 
 ## 🎨 **Giao Diện Trực Quan**
-+ Màu sắc tươi sáng
++ Màu sáng
 + Hiển thị sản phẩm
 + Dễ sử dụng
 
 1. ⏱️ **Tiết kiệm thời gian** quản lý
-2. 💰 **Tăng doanh thu** với báo cáo thông minh
-3. 😊 **Nhân viên hạnh phúc** hơn với giao diện thân thiện
+2. 💰 **Báo cáo** thông minh
+3. 😊 **Giao diện** thân thiện
